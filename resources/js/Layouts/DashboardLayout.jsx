@@ -34,12 +34,12 @@ export default function DashboardLayout({ header, children }) {
 
     // App menu items - you can customize these
     const appMenuItems = [
-        {
-            name: 'Quiz Arena',
-            href: '/quiz-page',
-            icon: '/images/logo_award.png', // Path to your image
-            alt: 'Quiz Arena Icon'
-        },
+        // {
+        //     name: 'Quiz Arena',
+        //     href: '/quiz-page',
+        //     icon: '/images/logo_award.png', // Path to your image
+        //     alt: 'Quiz Arena Icon'
+        // },
         {
             name: 'ePTRS',
             href: 'https://eptrs.my',

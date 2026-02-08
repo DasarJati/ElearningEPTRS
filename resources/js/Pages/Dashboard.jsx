@@ -10,7 +10,7 @@ export default function Dashboard() {
   const pageProps = usePage().props;
   const { student } = usePage().props;
 
-    useEffect(() => {
+  useEffect(() => {
     console.log('Current locale:', locale);
     console.log('Available translations:', translations);
     console.log('Test translation:', t('school'));
@@ -28,7 +28,7 @@ export default function Dashboard() {
   const friendsData = friends || [];
   const friendRequestsData = pendingRequests || [];
 
-  
+
 
   // Format time to MM:SS
   const formatTime = (seconds) => {
@@ -81,6 +81,36 @@ export default function Dashboard() {
       }
     });
   };
+
+  const ActionCard = ({ icon, title, bgColor, iconBg }) => (
+    <button
+      className="
+      flex items-center gap-3
+      w-full
+      bg-white
+      rounded-2xl
+      border border-gray-100
+      shadow-sm
+      px-4 py-3
+      hover:shadow-md
+      hover:-translate-y-0.5
+      transition-all
+      duration-200
+    "
+    >
+      {/* Icon */}
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center ${iconBg}`}
+      >
+        {icon}
+      </div>
+
+      {/* Text */}
+      <span className="text-sm font-semibold text-gray-800">
+        {title}
+      </span>
+    </button>
+  );
 
   // Chat data class structure
   class Chat {
@@ -196,57 +226,36 @@ export default function Dashboard() {
   ];
 
   const teachersData = [
-    {
-      id: 1,
-      name: 'Ahmad Hassan',
-      avatar: 'AH',
-      avatarColor: 'bg-gradient-to-br from-blue-500 to-purple-600',
-      subject: 'Bahasa Melayu',
-      school: 'SMK Seri Aman',
-      status: 'online',
-      experience: 5
-    },
-    {
-      id: 2,
-      name: 'Sarah Wong',
-      avatar: 'SW',
-      avatarColor: 'bg-gradient-to-br from-green-500 to-teal-600',
-      subject: 'Mathematics',
-      school: 'SMK Puteri',
-      status: 'offline',
-      experience: 7
-    },
-    {
-      id: 3,
-      name: 'Raj Kumar',
-      avatar: 'RK',
-      avatarColor: 'bg-gradient-to-br from-rose-500 to-pink-600',
-      subject: 'Science',
-      school: 'SMK Taman Desa',
-      status: 'online',
-      experience: 8
-    },
-    {
-      id: 4,
-      name: 'Lisa Tan',
-      avatar: 'LT',
-      avatarColor: 'bg-gradient-to-br from-yellow-500 to-orange-600',
-      subject: 'English',
-      school: 'SMK Bandar Baru',
-      status: 'online',
-      experience: 6
-    },
-    {
-      id: 5,
-      name: 'Mohd Salim',
-      avatar: 'MS',
-      avatarColor: 'bg-gradient-to-br from-purple-500 to-indigo-600',
-      subject: 'History',
-      school: 'SMK Seri Permata',
-      status: 'offline',
-      experience: 4
-    }
-  ];
+  {
+    id: 1,
+    name: 'Cikgu Aisyah',
+    subject: 'Mathematics',
+    avatar: 'A',
+    color: 'bg-emerald-500',
+  },
+  {
+    id: 2,
+    name: 'Cikgu Farid',
+    subject: 'Physics',
+    avatar: 'F',
+    color: 'bg-blue-500',
+  },
+  {
+    id: 3,
+    name: 'Cikgu Nurul',
+    subject: 'Biology',
+    avatar: 'N',
+    color: 'bg-pink-500',
+  },
+  {
+    id: 4,
+    name: 'Cikgu Hakim',
+    subject: 'Chemistry',
+    avatar: 'H',
+    color: 'bg-purple-500',
+  },
+];
+
 
   const filteredTeachers = activeFilter === 'all'
     ? teachersData
@@ -264,258 +273,276 @@ export default function Dashboard() {
   };
 
   return (
-    
+
     <DashboardLayout>
       <Head title="Dashboard" />
 
-      <div className="max-w-full px-4 py-4 xl:py-6 xl:px-12 lg:py-4 lg:px-4 ">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6  lg:grid-cols-8  xl:grid-cols-11">
+      <div className="w-full flex justify-center">
+
+      <div className="max-w-6xl px-4 py-4 xl:py-6 xl:px-12 lg:py-4 lg:px-4 flex justify-center w-full ">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-3 ">
 
           {/* Column 1 */}
-          <div className="lg:col-span-2 xl:col-span-3">
-            <div className="grid md:grid-cols-2 md:gap-4">
+          <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">
+            <div className="">
               {/* Profile Card */}
               <motion.div
-    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-2 lg:col-span-2 xl:col-span-2 h-96"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    {/* Header */}
-    <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
-      <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-indigo-500"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-        </svg>
-        {t( 'profile', 'Profile')}
-      </h2>
-    </div>
-
-    {/* Profile Section */}
-    <div className="px-4 sm:px-5 pb-4 sm:pb-5 md:col-span-1">
-      <div className="flex flex-col items-center text-center mb-4 sm:mb-5">
-        {/* Avatar */}
-        <div className="relative mb-2 sm:mb-2">
-          {/* Profile Picture Container */}
-          <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-full overflow-hidden border-4 border-white shadow-lg">
-            {/* Profile Picture */}
-            {student?.profile_picture ? (
-              <img
-                src={`/storage/${student.profile_picture}`}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : null}
-            
-            {/* Fallback with initials and gradient */}
-            <div 
-              className={`${student?.profile_picture ? 'hidden' : 'flex'} w-full h-full items-center justify-center bg-gradient-to-r from-blue-400 to-indigo-500 text-white font-semibold text-lg sm:text-xl`}
-            >
-              {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
-            </div>
-          </div>
-          
-          {/* Online Status Indicator */}
-          <div className="absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-white"></div>
-        </div>
-
-        {/* Name & Email */}
-        <div>
-          <h3 className="font-semibold text-gray-800 text-base sm:text-lg">
-            {profileData?.name || user.name}
-          </h3>
-        </div>
-      </div>
-
-      {/* Profile Details */}
-      <div className="space-y-3 sm:space-y-4">
-        <div className="flex items-center justify-start py-2 border-b border-gray-100">
-          <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            <span className="text-xs sm:text-sm text-gray-600">
-              {t( 'school','School')}
-            </span>
-          </div>
-          <span className="text-xs sm:text-sm font-medium text-gray-800 truncate ml-2 max-w-[120px] sm:max-w-none">
-            {profileData?.school || 'Not specified'}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-start gap-6 py-2 border-b border-gray-100">
-          <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-            </svg>
-            <span className="text-xs sm:text-sm text-gray-600">
-              {t('classroom','Classroom')}
-            </span>
-          </div>
-          <span className="text-xs sm:text-sm font-medium text-gray-800">
-            {profileData?.grade || 'Form 5'}
-          </span>
-        </div>
-      </div>
-    </div>
-  </motion.div>
-
-
-              {/* Friends Card */}
-              <div className="lg:col-span-2 xl:col-span-2">
-                <motion.div
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.4 }}
-                >
-                  {/* Header with Search */}
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {t('friends_ptrs','Friends_ptrs')}
-                      </h2>
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                        {friendsData.length}
-                      </span>
+                className="bg-gradient-to-br from-orange-400 via-orange-300 to-orange-500 rounded-2xl shadow-sm border border-gray-100 p-6 mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center gap-4 px-6" >
+                  {/* Avatar */}
+                  <div className="relative ">
+                    <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-md bg-gray-200">
+                      {student?.profile_picture ? (
+                        <img
+                          src={`/storage/${student.profile_picture}`}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-semibold text-xl">
+                          {user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </div>
-                      <input
-                        type="text"
-                        placeholder={t('search_friends', 'Search friends...')}
-                        className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                      />
-                    </div>
+
                   </div>
 
-                  {/* Friends List */}
-                  <div className="p-3 border-b border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-gray-700">
-                        Online
-                      </h3>
-                    </div>
+                  {/* Info */}
+                  <div className="flex flex-col justify-center">
+                    <h3 className="lg:text-xl text-2xl font-semibold text-gray-900">
+                      {profileData?.name || user.name}
+                    </h3>
+                    <p className="lg:text-xl text-xl text-gray-600 leading-tight">
+                      {profileData?.school || 'SMK GOMBAK SETIA'}
+                    </p>
+                    <p className="lg:text-xl text-xl text-gray-500">
+                      {profileData?.grade || '5 Science 1'}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
 
-                    <div className="space-y-2">
-                      {friendsData.map((friend) => (
-                        <div key={friend.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors group">
-                          <div className="flex items-center space-x-3">
-                            <div className="relative">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-semibold text-sm ${friend.avatarColor} shadow-sm`}>
-                                {friend.avatar}
-                              </div>
-                              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${friend.status === 'online' ? 'bg-green-400' :
-                                  friend.status === 'away' ? 'bg-yellow-400' : 'bg-gray-300'
-                                }`} />
+              {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 ">
+                <ActionCard
+                  title="Kawan PTRS"
+                  iconBg="bg-green-200"
+                  icon={
+                    <svg className="w-5 h-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M18 9a3 3 0 11-6 0 3 3 0 016 0zM6 9a3 3 0 116 0 3 3 0 01-6 0zM6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+                    </svg>
+                  }
+                />
+
+                <ActionCard
+                  title="Bincang Belajar"
+                  iconBg="bg-pink-200"
+                  icon={
+                    <svg className="w-5 h-5 text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.2-3.6A7.84 7.84 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  }
+                />
+
+                <ActionCard
+                  title="Kenali Guru PTRS"
+                  iconBg="bg-yellow-200"
+                  icon={
+                    <svg className="w-5 h-5 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m-4-2h8" />
+                    </svg>
+                  }
+                />
+              </div> */}
+
+              {/* <div className="grid grid-cols-2 gap-4 mb-4 h-56">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm col-span-1 flex flex-col">
+
+                  <div className="px-4 py-3">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase">
+                      Online Friends
+                    </h3>
+                  </div>
+
+
+                  <div className="px-3 pb-2 flex-1 overflow-y-auto scrollbar-thin space-y-1">
+                    {friendsData.map((friend) => (
+                      <div
+                        key={friend.id}
+                        className="
+          flex items-center justify-between
+          px-3 py-2
+          rounded-xl
+          hover:bg-gray-50
+          transition
+          group
+        "
+                      >
+                        <div className="flex items-center gap-3">
+
+                          <div className="relative">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold ${friend.avatarColor}`}>
+                              {friend.avatar}
                             </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{friend.name}</p>
-                              <p className="text-xs text-gray-500">
-                                {friend.mutualFriends} mutual
-                              </p>
-                            </div>
+                            <span
+                              className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white
+              ${friend.status === 'online'
+                                  ? 'bg-green-400'
+                                  : friend.status === 'away'
+                                    ? 'bg-yellow-400'
+                                    : 'bg-gray-300'}`}
+                            />
                           </div>
 
+
+                          <div>
+                            <p className="text-sm font-medium text-gray-800 leading-none">
+                              {friend.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {friend.mutualFriends} mutual
+                            </p>
+                          </div>
+                        </div>
+
+
+                        <button
+                          onClick={() => router.get(route('chat.lobby'))}
+                          className="
+            text-xs font-medium
+            text-blue-600
+            opacity-0 group-hover:opacity-100
+            transition
+          "
+                        >
+                          Chat →
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+
+                  <div className="border-t border-gray-100">
+                    <button
+                      onClick={() => router.get(route('friends.index'))}
+                      className="
+        w-full
+        py-2.5
+        text-sm font-medium
+        text-blue-600
+        hover:bg-gray-50
+        transition
+      "
+                    >
+                      See all friends →
+                    </button>
+                  </div>
+                </div>
+
+
+
+
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm col-span-1 flex flex-col">
+
+                  <div className="px-4 py-3">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase">
+                      Friend Requests
+                    </h3>
+                  </div>
+
+
+                  <div className="px-3 pb-2 flex-1 overflow-y-auto scrollbar-thin space-y-2">
+                    {friendRequestsData.map((request) => (
+                      <div
+                        key={request.id}
+                        className="
+          flex items-center justify-between
+          px-3 py-2
+          rounded-xl
+          bg-gray-50
+          hover:bg-gray-100
+          transition
+        "
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
+                            {request.avatar}
+                          </div>
+
+
+                          <div className="truncate">
+                            <p className="text-sm font-medium text-gray-800 truncate">
+                              {request.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {request.mutualFriends} mutual
+                            </p>
+                          </div>
+                        </div>
+
+
+                        <div className="flex gap-1 shrink-0">
                           <button
-                            className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg font-medium"
-                            onClick={() => router.get(route('chat.lobby'))}
+                            onClick={() => handleAcceptRequest(request.id)}
+                            className="w-7 h-7 rounded-lg bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition"
+                            title="Accept"
                           >
-                            Chat
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => handleRejectRequest(request.id)}
+                            className="w-7 h-7 rounded-lg bg-gray-300 text-white flex items-center justify-center hover:bg-gray-400 transition"
+                            title="Reject"
+                          >
+                            ✕
                           </button>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+
+                    {friendRequestsData.length === 0 && (
+                      <div className="text-center py-4">
+                        <p className="text-xs text-gray-400">
+                          No pending requests
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Friend Requests */}
-                  <div className="p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-semibold">
-                        {t('friend_requests','Friend Requests')}
-                      </h3>
-                      {friendRequestsData.length > 0 && (
-                        <span className="text-xs text-blue-600 font-medium">
-                          See all
-                        </span>
-                      )}
-                    </div>
 
-                    <div className="space-y-2">
-                      {friendRequestsData.map((request) => (
-                        <div key={request.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                              {request.avatar}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">{request.name}</p>
-                              <p className="text-xs text-gray-500">
-                                {request.mutualFriends} mutual friends
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex space-x-1">
-                            <button
-                              className="w-7 h-7 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm"
-                              onClick={() => handleAcceptRequest(request.id)}
-                            >
-                              <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                            <button
-                              className="w-7 h-7 bg-gray-300 hover:bg-gray-400 text-white rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm"
-                              onClick={() => handleRejectRequest(request.id)}
-                            >
-                              <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-
-                      {friendRequestsData.length === 0 && (
-                        <div className="text-center py-3">
-                          <p className="text-sm text-gray-400">
-                            No pending requests
-                          </p>
-                        </div>
-                      )}
+                  {friendRequestsData.length > 0 && (
+                    <div className="border-t border-gray-100">
+                      <button
+                        onClick={() => router.get(route('friends.requests'))}
+                        className="
+          w-full
+          py-2.5
+          text-sm font-medium
+          text-blue-600
+          hover:bg-gray-50
+          transition
+        "
+                      >
+                        See all requests →
+                      </button>
                     </div>
-                  </div>
-                </motion.div>
-              </div>
+                  )}
+                </div>
+
+
+
+              </div> */}
+
             </div>
-          </div>
 
-          {/* Column 2 - Assignments and Courses */}
-          <div className="lg:col-span-3 xl:col-span-4">
-            {/* Assignment Card */}
             {assignments && assignments.map((assignment, index) => (
               <motion.div
                 key={index}
@@ -540,7 +567,7 @@ export default function Dashboard() {
               transition={{ duration: 0.3, delay: 0.2 }}
               className="bg-white rounded-lg shadow-sm border border-gray-100 mb-2"
             >
-              <h2 className="text-sm font-bold mb-4 px-3 sm:px-4 pt-3 pb-2 border-b border-grey">{t('my_courses','My Courses')}</h2>
+              <h2 className="text-sm font-bold mb-4 px-3 sm:px-4 pt-3 pb-2 border-b border-grey">{t('my_courses', 'My Courses')}</h2>
 
               <div className="grid grid-cols-1 gap-3 p-3 max-h-[350px] sm:max-h-[150px] overflow-y-auto">
                 {courses && courses.map((course, index) => (
@@ -572,83 +599,89 @@ export default function Dashboard() {
             </motion.div>
 
             {/* Chat List Card */}
-            <div className="lg:col-span-2 xl:col-span-2">
-              <motion.div
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-              >
-                {/* Header */}
-                <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 border-b border-gray-100">
-                  <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-green-500"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                    </svg>
-                    Perbincangan PTRS
-                  </h2>
-                </div>
 
-                {/* Chat List */}
-                <div className="divide-y divide-gray-100">
-                  {chatData.map((chat, index) => (
-                    <div
-                      key={chat.id}
-                      className="p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
-                      onClick={() => handleChatClick(chat.id)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        {/* Avatar */}
-                        <div className="relative">
-                          <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm ${chat.avatarColor}`}
-                          >
-                            {chat.avatar}
-                          </div>
-                          {/* Online Status */}
-                          <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${chat.status === 'online' ? 'bg-green-400' :
-                            chat.status === 'away' ? 'bg-yellow-400' : 'bg-gray-300'
-                            }`}></div>
-                        </div>
+          </div>
 
-                        {/* Chat Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-gray-800 truncate">{chat.name}</h3>
-                            <span className="text-xs text-gray-500">{chat.lastMessageTime}</span>
-                          </div>
-                          <p className="text-sm text-gray-600 truncate mt-1">{chat.lastMessage}</p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${chat.subjectBadge.color}`}>
-                              {chat.subjectBadge.text}
-                            </span>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${chat.statusBadge.color}`}>
-                              {chat.statusBadge.text}
-                            </span>
-                            {chat.unreadCount > 0 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                {chat.unreadCount} new
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+           <div className="md:col-span-2 lg:col-span-2 xl:col-span-1">
+  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full">
+    
+    {/* Header */}
+    <div className="px-4 py-3">
+      <h3 className="text-xs font-semibold text-gray-500 uppercase">
+        Kenali Cikgu PTRS
+      </h3>
+    </div>
+
+    {/* List */}
+    <div className="px-3 pb-2 flex-1 overflow-y-auto scrollbar-thin space-y-2">
+      {teachersData.map((teacher) => (
+        <div
+          key={teacher.id}
+          className="
+            flex items-center justify-between
+            px-3 py-2
+            rounded-xl
+            hover:bg-gray-50
+            transition
+            group
+          "
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Avatar */}
+            <div className={`w-10 h-10 rounded-xl ${teacher.color} flex items-center justify-center text-white font-semibold`}>
+              {teacher.avatar}
+            </div>
+
+            {/* Info */}
+            <div className="truncate">
+              <p className="text-sm font-medium text-gray-800 truncate">
+                {teacher.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {teacher.subject}
+              </p>
             </div>
           </div>
 
-          {/* Column 3 - Leaderboard - Table Version */}
-          <div className="lg:col-span-3 xl:col-span-4 relative">
+          {/* Action */}
+          <button
+            className="
+              text-xs font-medium
+              text-blue-600
+              opacity-0 group-hover:opacity-100
+              transition
+            "
+          >
+            View →
+          </button>
+        </div>
+      ))}
+    </div>
+
+    {/* Footer */}
+    <div className="border-t border-gray-100">
+      <button
+        className="
+          w-full
+          py-2.5
+          text-sm font-medium
+          text-blue-600
+          hover:bg-gray-50
+          transition
+        "
+      >
+        See all teachers →
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+          {/* Column 2 - Assignments and Courses */}
+          {/* <div className="md:col-span-2 lg:col-span-2 xl:col-span-1">
             <div className='relative mb-2'>
-              {/* Background Image */}
+              
               <div
                 className="absolute inset-0 bg-cover bg-top bg-no-repeat z-0 rounded-lg"
                 style={{ backgroundImage: 'url(/images/bg_leaderboard.jpg)' }}
@@ -660,7 +693,7 @@ export default function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.3 }}
                 >
-                  {/* Header */}
+                  
                   <div className="px-2 sm:px-3 pt-3 sm:pt-4">
                     <div className="flex flex-col items-center justify-center space-y-1 sm:space-y-2">
                       <img
@@ -672,24 +705,24 @@ export default function Dashboard() {
                         }}
                       />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 bg-gray-100 rounded-t-xl border-b-2 py-2 sm:py-3 flex items-center justify-center">
-                      {t('leaderboard','Leaderboard')}
+                    <h2 className="lg:text-xl text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-800 bg-gray-100 rounded-t-xl border-b-2 py-2 sm:py-3 flex items-center justify-center">
+                      {t('leaderboard', 'Leaderboard')}
                     </h2>
                   </div>
 
-                  {/* Leaderboard Table */}
+                 
                   <div className="px-2 sm:px-3 pb-2 sm:pb-3 rounded-xl">
                     {processedLeaderboardData.length > 0 ? (
                       <div className="space-y-1 sm:space-y-2">
-                        {/* Table Header */}
+                        
                         <div className="grid grid-cols-12 gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-3 bg-gray-100 rounded-b-xl text-xs font-semibold text-gray-600 uppercase tracking-wider border-b border-gray-200">
-                          <div className="col-span-1 text-center text-xs">{t('rank','Rank')}</div>
+                          <div className="col-span-1 text-center text-xs">{t('rank', 'Rank')}</div>
                           <div className="col-span-4 text-xs lg:ms-2"></div>
-                          <div className="col-span-5 text-xs">{t('school','School')}</div>
-                          <div className="col-span-2 text-right text-xs">{t('time','Time')}</div>
+                          <div className="col-span-5 text-xs">{t('school', 'School')}</div>
+                          <div className="col-span-2 text-right text-xs">{t('time', 'Time')}</div>
                         </div>
 
-                        {/* Table Rows */}
+                        
                         <div className="space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 max-h-[400px] sm:max-h-[350px] md:max-h-[500px] xl:max-h-[600px]">
                           {processedLeaderboardData.map((user) => (
                             <div
@@ -697,7 +730,7 @@ export default function Dashboard() {
                               className={`grid grid-cols-12 gap-1 sm:gap-2 items-center p-2 sm:p-3 rounded-lg ${user.isCurrentUser ? "bg-blue-50 border border-blue-100" : "bg-gray-50"
                                 }`}
                             >
-                              {/* Rank */}
+                             
                               <div className="col-span-1 flex justify-center">
                                 <div className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-medium relative ${user.rank === 1 ? "bg-yellow-500 shadow-lg" :
                                   user.rank === 2 ? "bg-gray-400 shadow-md" :
@@ -713,7 +746,7 @@ export default function Dashboard() {
                                 </div>
                               </div>
 
-                              {/* Name - Single line */}
+                              
                               <div className="col-span-4 min-w-0">
                                 <div className="flex items-center">
                                   <p className={`text-xs font-bold truncate ${user.isCurrentUser ? "text-blue-700" : "text-gray-800"}`}>
@@ -722,7 +755,7 @@ export default function Dashboard() {
                                 </div>
                               </div>
 
-                              {/* School - Multi-line (2 lines) */}
+                              
                               <div className="col-span-5 min-w-0">
                                 <p className="text-xs text-gray-600 font-bold overflow-hidden"
                                   style={{
@@ -734,7 +767,7 @@ export default function Dashboard() {
                                 </p>
                               </div>
 
-                              {/* Time and Points */}
+                              
                               <div className="col-span-2 text-right">
                                 <p className="text-xs font-semibold text-gray-500">
                                   {formatTime(user.time)}
@@ -752,11 +785,11 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  {/* Footer */}
+                  
                   <div className="p-3 border-t-4 border-gray-100 bg-transparent opacity-90 rounded-b-md">
-                    <button 
-                    onClick={() => router.visit(route('quiz-page'))}
-                    className="w-full text-center py-1.5 text-gray-50 hover:text-purple-700 text-sm font-medium transition duration-200">
+                    <button
+                      onClick={() => router.visit(route('quiz-page'))}
+                      className="w-full text-center py-1.5 text-gray-50 hover:text-purple-700 text-sm font-medium transition duration-200">
                       View All Leaderboard
                     </button>
                   </div>
@@ -764,7 +797,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Teacher/PTS List Box - Interactive */}
+           
             <div className="lg:col-span-2 xl:col-span-2">
               <motion.div
                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
@@ -772,12 +805,12 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
-                {/* Header */}
+                
                 <div className="p-3 border-b border-gray-100">
                   <h2 className="text-base font-semibold text-gray-800">Cikgu PTRS</h2>
                 </div>
 
-                {/* Filter Section */}
+                
                 <div className="p-3 border-b border-gray-100 bg-gray-50">
                   <div className="flex flex-wrap gap-1.5">
                     {filterButtons.map((filter) => (
@@ -795,7 +828,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Teacher List */}
+               
                 <div className="max-h-72 overflow-y-auto">
                   <div className="divide-y divide-gray-100">
                     {filteredTeachers.map((teacher) => (
@@ -831,18 +864,24 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Footer */}
+        
                 <div className="p-3 border-t border-gray-100 bg-gray-50">
-                  <button 
-                  onClick={() => router.visit(route('quiz-page'))}
-                  className="w-full text-center py-1.5 text-blue-600 hover:text-blue-700 text-xs font-medium transition duration-200">
+                  <button
+                    onClick={() => router.visit(route('quiz-page'))}
+                    className="w-full text-center py-1.5 text-blue-600 hover:text-blue-700 text-xs font-medium transition duration-200">
                     View All Teachers →
                   </button>
                 </div>
               </motion.div>
             </div>
+          </div> */}
+
+          {/* Column 3 - Leaderboard - Table Version */}
+          <div className="lg:col-span-3 xl:col-span-4 relative">
+
           </div>
         </div>
+      </div>
       </div>
     </DashboardLayout>
 

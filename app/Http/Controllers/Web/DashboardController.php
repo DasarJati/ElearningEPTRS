@@ -105,7 +105,7 @@ public function index()
     $quizSessions = QuizSession::with('school')
         ->orderBy('total_correct', 'desc')
         ->orderBy('total_time_seconds', 'asc')
-        ->limit(5)
+        ->limit(7)
         ->get();
 
     // Courses and assignments data

@@ -367,7 +367,7 @@ const handleQuizComplete = async (results) => {
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">
-                Leaderboard - <span className="bg-white text-blue-600 px-2 py-1 rounded">JERAYAWARA</span>
+                Leaderboard 
               </h2>
               <span className="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
                 {leaderboard.length} Players
