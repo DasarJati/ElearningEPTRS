@@ -1,5 +1,4 @@
-// components/QuizDashboard.jsx
-// components/QuizDashboard.jsx
+
 import React, { useState, useEffect } from 'react';
 import ObjectiveSection from './QuizInterface';
 import { router, Link } from '@inertiajs/react';
