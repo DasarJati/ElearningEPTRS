@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ObjectiveSection from './QuizInterface';
 import { router, Link } from '@inertiajs/react';
-import ApplicationLogo from '@/components/ApplicationLogo';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 
 const QuizLeaderboard = ({ schools = [], quizSessions = [] }) => {

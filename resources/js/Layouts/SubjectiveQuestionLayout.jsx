@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SubjectNavbar from '@/Layouts/SubjectNavbar';
-import StandardFooter from '@/components/StandardFooter';
+import StandardFooter from '@/Components/StandardFooter';
 
 const SubjectiveQuestionLayout = ({
   children,

@@ -1,10 +1,10 @@
 // SubjectNavbar.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
-import ApplicationLogo from '@/components/ApplicationLogo';
-import ProfileDropdown from '@/components/ProfileDropdown';
-import SubjectMenuDropdown from '@/components/SubjectMenuDropdown';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import ProfileDropdown from '@/Components/ProfileDropdown';
+import SubjectMenuDropdown from '@/Components/SubjectMenuDropdown';
+import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { Link } from '@inertiajs/react';
 
 export default function SubjectNavbar({ title }) {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, usePage, router } from "@inertiajs/react";
 import SubjectNavbar from './SubjectNavbar';
-import StandardFooter from '@/components/StandardFooter';
+import StandardFooter from '@/Components/StandardFooter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const formatTitle = (slug) => {

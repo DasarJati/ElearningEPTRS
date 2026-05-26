@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { usePage, router } from "@inertiajs/react";
 import SubjectLayout from "@/Layouts/SubjectLayout";
-import MasteryChallenge from "@/components/MasteryChallenge";
-import PracticeChallenge from "@/components/PracticeChallenge";
+import MasteryChallenge from "@/Components/MasteryChallenge";
+import PracticeChallenge from "@/Components/PracticeChallenge";
 
 export default function SubjectMissionPage() {
     const { props } = usePage();

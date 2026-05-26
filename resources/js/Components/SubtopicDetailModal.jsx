@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import DonutChart from '@/components/ChartJsDonut';
-import QuestionReviewModal from '@/components/QuestionReviewModal';
+import DonutChart from '@/Components/ChartJsDonut';
+import QuestionReviewModal from '@/Components/QuestionReviewModal';
 import { exportSessionsToPdf } from '@/utils/exportPdf';
 
 export default function SubtopicDetailModal({ isOpen, onClose, subtopicData, questionType }) {

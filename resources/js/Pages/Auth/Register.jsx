@@ -1,9 +1,9 @@
 // resources/js/Pages/Auth/RegisterForm.jsx
 import React from 'react';
-import InputError from '@/components/InputError';
-import InputLabel from '@/components/InputLabel';
-import PrimaryButton from '@/components/PrimaryButton';
-import TextInput from '@/components/TextInput';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 
 export default function RegisterForm({ onSubmit }) {

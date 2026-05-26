@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { Head } from '@inertiajs/react';
 import QuizLayout from '@/Layouts/QuizLayout';
-import QuizFooter from '@/components/QuizFooter';
+import QuizFooter from '@/Components/QuizFooter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getRandomQuestions } from '../../Data/QuizBank';
 
