@@ -165,10 +165,10 @@ class ChatController extends Controller
             // \Log::error('Broadcast error: ' . $e->getMessage());
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => $this->formatMessage($message, $user)
-        ]);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => $this->formatMessage($message, $user)
+        // ]);
     }
 
     public function startConversation(Request $request)

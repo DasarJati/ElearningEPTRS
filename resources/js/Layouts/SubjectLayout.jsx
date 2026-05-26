@@ -1,6 +1,6 @@
 // resources/js/Layouts/SubjectLayout.jsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, usePage } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
 import SubjectNavbar from './SubjectNavbar';
 import StandardFooter from '@/Components/StandardFooter';
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -36,15 +36,17 @@ export default function SubjectLayout({
   bgColor = "bg-white",
   onStandardChange,
   selectedStandard: propSelectedStandard,
-  isLoading = false // Add this prop for loading state
+  isLoading = false
 }) {
   const { url, props } = usePage();
   const { form, level_id, subject_id } = props;
   
-  // Use the language hook
   const { t, locale } = useLanguage();
 
-  // ✅ FIX: Wrap TAB_CONFIG in useMemo to prevent recreation every render
+  // Internal loading state for tab navigation and form level change
+  const [internalLoading, setInternalLoading] = useState(false);
+  const [loadingLabel, setLoadingLabel] = useState('');
+
   const TAB_CONFIG = useMemo(() => [
     {
       key: 'practice',
@@ -82,7 +84,7 @@ export default function SubjectLayout({
         }),
       isActive: () => route().current('subject-report-page')
     },
-  ], [t, locale]); // ✅ Only recreate when locale changes
+  ], [t, locale]);
 
   const title = formatTitle(subject);
 
@@ -90,14 +92,29 @@ export default function SubjectLayout({
   const [internalSelectedStandard, setInternalSelectedStandard] = useState(propSelectedStandard || 'Form 4');
   const selectedStandard = propSelectedStandard !== undefined ? propSelectedStandard : internalSelectedStandard;
 
-  // ✅ FIX: Wrap translateFormLevel in useCallback
   const translateFormLevel = useMemo(() => {
     const formMap = {
       'Form 4': t('form_4', 'Form 4'),
       'Form 5': t('form_5', 'Form 5'),
     };
     return (form) => formMap[form] || form;
-  }, [t, locale]); // ✅ Only recreate when locale changes
+  }, [t, locale]);
+
+  // Listen to Inertia navigation events to auto-show/hide loading
+  useEffect(() => {
+    const startHandler = router.on('start', () => {
+      setInternalLoading(true);
+    });
+    const finishHandler = router.on('finish', () => {
+      setInternalLoading(false);
+      setLoadingLabel('');
+    });
+
+    return () => {
+      startHandler();
+      finishHandler();
+    };
+  }, []);
 
   // Handle browser extension errors
   useEffect(() => {
@@ -125,44 +142,32 @@ export default function SubjectLayout({
       setInternalSelectedStandard(standard);
     }
     setIsDropdownOpen(false);
+    setLoadingLabel(translateFormLevel(standard));
+    setInternalLoading(true);
     if (onStandardChange) {
       onStandardChange(standard);
     }
   };
 
+  const handleTabClick = (tab) => {
+    if (tab.isActive()) return; // Already on this tab, skip
+    setLoadingLabel(tab.label);
+    setInternalLoading(true);
+  };
+
+  const showLoading = isLoading || internalLoading;
+
+  const activeTab = TAB_CONFIG.find((tab) => tab.isActive());
+  const loadingMessage = loadingLabel || activeTab?.label || 'data';
+
   return (
     <div className={`min-h-screen ${bgColor} relative`}>
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 shadow-2xl max-w-md w-full mx-4">
-            <div className="flex flex-col items-center justify-center">
-              {/* Spinner */}
-              <div className="relative">
-                <div className="w-20 h-20 border-4 border-gray-200 rounded-full"></div>
-                <div className="absolute top-0 left-0 w-20 h-20 border-4 border-[#8F3091] rounded-full border-t-transparent animate-spin"></div>
-              </div>
-              
-              {/* Loading Text */}
-              <div className="mt-6 text-center">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {t('loading', 'Loading')}...
-                </h3>
-                <p className="text-gray-600">
-                  {t('loading_data', 'Loading report data, please wait')}
-                </p>
-              </div>
-              
-              {/* Progress Indicator (Optional) */}
-              <div className="mt-6 w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-[#8F3091] h-2 rounded-full animate-pulse w-3/4"></div>
-              </div>
-              
-              {/* Loading Tips (Optional) */}
-              <div className="mt-4 text-sm text-gray-500 text-center">
-                <p>{t('loading_tip', 'This may take a few moments')}</p>
-              </div>
-            </div>
+      {/* Simple Loading Overlay */}
+      {showLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-gray-700">Loading {loadingMessage.toLowerCase()} data...</p>
           </div>
         </div>
       )}
@@ -184,7 +189,7 @@ export default function SubjectLayout({
                 aria-expanded={isDropdownOpen}
                 aria-haspopup="true"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={isLoading}
+                disabled={showLoading}
               >
                 {translateFormLevel(selectedStandard)}
                 <svg className="-mr-1 h-5 w-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
@@ -193,7 +198,7 @@ export default function SubjectLayout({
               </button>
             </div>
 
-            {isDropdownOpen && !isLoading && (
+            {isDropdownOpen && !showLoading && (
               <div
                 className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                 role="menu"
@@ -213,7 +218,7 @@ export default function SubjectLayout({
                       role="menuitem"
                       tabIndex="-1"
                       onClick={() => handleStandardSelect(standard.value)}
-                      disabled={isLoading}
+                      disabled={showLoading}
                     >
                       {standard.label}
                     </button>
@@ -225,7 +230,7 @@ export default function SubjectLayout({
         </div>
       </div>
 
-      {/* Tabs - Fixed with better URL handling */}
+      {/* Tabs */}
       <div className="px-4 sm:px-6 lg:px-8 bg-white pt-3 shadow-b shadow-md border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="flex space-x-6 border-b border-gray-200">
@@ -238,8 +243,9 @@ export default function SubjectLayout({
                   className={`pb-4 relative text-sm font-medium whitespace-nowrap transition-all duration-200 ${isActive
                     ? "text-[#8F3091] font-semibold border-b-2 border-[#8F3091]"
                     : "text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300"
-                    } ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                    } ${showLoading ? 'opacity-50 pointer-events-none' : ''}`}
                   preserveScroll
+                  onClick={() => handleTabClick(tab)}
                 >
                   {tab.label}
                   {isActive && (
@@ -252,12 +258,12 @@ export default function SubjectLayout({
         </div>
       </div>
 
-      {/* Page Content with Loading Blur Effect */}
-      <div className={`py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-16 mt-0 transition-all duration-300 ${isLoading ? 'opacity-50 blur-sm' : ''}`}>
+      {/* Page Content */}
+      <div className="py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-16 mt-0">
         {children}
       </div>
 
-      <div className={`mt-10 transition-all duration-300 ${isLoading ? 'opacity-50 blur-sm' : ''}`}>
+      <div className="mt-10">
         <StandardFooter />
       </div>
     </div>
