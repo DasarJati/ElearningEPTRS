@@ -1,7 +1,7 @@
 // MobileProfileDropdown.jsx
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import Dropdown from '@/Components/Dropdown';
+import Dropdown from '@/components/Dropdown';
 
 export default function MobileProfileDropdown({ user }) {
   return (

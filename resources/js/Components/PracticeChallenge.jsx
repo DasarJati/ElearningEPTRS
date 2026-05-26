@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ResultChallenge from '@/Components/ResultChallenge';
+import ResultChallenge from '@/components/ResultChallenge';
 
 export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId, subjectKey, topicId, topicName }) {
     const [sessionId, setSessionId] = useState(null);

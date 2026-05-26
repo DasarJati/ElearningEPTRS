@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import SubjectLayout from '@/Layouts/SubjectLayout';
-import DonutChart from '@/Components/ChartJsDonut';
-import SubtopicDetailModal from '@/Components/SubtopicDetailModal';
+import DonutChart from '@/components/ChartJsDonut';
+import SubtopicDetailModal from '@/components/SubtopicDetailModal';
 
 export default function SubjectReportPage() {
   const { props } = usePage();

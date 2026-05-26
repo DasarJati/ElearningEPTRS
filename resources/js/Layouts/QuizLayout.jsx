@@ -1,7 +1,7 @@
 // Layouts/QuestionLayout.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import QuestionNavbar from './QuestionNavbar';
-import Calculator from '../Components/Calculator'; // Import kalkulator
+import Calculator from '../components/Calculator'; // Import kalkulator
 
 const QuizLayout = ({ 
   children, 

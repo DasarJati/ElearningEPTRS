@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import Dropdown from '@/Components/Dropdown';
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import Dropdown from '@/components/Dropdown';
+import ApplicationLogo from '@/components/ApplicationLogo';
 
 export default function QuestionNavbar({ title, visible = true }) {
   const { auth } = usePage().props;

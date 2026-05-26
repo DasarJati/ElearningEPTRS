@@ -1,10 +1,10 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import ApplicationLogoImg from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import ProfileDropdown from '@/Components/ProfileDropdown';
-import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import ApplicationLogo from '@/components/ApplicationLogo';
+import ApplicationLogoImg from '@/components/ApplicationLogo';
+import Dropdown from '@/components/Dropdown';
+import NavLink from '@/components/NavLink';
+import ResponsiveNavLink from '@/components/ResponsiveNavLink';
+import ProfileDropdown from '@/components/ProfileDropdown';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useLanguage } from '@/Contexts/LanguageContext';

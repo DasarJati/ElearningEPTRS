@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Head, usePage, Link, router } from '@inertiajs/react';
 import ObjectiveQuestionLayout from '@/Layouts/ObjectiveQuestionLayout';
 import ResultQuestion from '@/Pages/courses/training/ResultQuestion';
-import Calculator from '@/Components/ScientificCalculator';
-import PageDrawingTool from '@/Components/PageDrawingTool';
-import AutoNotes from '@/Components/AutoNotes';
+import Calculator from '@/components/ScientificCalculator';
+import PageDrawingTool from '@/components/PageDrawingTool';
+import AutoNotes from '@/components/AutoNotes';
 
 /**
  * QuestionDisplay Component
