@@ -680,7 +680,7 @@ export default function SubjectPage({ selectedStandard }) {
                               <div className="flex items-center space-x-2 mb-3">
                                 <PlayIcon className="w-4 h-4 text-sky-600" />
                                 <h5 className="text-sm font-semibold text-gray-900">
-                                  Hello syazwan
+                                  Recommended Videos
                                 </h5>
                               </div>
                               <div className="space-y-2 sm:space-y-3 flex-1">
