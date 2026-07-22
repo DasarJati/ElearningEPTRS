@@ -7,6 +7,25 @@ import PageDrawingTool from '@/Components/PageDrawingTool';
 import AutoNotes from '@/Components/AutoNotes';
 import QuestionReportButton from '@/Components/QuestionReportButton';
 
+const processQuestionHtml = (html) => html
+  .replace(/<img\b([^>]*)>/gi, (match, attributes) => {
+    const width = Number(attributes.match(/\bwidth\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    const height = Number(attributes.match(/\bheight\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    const isInlineImage = width > 0 && height > 0 && width <= 140 && height <= 80;
+    const cleanAttributes = attributes
+      .replace(/\sclass\s*=\s*("[^"]*"|'[^']*')/i, '')
+      .replace(/\sstyle\s*=\s*("[^"]*"|'[^']*')/i, '');
+
+    if (isInlineImage) {
+      return `<img${cleanAttributes} class="inline-block h-auto max-h-10 w-auto cursor-zoom-in align-middle mx-1" onerror="this.style.display='none'">`;
+    }
+
+    return `<img${cleanAttributes} class="block max-w-full w-auto h-auto rounded-lg shadow-md object-contain mx-auto my-4 cursor-zoom-in" style="max-height: none;" onerror="this.style.display='none'">`;
+  })
+  .replace(/<br\s*\/?>/g, '<br class="my-3">')
+  .replace(/(<br\s*\/?>\s*){2,}/g, '</p><p class="mb-4">')
+  .replace(/<p([^>]*)>/g, '<p$1 class="mb-4 leading-relaxed">');
+
 /**
  * QuestionDisplay Component
  * Displays the question content (text, images, or fallback)
@@ -26,14 +45,7 @@ const QuestionDisplay = ({ question }) => {
     // If question has text content
     if (question.question_text) {
       // Process HTML content for better styling
-      const processedHtml = question.question_text
-        .replace(
-          /<img([^>]*)>/g,
-          '<img$1 class="max-w-full h-auto rounded-lg shadow-md max-h-96 object-contain mx-auto my-4" onerror="this.style.display=\'none\'; this.nextElementSibling?.style.display=\'block\';">'
-        )
-        .replace(/<br\s*\/?>/g, '<br class="my-3">')
-        .replace(/(<br\s*\/?>\s*){2,}/g, '</p><p class="mb-4">')
-        .replace(/<p([^>]*)>/g, '<p$1 class="mb-4 leading-relaxed">');
+      const processedHtml = processQuestionHtml(question.question_text);
 
       return (
         <div className="relative">
@@ -56,7 +68,7 @@ const QuestionDisplay = ({ question }) => {
             <img
               src={imageUrl}
               alt="Question"
-              className="max-w-full h-auto rounded-lg shadow-md max-h-96 object-contain"
+              className="mx-auto block h-auto w-auto max-w-full rounded-lg object-contain shadow-md"
               onError={(e) => {
                 console.error('Failed to load question image:', imageUrl);
                 e.target.style.display = 'none';

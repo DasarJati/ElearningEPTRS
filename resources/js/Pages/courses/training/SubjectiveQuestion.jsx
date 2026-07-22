@@ -228,38 +228,32 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
     setError("");
   };
 
-  // Process HTML content for better rendering - FIX FOR INLINE IMAGES
+// Preserve large question diagrams while keeping genuinely small formula images inline.
 const processHtmlContent = (html) => {
   if (!html) return '';
-  
-  // First, handle the specific pattern from your database
-  // Example: <p>Diberi bahawa... <img> dengan lebar...</p>
-  
+
   // Remove text-align: justify styles that might cause issues
   let processedHtml = html.replace(/text-align:\s*justify;/g, '');
-  
+
   // Replace paragraph tags with div for better control (paragraphs create block elements)
   processedHtml = processedHtml.replace(/<p([^>]*)>/g, '<div$1 class="question-paragraph mb-4">');
   processedHtml = processedHtml.replace(/<\/p>/g, '</div>');
-  
-  // Process images - make them inline with text
-  // Add inline display and vertical alignment
-  processedHtml = processedHtml.replace(
-    /<img([^>]*width="([^"]*)"[^>]*height="([^"]*)")/g,
-    '<img$1 class="inline-image align-middle mx-1 my-0 cursor-zoom-in" style="max-height: 28px; width: auto;"'
-  );
-  
-  // Fallback for images without width/height attributes
-  processedHtml = processedHtml.replace(
-    /<img([^>]*)>/g,
-    (match, attributes) => {
-      if (!match.includes('class=')) {
-        return `<img${attributes} class="inline-image align-middle mx-1 my-0 cursor-zoom-in" style="max-height: 28px; width: auto;">`;
-      }
-      return match.replace('class="', 'class="inline-image align-middle mx-1 my-0 cursor-zoom-in ');
+
+  processedHtml = processedHtml.replace(/<img\b([^>]*)>/gi, (match, attributes) => {
+    const width = Number(attributes.match(/\bwidth\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    const height = Number(attributes.match(/\bheight\s*=\s*["']?(\d+)/i)?.[1] || 0);
+    const isInlineImage = width > 0 && height > 0 && width <= 140 && height <= 80;
+    const cleanAttributes = attributes
+      .replace(/\sclass\s*=\s*("[^"]*"|'[^']*')/i, '')
+      .replace(/\sstyle\s*=\s*("[^"]*"|'[^']*')/i, '');
+
+    if (isInlineImage) {
+      return `<img${cleanAttributes} class="inline-image cursor-zoom-in" style="max-height: 2.5rem; width: auto; height: auto;">`;
     }
-  );
-  
+
+    return `<img${cleanAttributes} class="question-image cursor-zoom-in" style="display: block; max-width: 100%; width: auto; height: auto; margin: 1rem auto;">`;
+  });
+
   // Handle the non-breaking space entity
   processedHtml = processedHtml.replace(/&nbsp;/g, ' ');
   
@@ -519,7 +513,7 @@ const processHtmlContent = (html) => {
   // Main content for children prop
   const mainContent = (
     <div className="py-4 md:py-6 bg-cover bg-center bg-no-repeat min-h-screen" style={{ backgroundImage: 'url(/images/background_classroom.jpg)' }}>
-      <div className="max-w-4xl mx-auto relative px-4 md:px-0">
+      <div className="max-w-6xl mx-auto relative px-4 md:px-0">
         {/* Floating Feedback Messages - Hidden on mobile */}
         {isCorrect[currentIndex] === true && (
           <div className="hidden lg:block absolute -right-44 top-1/2 transform -translate-y-1/2 z-10 w-40">
@@ -578,6 +572,13 @@ const processHtmlContent = (html) => {
           vertical-align: middle;
           margin: 0 4px;
           transition: transform 0.2s ease;
+        }
+        .question-image {
+          display: block;
+          max-width: 100%;
+          height: auto;
+          margin: 1rem auto;
+          border-radius: 0.5rem;
         }
         .inline-image:hover {
           transform: scale(1.05);
