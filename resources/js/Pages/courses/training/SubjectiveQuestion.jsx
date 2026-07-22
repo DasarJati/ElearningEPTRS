@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import SubjectiveQuestionLayout from "@/Layouts/SubjectiveQuestionLayout";
 import ResultQuestion from "@/Pages/courses/training/ResultQuestion";
 import { Head, usePage, router } from '@inertiajs/react'; // Added router import
+import QuestionReportButton from '@/Components/QuestionReportButton';
 
 export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
   const pageProps = usePage().props;
@@ -586,6 +587,17 @@ const processHtmlContent = (html) => {
   ) : (
     <p className="text-red-500">No question content available</p>
   )}
+  </div>
+
+  <div className="-mt-2 mb-4 flex justify-end">
+    <QuestionReportButton
+      questionId={questions[currentIndex]?.id}
+      questionCode={questions[currentIndex]?.question_code}
+      subjectId={subject_id}
+      topicId={topic_id}
+      context="subjective_practice"
+      questionNumber={currentIndex + 1}
+    />
   </div>
 
   <span className="text-gray-600 text-sm md:text-md mb-3 md:mb-4 block">Type your answer below:</span>

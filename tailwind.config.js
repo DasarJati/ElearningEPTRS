@@ -13,7 +13,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Poppins', 'sans-serif'],
+                sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 primary: '#3b82f6', // Blue

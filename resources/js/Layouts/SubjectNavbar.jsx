@@ -1,201 +1,106 @@
-// SubjectNavbar.jsx
-import React, { useState, useRef, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import ProfileDropdown from '@/Components/ProfileDropdown';
-import SubjectMenuDropdown from '@/Components/SubjectMenuDropdown';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
-import { Link } from '@inertiajs/react';
+import ProfileDropdown from '@/Components/ProfileDropdown';
+import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AcademicCapIcon,
+  Bars3Icon,
+  BellIcon,
+  ChevronDownIcon,
+  HomeIcon,
+  Squares2X2Icon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 
 export default function SubjectNavbar({ title }) {
-  const { auth } = usePage().props;
+  const { auth, schoolSubjects = [] } = usePage().props;
   const user = auth?.user;
-  const menuRef = useRef(null);
+  const [subjectsOpen, setSubjectsOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
-
-  const toggleAppMenu = () => setIsAppMenuOpen(!isAppMenuOpen); // Toggle app menu
-  const closeAppMenu = () => setIsAppMenuOpen(false); // Close app menu
-
-  const appMenuItems = [
-    // {
-    //   name: 'Quiz Arena',
-    //   href: '/quiz-page',
-    //   icon: '/images/logo_award.png', // Path to your image
-    //   alt: 'Quiz Arena Icon'
-    // },
-    {
-      name: 'ePTRS',
-      href: 'https://eptrs.my',
-      icon: '/images/logo_PTRS.png', // Path to your image
-      alt: 'ePTRS Icon',
-      external: true
-    },
-
-  ];
-
-
-  // Debug: Check what title we're receiving
-  // console.log('SubjectNavbar received title:', title);
-  // console.log('Page props:', usePage().props);
-
-  // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
+    const close = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setSubjectsOpen(false);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
   }, []);
 
+  const subjectUrl = (subject) => {
+    const slug = subject.abbr || subject.name.toLowerCase().replace(/\s+/g, '-');
+    const subjectLevel = subject.level_id || 10;
+    return `/subject/${slug}?subject_id=${subject.id}&level_id=${subjectLevel}&form=${encodeURIComponent(subjectLevel === 10 ? 'Form 4' : 'Form 5')}`;
+  };
+
   return (
-    <nav
-      className={
-        `sticky top-0 z-40 border-b border-gray-200  shadow-sm px-4 sm:px-6
-    ${isMenuOpen
-          ? 'bg-white text-black'                      // when dropdown open → hide gradient
-          : 'bg-[#8F3091] text-white' // when closed → show gradient
-        }`
-      }
-    >
-      <div className="mx-auto px-0 sm:px-3 lg:px-3">
-        <div className="flex h-16 sm:h-20 items-center justify-between relative">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-7">
+          <Link href={route('dashboard')} className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-950 shadow-sm">
+              <ApplicationLogo className="h-9 w-9 object-contain" />
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-bold leading-none tracking-tight text-slate-900">PTRS Learning</p>
+              <p className="mt-1 max-w-[150px] truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-500">{title || 'Course workspace'}</p>
+            </div>
+          </Link>
 
-          {/* Left Side - Subject Menu Dropdown */}
-          <div className="flex items-center" ref={menuRef}>
-            <SubjectMenuDropdown
-              isOpen={isMenuOpen}
-              setIsOpen={setIsMenuOpen}
-              title={title}
-            />
-          </div>
-
-          {/* Center - Logo */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
-            <Link href="/dashboard">
-              <ApplicationLogo className="block h-12 sm:h-16 w-auto fill-current " />
+          <div className="hidden items-center gap-1 lg:flex">
+            <Link href={route('dashboard')} className="flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+              <HomeIcon className="h-4 w-4" /> Dashboard
             </Link>
-          </div>
-
-
-
-          {/* Right Side - Profile Dropdown */}
-          <div className="hidden sm:flex sm:items-center items-center space-x-4">
-            <div className="relative">
-              <button
-                onClick={toggleAppMenu}
-                className="p-1 rounded-md text-gray-100 border  hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-                aria-label="App Menu"
-              >
-                {/* 4 Box Icon (Grid Icon) */}
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                  />
-                </svg>
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={() => setSubjectsOpen(!subjectsOpen)} className="flex items-center gap-2 rounded-xl bg-indigo-50 px-3.5 py-2 text-sm font-semibold text-indigo-700">
+                <AcademicCapIcon className="h-4 w-4" /> Courses
+                <ChevronDownIcon className={`h-3.5 w-3.5 transition ${subjectsOpen ? 'rotate-180' : ''}`} />
               </button>
-
-              {/* App Menu Dropdown */}
-              {isAppMenuOpen && (
-                <div className="absolute right-0 mt-2 w-max bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                  <div className="p-4">
-                    <h3 className="text-xs font-semibold text-gray-500 mb-3">Quick Access :</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {appMenuItems.map((item, index) => {
-                        // Check if link is external
-                        const isExternalLink = item.href.startsWith('http');
-
-                        const handleClick = (e) => {
-                          closeAppMenu();
-
-                          if (isExternalLink) {
-                            e.preventDefault();
-                            // Open external links in new tab
-                            window.open(item.href, '_blank', 'noopener,noreferrer');
-                          }
-                          // Internal links will navigate normally via Inertia
-                        };
-
-                        return (
-                          <Link
-                            key={index}
-                            href={item.href}
-                            onClick={handleClick}
-                            {...(isExternalLink && {
-                              as: 'button', // Treat as button for external links
-                              type: 'button'
-                            })}
-                            className="flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
-                          >
-                            <div className="w-16 h-16 mb-2 flex items-center justify-center rounded-md bg-gray-100 group-hover:bg-gray-200 transition-colors duration-200">
-                              <img
-                                src={item.icon}
-                                alt={item.alt}
-                                className="w-16 h-16 object-contain rounded-xl"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.style.display = 'none';
-                                  e.target.parentElement.innerHTML = `<span class="text-lg">${item.name.charAt(0)}</span>`;
-                                }}
-                              />
-                            </div>
-                            <span className="text-xs font-semibold text-gray-700 text-center leading-tight">
-                              {item.name}
-                            </span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                    {/* <div className="mt-4 pt-4 border-t border-gray-100">
-                                                <Link
-                                                    href="/all-apps"
-                                                    onClick={closeAppMenu}
-                                                    className="block w-full text-center text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 py-2 rounded-md transition-colors duration-200"
-                                                >
-                                                    View All Applications
-                                                </Link>
-                                            </div> */}
+              {subjectsOpen && (
+                <div className="absolute left-0 top-full mt-3 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-200/70">
+                  <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Switch subject</p>
+                  <div className="max-h-80 overflow-y-auto">
+                    {schoolSubjects.length ? schoolSubjects.map((subject) => (
+                      <Link key={subject.id} href={subjectUrl(subject)} onClick={() => setSubjectsOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"><AcademicCapIcon className="h-4 w-4" /></span>
+                        <span className="truncate">{subject.name}</span>
+                      </Link>
+                    )) : <p className="px-3 py-5 text-sm text-slate-400">No other subjects available.</p>}
                   </div>
                 </div>
               )}
             </div>
-
-            <div className="hidden sm:block">
-              <LanguageSwitcher type="buttons" />
-            </div>
-
-            {/* Mobile Language Switcher (Simplified) */}
-            <div className="sm:hidden">
-              <LanguageSwitcher type="dropdown" className="text-sm" />
-            </div>
-            <div className="relative ms-3">
-              <ProfileDropdown user={user} student={user?.student} />
-            </div>
-          </div>
-
-          {/* Mobile - Profile Dropdown */}
-          <div className="flex sm:hidden items-center">
-            <div className="relative">
-              <ProfileDropdown user={user} student={user?.student} />
-            </div>
+            <Link href={route('quiz-page')} className="flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+              <Squares2X2Icon className="h-4 w-4" /> Quiz arena
+            </Link>
           </div>
         </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:block"><LanguageSwitcher type="buttons" /></div>
+          <button className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100" aria-label="Notifications">
+            <BellIcon className="h-5 w-5" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white" />
+          </button>
+          <div className="h-6 w-px bg-slate-200" />
+          <ProfileDropdown user={user} student={user?.student} />
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 lg:hidden" aria-label="Toggle navigation">
+            {mobileOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
+
+      {mobileOpen && (
+        <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg lg:hidden">
+          <div className="mx-auto grid max-w-[1440px] gap-1">
+            <Link href={route('dashboard')} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"><HomeIcon className="h-5 w-5" /> Dashboard</Link>
+            <Link href={route('quiz-page')} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"><Squares2X2Icon className="h-5 w-5" /> Quiz arena</Link>
+            <p className="mt-2 border-t border-slate-100 px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Switch subject</p>
+            {schoolSubjects.slice(0, 6).map((subject) => <Link key={subject.id} href={subjectUrl(subject)} className="rounded-xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50">{subject.name}</Link>)}
+            <div className="mt-3 sm:hidden"><LanguageSwitcher type="dropdown" /></div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

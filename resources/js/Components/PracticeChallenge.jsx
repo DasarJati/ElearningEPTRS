@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ResultChallenge from '@/Components/ResultChallenge';
+import QuestionReportButton from '@/Components/QuestionReportButton';
 
 export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId, subjectKey, topicId, topicName }) {
     const [sessionId, setSessionId] = useState(null);
@@ -616,6 +617,18 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                         {currentQuestion.question}
                                     </p>
                                 )}
+                            </div>
+
+                            <div className="-mt-3 mb-5 flex justify-end">
+                                <QuestionReportButton
+                                    questionId={currentQuestion.id}
+                                    questionCode={currentQuestion.question_code}
+                                    subjectId={subjectId}
+                                    topicId={topicId || currentQuestion.topic_id}
+                                    context="adaptive_practice"
+                                    questionNumber={questionNumber}
+                                    selectedAnswerId={selectedAnswer}
+                                />
                             </div>
 
                             {/* Answer Options */}

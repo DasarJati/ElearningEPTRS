@@ -1,271 +1,141 @@
-// resources/js/Layouts/SubjectLayout.jsx
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link, usePage, router } from "@inertiajs/react";
+import { useEffect, useMemo, useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
 import SubjectNavbar from './SubjectNavbar';
 import StandardFooter from '@/Components/StandardFooter';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import {
+  AcademicCapIcon,
+  ChartBarIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  FireIcon,
+  SparklesIcon,
+  TrophyIcon,
+} from '@heroicons/react/24/outline';
 
-const formatTitle = (slug) => {
-  return slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
-const normalizeUrl = (url) => {
-  try {
-    const decodedUrl = decodeURIComponent(url);
-    return decodedUrl.replace(/\/+$/, '');
-  } catch (error) {
-    return url;
-  }
-};
-
-const getCleanPath = (url) => {
-  try {
-    const normalized = normalizeUrl(url);
-    return normalized.split('?')[0];
-  } catch (error) {
-    return url.split('?')[0];
-  }
-};
+const formatTitle = (value = '') => value.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
 export default function SubjectLayout({
   children,
   subject,
-  bgColor = "bg-white",
   onStandardChange,
   selectedStandard: propSelectedStandard,
-  isLoading = false
+  isLoading = false,
+  studentData = null,
 }) {
-  const { url, props } = usePage();
+  const { props } = usePage();
   const { form, level_id, subject_id } = props;
-  
   const { t, locale } = useLanguage();
-
-  // Internal loading state for tab navigation and form level change
   const [internalLoading, setInternalLoading] = useState(false);
-  const [loadingLabel, setLoadingLabel] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [internalStandard, setInternalStandard] = useState(propSelectedStandard || form || 'Form 4');
+  const selectedStandard = propSelectedStandard ?? internalStandard;
 
-  const TAB_CONFIG = useMemo(() => [
-    {
-      key: 'practice',
-      label: t('practice', 'Practice'),
-      href: (subject, form, level_id, subject_id) =>
-        route('subject-page', {
-          subject: subject,
-          form: form,
-          level_id: level_id,
-          subject_id: subject_id
-        }),
-      isActive: () => route().current('subject-page')
-    },
-    {
-      key: 'mission',
-      label: t('mission', 'Mission'),
-      href: (subject, form, level_id, subject_id) =>
-        route('subject-mission-page', {
-          subject: subject,
-          form: form,
-          level_id: level_id,
-          subject_id: subject_id
-        }),
-      isActive: () => route().current('subject-mission-page')
-    },
-    {
-      key: 'report',
-      label: t('report', 'Report'),
-      href: (subject, form, level_id, subject_id) =>
-        route('subject-report-page', {
-          subject: subject,
-          form: form,
-          level_id: level_id,
-          subject_id: subject_id
-        }),
-      isActive: () => route().current('subject-report-page')
-    },
+  const stats = {
+    level: studentData?.level || 5,
+    xp: studentData?.xp || 1840,
+    xpToNextLevel: studentData?.xpToNextLevel || 2000,
+    streak: studentData?.streak || 12,
+    badges: studentData?.badges || 4,
+  };
+  const xpPercentage = Math.min(100, Math.round((stats.xp / stats.xpToNextLevel) * 100));
+
+  const tabs = useMemo(() => [
+    { key: 'practice', label: t('practice', 'Learn'), icon: AcademicCapIcon, routeName: 'subject-page' },
+    { key: 'mission', label: t('mission', 'Practice'), icon: SparklesIcon, routeName: 'subject-mission-page' },
+    { key: 'report', label: t('report', 'Progress'), icon: ChartBarIcon, routeName: 'subject-report-page' },
   ], [t, locale]);
 
-  const title = formatTitle(subject);
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [internalSelectedStandard, setInternalSelectedStandard] = useState(propSelectedStandard || 'Form 4');
-  const selectedStandard = propSelectedStandard !== undefined ? propSelectedStandard : internalSelectedStandard;
-
-  const translateFormLevel = useMemo(() => {
-    const formMap = {
-      'Form 4': t('form_4', 'Form 4'),
-      'Form 5': t('form_5', 'Form 5'),
-    };
-    return (form) => formMap[form] || form;
-  }, [t, locale]);
-
-  // Listen to Inertia navigation events to auto-show/hide loading
   useEffect(() => {
-    const startHandler = router.on('start', () => {
-      setInternalLoading(true);
-    });
-    const finishHandler = router.on('finish', () => {
-      setInternalLoading(false);
-      setLoadingLabel('');
-    });
-
-    return () => {
-      startHandler();
-      finishHandler();
-    };
+    const stopStart = router.on('start', () => setInternalLoading(true));
+    const stopFinish = router.on('finish', () => setInternalLoading(false));
+    return () => { stopStart(); stopFinish(); };
   }, []);
 
-  // Handle browser extension errors
-  useEffect(() => {
-    const handleError = (event) => {
-      if (event.error && event.error.message &&
-        event.error.message.includes('asynchronous response') &&
-        event.error.message.includes('message channel closed')) {
-        event.preventDefault();
-        console.warn('Browser extension error suppressed');
-        return true;
-      }
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleError);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
-    };
-  }, []);
-
-  const handleStandardSelect = (standard) => {
-    if (propSelectedStandard === undefined) {
-      setInternalSelectedStandard(standard);
-    }
+  const selectStandard = (standard) => {
+    setInternalStandard(standard);
     setIsDropdownOpen(false);
-    setLoadingLabel(translateFormLevel(standard));
-    setInternalLoading(true);
-    if (onStandardChange) {
-      onStandardChange(standard);
-    }
+    if (onStandardChange) onStandardChange(standard);
   };
 
-  const handleTabClick = (tab) => {
-    if (tab.isActive()) return; // Already on this tab, skip
-    setLoadingLabel(tab.label);
-    setInternalLoading(true);
-  };
-
+  const title = formatTitle(subject);
   const showLoading = isLoading || internalLoading;
 
-  const activeTab = TAB_CONFIG.find((tab) => tab.isActive());
-  const loadingMessage = loadingLabel || activeTab?.label || 'data';
-
   return (
-    <div className={`min-h-screen ${bgColor} relative`}>
-      {/* Simple Loading Overlay */}
+    <div className="min-h-screen bg-[#f6f7fb] text-slate-900">
       {showLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-700">Loading {loadingMessage.toLowerCase()} data...</p>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-2xl">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+            <p className="text-sm font-semibold text-slate-700">Loading your course…</p>
           </div>
         </div>
       )}
 
-      <SubjectNavbar title={subject} />
+      <SubjectNavbar title={title} />
 
-      {/* Header Section */}
-      <div className="px-4 sm:px-6 lg:px-8 bg-[#8F3091] py-4 sm:py-6 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-1">{title}</h1>
-
-          {/* Standard Dropdown */}
-          <div className="relative inline-block text-start">
+      <header className="relative overflow-hidden bg-slate-950 text-white">
+        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
+        <div className="absolute bottom-[-7rem] left-1/3 h-56 w-56 rounded-full bg-cyan-400/15 blur-3xl" />
+        <div className="relative mx-auto max-w-[1440px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <button
-                type="button"
-                className="inline-flex justify-center gap-x-1.5 bg-none py-2 text-sm font-semibold text-white shadow-none ring-none hover:bg-white/10 rounded-md px-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                id="standard-filter-button"
-                aria-expanded={isDropdownOpen}
-                aria-haspopup="true"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={showLoading}
-              >
-                {translateFormLevel(selectedStandard)}
-                <svg className="-mr-1 h-5 w-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                </svg>
-              </button>
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
+                <AcademicCapIcon className="h-4 w-4" /> Course workspace
+              </div>
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">Learn each topic at your pace, practise your skills, and track every milestone.</p>
             </div>
-
-            {isDropdownOpen && !showLoading && (
-              <div
-                className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
-                role="menu"
-                aria-orientation="vertical"
-                aria-labelledby="standard-filter-button"
-                tabIndex="-1"
-              >
-                <div className="py-1" role="none">
-                  {[
-                    { value: 'Form 4', label: t('form_4', 'Form 4') },
-                    { value: 'Form 5', label: t('form_5', 'Form 5') }
-                  ].map((standard) => (
-                    <button
-                      key={standard.value}
-                      type="button"
-                      className={`block w-full px-4 py-2 text-left text-sm ${selectedStandard === standard.value ? 'bg-sky-100 text-sky-700' : 'text-gray-700 hover:bg-gray-100'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                      role="menuitem"
-                      tabIndex="-1"
-                      onClick={() => handleStandardSelect(standard.value)}
-                      disabled={showLoading}
-                    >
-                      {standard.label}
+            <div className="relative">
+              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex min-w-[150px] items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/15">
+                <span>{selectedStandard}</span><ChevronDownIcon className={`h-4 w-4 transition ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 z-20 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-slate-700 shadow-2xl">
+                  {['Form 4', 'Form 5'].map((standard) => (
+                    <button key={standard} onClick={() => selectStandard(standard)} className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm ${selectedStandard === standard ? 'bg-indigo-50 font-semibold text-indigo-700' : 'hover:bg-slate-50'}`}>
+                      {standard}{selectedStandard === standard && <CheckIcon className="h-4 w-4" />}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+              <div className="flex items-center justify-between text-xs text-slate-300"><span>Level {stats.level}</span><TrophyIcon className="h-4 w-4 text-amber-300" /></div>
+              <p className="mt-2 text-xl font-semibold">Silver Scholar</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+              <div className="flex items-center justify-between text-xs text-slate-300"><span>XP progress</span><span>{stats.xp}/{stats.xpToNextLevel}</span></div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" style={{ width: `${xpPercentage}%` }} /></div>
+              <p className="mt-2 text-xs font-medium text-indigo-200">{xpPercentage}% to the next level</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+              <div className="flex items-center justify-between text-xs text-slate-300"><span>Study streak</span><FireIcon className="h-4 w-4 text-orange-300" /></div>
+              <p className="mt-2 text-xl font-semibold">{stats.streak} days</p>
+            </div>
           </div>
         </div>
+      </header>
+
+      <div className="sticky top-[72px] z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
+        <nav className="mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-4 sm:px-6 lg:px-8" aria-label="Course sections">
+          {tabs.map((tab) => {
+            const active = route().current(tab.routeName);
+            const TabIcon = tab.icon;
+            return (
+              <Link key={tab.key} href={route(tab.routeName, { subject, form, level_id, subject_id })} preserveScroll className={`flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-semibold transition ${active ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-900'}`}>
+                <TabIcon className="h-4 w-4" />{tab.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4 sm:px-6 lg:px-8 bg-white pt-3 shadow-b shadow-md border-gray-200">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex space-x-6 border-b border-gray-200">
-            {TAB_CONFIG.map((tab) => {
-              const isActive = tab.isActive(url, subject);
-              return (
-                <Link
-                  key={tab.key}
-                  href={tab.href(subject, form, level_id, subject_id)}
-                  className={`pb-4 relative text-sm font-medium whitespace-nowrap transition-all duration-200 ${isActive
-                    ? "text-[#8F3091] font-semibold border-b-2 border-[#8F3091]"
-                    : "text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300"
-                    } ${showLoading ? 'opacity-50 pointer-events-none' : ''}`}
-                  preserveScroll
-                  onClick={() => handleTabClick(tab)}
-                >
-                  {tab.label}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8F3091] animate-pulse"></div>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Page Content */}
-      <div className="py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-16 mt-0">
-        {children}
-      </div>
-
-      <div className="mt-10">
-        <StandardFooter />
-      </div>
+      <main className="py-7 sm:py-9">{children}</main>
+      <StandardFooter />
     </div>
   );
 }

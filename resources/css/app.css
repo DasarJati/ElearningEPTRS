@@ -1,6 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  background: #f6f7fb;
+}
+
+body {
+  margin: 0;
+  color: #0f172a;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
 /* global.css */
 ::-webkit-scrollbar {
@@ -10,6 +23,6 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #bfc9ca;
+  background-color: #cbd5e1;
   border-radius: 10px;
 }

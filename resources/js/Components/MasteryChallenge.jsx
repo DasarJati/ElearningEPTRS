@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import QuestionReportButton from '@/Components/QuestionReportButton';
 
 export default function MasteryChallenge({ isOpen, onClose, subjectId, levelId, subjectKey }) {
     const [sessionId, setSessionId] = useState(null);
@@ -453,6 +454,18 @@ const getCorrectAnswerInfo = () => {
                                         {currentQuestion.question}
                                     </p>
                                 )}
+                            </div>
+
+                            <div className="-mt-3 mb-5 flex justify-end">
+                                <QuestionReportButton
+                                    questionId={currentQuestion.id}
+                                    questionCode={currentQuestion.question_code}
+                                    subjectId={subjectId}
+                                    topicId={currentQuestion.topic_id}
+                                    context="mastery_challenge"
+                                    questionNumber={questionNumber}
+                                    selectedAnswerId={selectedAnswer}
+                                />
                             </div>
 
                             {/* Answer Options */}

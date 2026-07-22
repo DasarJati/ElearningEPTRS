@@ -5,6 +5,7 @@ import ResultQuestion from '@/Pages/courses/training/ResultQuestion';
 import Calculator from '@/Components/ScientificCalculator';
 import PageDrawingTool from '@/Components/PageDrawingTool';
 import AutoNotes from '@/Components/AutoNotes';
+import QuestionReportButton from '@/Components/QuestionReportButton';
 
 /**
  * QuestionDisplay Component
@@ -1808,6 +1809,18 @@ export default function ObjectiveQuestion() {
                             'Unknown'}
                     </div>
                   )}
+                </div>
+
+                <div className="-mt-3 mb-4 flex justify-end">
+                  <QuestionReportButton
+                    questionId={currentQuestion.id}
+                    questionCode={currentQuestion.question_code}
+                    subjectId={subject_id}
+                    topicId={topic_id}
+                    context="objective_practice"
+                    questionNumber={currentQuestionIndex + 1}
+                    selectedAnswerId={selectedAnswer.id}
+                  />
                 </div>
 
                 {/* Instructions */}

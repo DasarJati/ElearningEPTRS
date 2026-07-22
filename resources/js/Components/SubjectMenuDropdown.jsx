@@ -4,28 +4,33 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
   const schoolSubjects = usePage().props.schoolSubjects || [];
-  const { t } = useLanguage(); // Add this to use translations
+  const { t } = useLanguage();
 
   const getSubjectUrl = (subject) => {
     const subjectSlug = subject.abbr || subject.name.toLowerCase().replace(/\s+/g, '-');
     const subjectId = subject.id;
     const levelId = subject.level_id;
     const form = levelId === 10 ? 'Form 4' : 'Form 5';
-
     return `/subject/${subjectSlug}?subject_id=${subjectId}&level_id=${levelId}&form=${encodeURIComponent(form)}`;
   };
 
   return (
     <>
-      {/* Dropdown Trigger Button */}
+      {/* Game-style Dropdown Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center text-sm font-semibold 
-              ${isOpen ? 'text-gray-800' : 'text-white'}
-              focus:outline-none transition-colors duration-200 px-3 py-2 rounded-lg`}>
-        {/* Hamburger icon for mobile */}
+        className={`
+          flex items-center gap-2 text-sm font-semibold rounded-xl transition-all duration-200
+          ${isOpen 
+            ? 'bg-white text-amber-600 shadow-md' 
+            : 'bg-white/10 text-white hover:bg-white/20'
+          }
+          focus:outline-none focus:ring-2 focus:ring-amber-400 px-3 py-2
+        `}
+      >
+        {/* Hamburger icon */}
         <svg
-          className="h-5 w-5 sm:hidden mr-2"
+          className="h-5 w-5 sm:hidden"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -38,12 +43,10 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
           />
         </svg>
 
-        {/* Text for tablet */}
+        {/* Tablet view */}
         <span className="hidden sm:flex lg:hidden flex-col items-start">
-          <span className="text-sm font-semibold">
-            {t('school_subject', 'School Subject')}
-          </span>
-          <span className="flex items-center text-sm text-gray-600 mt-1">
+          <span className="text-xs text-white/80">Menu</span>
+          <span className="flex items-center text-sm font-semibold">
             {title}
             <svg
               className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -59,11 +62,12 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
           </span>
         </span>
 
-        {/* Text for desktop */}
-        <span className="hidden lg:flex items-center">
-          {t('school_subject', 'School Subject')} - {title}
+        {/* Desktop view */}
+        <span className="hidden lg:flex items-center gap-2">
+          <span className="text-lg">📚</span>
+          <span className='text-black'>Subjects</span>
           <svg
-            className={`ml-2 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -76,87 +80,149 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
         </span>
       </button>
 
-      {/* Enhanced Dropdown Menu */}
+      {/* Game-style Dropdown Menu */}
       <div
-        className={`fixed left-0 top-16 sm:top-20 w-screen h-auto bg-white px-4 sm:px-6 py-2 shadow-lg transition-all duration-300 ease-in-out z-50 ${isOpen
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-2 pointer-events-none"
-          }`}
+        className={`
+          fixed left-0 top-16 sm:top-20 w-screen bg-gradient-to-b from-white to-amber-50 
+          shadow-xl transition-all duration-300 ease-out z-50 border-t-4 border-amber-400
+          ${isOpen
+            ? "opacity-100 translate-y-0 visible"
+            : "opacity-0 -translate-y-4 invisible"
+          }
+        `}
       >
-        <div className="px-2 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* School Subjects */}
-            <div>
-              <h4 className="mb-2 border-b pb-1 text-sm font-semibold text-gray-700">
-                {t('school_subject', 'School Subjects')}
-              </h4>
-              <ul className="space-y-1 text-sm text-sky-600">
-                {schoolSubjects.map((subject) => (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Menu Header with Decoration */}
+          <div className="flex items-center gap-2 mb-5 pb-2 border-b border-amber-200">
+            <div className="w-1 h-6 bg-amber-400 rounded-full"></div>
+            <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
+              Explore Your Quests
+            </span>
+            <div className="flex-1"></div>
+            <button 
+              onClick={() => setIsOpen(false)}
+              className="p-1 hover:bg-amber-100 rounded-full transition"
+            >
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* School Subjects - Quest Categories */}
+            <div className="group">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <span className="text-lg">📖</span>
+                </div>
+                <h4 className="font-bold text-gray-800">
+                  {t('school_subject', 'School Subjects')}
+                </h4>
+                <span className="text-xs bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">
+                  {schoolSubjects.length}
+                </span>
+              </div>
+              
+              <ul className="space-y-1">
+                {schoolSubjects.map((subject, idx) => (
                   <li key={subject.id}>
                     <Link
                       href={getSubjectUrl(subject)}
-                      className="hover:underline block py-1"
                       onClick={() => setIsOpen(false)}
+                      className="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-amber-50 transition-all duration-200"
                     >
-                      {subject.name}
+                      <span className="text-lg opacity-60 group-hover:opacity-100 transition">
+                        {getSubjectIcon(idx)}
+                      </span>
+                      <span className="text-sm text-gray-700 group-hover:text-amber-700 group-hover:font-medium transition">
+                        {subject.name}
+                      </span>
+                      <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition">
+                        →
+                      </span>
                     </Link>
                   </li>
                 ))}
                 {schoolSubjects.length === 0 && (
-                  <li className="text-gray-500">
-                    {t('no_subjects_available', 'No subjects available')}
+                  <li className="px-3 py-4 text-center text-gray-400 text-sm">
+                    📭 {t('no_subjects_available', 'No subjects available')}
                   </li>
                 )}
               </ul>
             </div>
 
-            {/* VideoTube */}
-            {/* <div>
-              <h4 className="mb-2 border-b pb-1 text-sm font-semibold text-gray-700">
-                {t('videotube', 'VideoTube')}
-              </h4>
-              <ul className="space-y-1 text-sm text-red-500">
-                <li>
-                  <Link 
-                    href="#" 
-                    className="hover:underline block py-1"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {t('general_learning', 'General Learning')}
-                  </Link>
-                </li>
-              </ul>
-            </div> */}
-
-            {/* Games */}
-            {/* <div>
-              <h4 className="mb-2 border-b pb-1 text-sm font-semibold text-gray-700">
-                {t('games', 'Games')}
-              </h4>
-              <ul className="space-y-1 text-sm text-gray-600">
+            {/* Games Section - Play & Learn */}
+            {/* <div className="group">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center">
+                  <span className="text-lg">🎮</span>
+                </div>
+                <h4 className="font-bold text-gray-800">
+                  {t('games', 'Games')}
+                </h4>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+                  Play & Earn
+                </span>
+              </div>
+              
+              <ul className="space-y-1">
                 <li>
                   <Link 
                     href="/tekakata-page" 
-                    className="hover:underline block py-1"
                     onClick={() => setIsOpen(false)}
+                    className="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-green-50 transition-all duration-200"
                   >
-                    {t('teka_kata', 'Teka Kata')}
+                    <span className="text-lg">🔤</span>
+                    <span className="text-sm text-gray-700 group-hover:text-green-700 transition">
+                      {t('teka_kata', 'Word Puzzle')}
+                    </span>
+                    <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition">
+                      +50 XP
+                    </span>
                   </Link>
                 </li>
                 <li>
                   <Link 
                     href="/quiz-page" 
-                    className="hover:underline block py-1"
                     onClick={() => setIsOpen(false)}
+                    className="group flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-green-50 transition-all duration-200"
                   >
-                    {t('quiz_arena', 'Quiz Arena')}
+                    <span className="text-lg">⚡</span>
+                    <span className="text-sm text-gray-700 group-hover:text-green-700 transition">
+                      {t('quiz_arena', 'Quiz Arena')}
+                    </span>
+                    <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition">
+                      +100 XP
+                    </span>
                   </Link>
                 </li>
               </ul>
             </div> */}
+
+            
+          </div>
+
+          {/* Menu Footer - Quick Tips */}
+          <div className="mt-6 pt-4 border-t border-amber-100 flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400">💡</span>
+              <span>Complete subjects to earn XP and unlock new adventures!</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-amber-400">🏆</span>
+              <span>{schoolSubjects.length} Subjects Available</span>
+            </div>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+// Helper function to get subject icons
+function getSubjectIcon(index) {
+  const icons = ['📘', '📗', '📕', '📙', '📔', '📒', '📚', '🔬', '🧮', '🎨', '🌍', '💻'];
+  return icons[index % icons.length];
 }

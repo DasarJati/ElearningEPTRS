@@ -20,6 +20,7 @@ use App\Http\Controllers\Web\ReportController;
 use App\Http\Controllers\Web\SubjectiveController;
 use App\Http\Controllers\Web\MissionController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\QuestionReportController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -33,6 +34,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/question-reports', [QuestionReportController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('question-reports.store');
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

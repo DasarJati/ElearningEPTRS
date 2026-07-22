@@ -236,6 +236,7 @@ class ObjectiveController extends Controller
 
             return [
                 'id' => $question->id,
+                'question_code' => $question->question_code,
                 'question_text' => $question->question_text,
                 'question_file' => $question->question_file,
                 'question_type' => $this->determineQuestionType($question),

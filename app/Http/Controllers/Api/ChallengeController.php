@@ -216,6 +216,7 @@ class ChallengeController extends Controller
             // Prepare question object
     $questionData = [
         'id' => $nextQuestion->id,
+        'question_code' => $nextQuestion->question_code,
         'topic_id' => $nextQuestion->topic_id
     ];
 
