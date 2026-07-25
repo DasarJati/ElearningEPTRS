@@ -1,421 +1,240 @@
-import React, { useState } from 'react';
-import { evaluate, sqrt, sin, cos, tan, log, pi, e, pow, abs, mean, std, factorial, combinations, permutations } from 'mathjs';
+import { useEffect, useMemo, useState } from 'react';
+import { evaluate } from 'mathjs';
 
-const ScientificCalculator = () => {
-  const [display, setDisplay] = useState('0');
-  const [expression, setExpression] = useState('');
-  const [memory, setMemory] = useState(0);
-  const [isRad, setIsRad] = useState(true);
-  const [history, setHistory] = useState([]);
-  const [activeMode, setActiveMode] = useState('main'); // 'main' or 'function'
-  const [ans, setAns] = useState(null);
+const scientificButtons = [
+  { label: 'sin', value: 'sin(', tone: 'function' },
+  { label: 'cos', value: 'cos(', tone: 'function' },
+  { label: 'tan', value: 'tan(', tone: 'function' },
+  { label: 'log', value: 'log10(', tone: 'function' },
+  { label: 'ln', value: 'log(', tone: 'function' },
+  { label: 'sin⁻¹', value: 'asin(', tone: 'function' },
+  { label: 'cos⁻¹', value: 'acos(', tone: 'function' },
+  { label: 'tan⁻¹', value: 'atan(', tone: 'function' },
+  { label: '√', value: 'sqrt(', tone: 'function' },
+  { label: 'x²', action: 'square', tone: 'function' },
+  { label: 'π', value: 'pi', tone: 'function' },
+  { label: 'e', value: 'e', tone: 'function' },
+  { label: 'xʸ', value: '^', tone: 'function' },
+  { label: '1/x', action: 'reciprocal', tone: 'function' },
+  { label: 'n!', value: '!', tone: 'function' },
+];
 
-  // Mode buttons - only main and function
-  const modeButtons = [
-    { id: 'main', label: 'main', className: 'bg-blue-600 text-white' },
-    { id: 'function', label: 'func', className: 'bg-gray-600 text-white' },
-  ];
+const keypadButtons = [
+  { label: 'MC', action: 'memory-clear', tone: 'utility' },
+  { label: 'MR', action: 'memory-recall', tone: 'utility' },
+  { label: 'M+', action: 'memory-add', tone: 'utility' },
+  { label: 'DEL', action: 'delete', tone: 'danger' },
+  { label: 'AC', action: 'clear', tone: 'danger' },
+  { label: '(', value: '(', tone: 'utility' },
+  { label: ')', value: ')', tone: 'utility' },
+  { label: '%', action: 'percent', tone: 'utility' },
+  { label: '÷', value: '/', tone: 'operator' },
+  { label: '×', value: '*', tone: 'operator' },
+  { label: '7', value: '7' },
+  { label: '8', value: '8' },
+  { label: '9', value: '9' },
+  { label: '−', value: '-', tone: 'operator' },
+  { label: 'ANS', action: 'answer', tone: 'utility' },
+  { label: '4', value: '4' },
+  { label: '5', value: '5' },
+  { label: '6', value: '6' },
+  { label: '+', value: '+', tone: 'operator' },
+  { label: '±', action: 'negate', tone: 'utility' },
+  { label: '1', value: '1' },
+  { label: '2', value: '2' },
+  { label: '3', value: '3' },
+  { label: '=', action: 'calculate', tone: 'equals', rowSpan: true },
+  { label: '0', value: '0', colSpan: true },
+  { label: '.', value: '.' },
+];
 
-  // Main mode buttons (basic operations) - 8 columns, 4 rows
-  const mainButtons = [
-    // Row 1
-    { value: '7', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '8', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '9', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '÷', displayText: '÷', className: 'bg-orange-500 text-white hover:bg-orange-600' },
-    { value: 'x²', displayText: 'a²', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'x^y', displayText: 'aᵇ', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'a/b', displayText: 'a/b', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'Check', displayText: '=', className: 'bg-green-600 text-white hover:bg-green-700' },
-    
-    // Row 2
-    { value: '4', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '5', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '6', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '×', displayText: '×', className: 'bg-orange-500 text-white hover:bg-orange-600' },
-    { value: '√', displayText: '√', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: '³√', displayText: '³√', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: '(', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: ')', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    
-    // Row 3
-    { value: '1', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '2', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '3', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '-', displayText: '−', className: 'bg-orange-500 text-white hover:bg-orange-600' },
-    { value: 'sin', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'cos', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'tan', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'π', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    
-    // Row 4
-    { value: '0', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '.', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: 'ans', displayText: 'ans', className: 'bg-gray-600 text-white hover:bg-gray-500' },
-    { value: '+', className: 'bg-orange-500 text-white hover:bg-orange-600' },
-    { value: 'abs', displayText: '|a|', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'ln', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: ',', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: '±', displayText: '−', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-  ];
-
-  // Function mode buttons (scientific operations) - 6 columns, 5 rows
-  const functionButtons = [
-    // Row 1
-    { value: 'sin', displayText: 'sin', className: 'bg-purple-700 text-white hover:bg-purple-800' },
-    { value: 'cos', displayText: 'cos', className: 'bg-purple-700 text-white hover:bg-purple-800' },
-    { value: 'tan', displayText: 'tan', className: 'bg-purple-700 text-white hover:bg-purple-800' },
-    { value: 'ln', displayText: 'ln', className: 'bg-purple-700 text-white hover:bg-purple-800' },
-    { value: 'log', displayText: 'log', className: 'bg-purple-700 text-white hover:bg-purple-800' },
-    { value: 'empty', displayText: '', className: 'bg-transparent cursor-default' },
-    
-    // Row 2
-    { value: 'asin', displayText: 'sin⁻¹', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'acos', displayText: 'cos⁻¹', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'atan', displayText: 'tan⁻¹', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'e^x', displayText: 'eˣ', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'abs', displayText: 'abs', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    { value: 'round', displayText: 'round', className: 'bg-blue-700 text-white hover:bg-blue-800' },
-    
-    // Row 3
-    { value: 'mean', displayText: 'mean', className: 'bg-green-700 text-white hover:bg-green-800' },
-    { value: 'stdev', displayText: 'stdev', className: 'bg-green-700 text-white hover:bg-green-800' },
-    { value: 'stdevp', displayText: 'stdevp', className: 'bg-green-700 text-white hover:bg-green-800' },
-    { value: 'x^y', displayText: 'aᵇ', className: 'bg-green-700 text-white hover:bg-green-800' },
-    { value: '√', displayText: '√', className: 'bg-green-700 text-white hover:bg-green-800' },
-    { value: '³√', displayText: '³√', className: 'bg-green-700 text-white hover:bg-green-800' },
-    
-    // Row 4
-    { value: 'nPr', displayText: 'nPr', className: 'bg-indigo-700 text-white hover:bg-indigo-800' },
-    { value: 'nCr', displayText: 'nCr', className: 'bg-indigo-700 text-white hover:bg-indigo-800' },
-    { value: '!', displayText: '!', className: 'bg-indigo-700 text-white hover:bg-indigo-800' },
-    { value: 'e', displayText: 'e', className: 'bg-indigo-700 text-white hover:bg-indigo-800' },
-    { value: 'π', displayText: 'π', className: 'bg-indigo-700 text-white hover:bg-indigo-800' },
-    { value: 'down', displayText: '↓', className: 'bg-gray-700 text-white hover:bg-gray-800' },
-  ];
-
-  const handleButtonClick = (value) => {
-    if (value === 'empty') return;
-    
-    switch(value) {
-      case 'C':
-      case 'clear all':
-        setDisplay('0');
-        setExpression('');
-        break;
-        
-      case 'CE':
-        setDisplay('0');
-        break;
-        
-      case 'DEL':
-        if (display.length === 1) {
-          setDisplay('0');
-        } else {
-          setDisplay(display.slice(0, -1));
-        }
-        break;
-        
-      case 'Check':
-      case '=':
-        calculateResult();
-        break;
-        
-      case 'sin':
-      case 'cos':
-      case 'tan':
-      case 'asin':
-      case 'acos':
-      case 'atan':
-        handleTrigFunction(value);
-        break;
-        
-      case 'log':
-        setDisplay(`log(${display})`);
-        setExpression(`log10(${display})`);
-        break;
-        
-      case 'ln':
-        setDisplay(`ln(${display})`);
-        setExpression(`log(${display})`);
-        break;
-        
-      case 'e^x':
-        setDisplay(`e^(${display})`);
-        setExpression(`exp(${display})`);
-        break;
-        
-      case '√':
-        setDisplay(`√(${display})`);
-        setExpression(`sqrt(${display})`);
-        break;
-        
-      case '³√':
-        setDisplay(`³√(${display})`);
-        setExpression(`cbrt(${display})`);
-        break;
-        
-      case 'x²':
-        setDisplay(`(${display})²`);
-        setExpression(`(${display})^2`);
-        break;
-        
-      case 'x^y':
-        setDisplay(`${display}^`);
-        setExpression(`${display}^`);
-        break;
-        
-      case 'a/b':
-        setDisplay(`(${display})/`);
-        setExpression(`(${display})/`);
-        break;
-        
-      case 'π':
-        setDisplay(Math.PI.toString());
-        setExpression('pi');
-        break;
-        
-      case 'e':
-        setDisplay(Math.E.toString());
-        setExpression('e');
-        break;
-        
-      case 'abs':
-        setDisplay(`abs(${display})`);
-        setExpression(`abs(${display})`);
-        break;
-        
-      case 'round':
-        setDisplay(`round(${display})`);
-        setExpression(`round(${display})`);
-        break;
-        
-      case 'mean':
-        setDisplay(`mean(${display})`);
-        setExpression(`mean(${display})`);
-        break;
-        
-      case 'stdev':
-        setDisplay(`stdev(${display})`);
-        setExpression(`std(${display})`);
-        break;
-        
-      case 'stdevp':
-        setDisplay(`stdevp(${display})`);
-        setExpression(`std(${display}, "uncorrected")`);
-        break;
-        
-      case 'nPr':
-        setDisplay(`perm(${display})`);
-        setExpression(`permutations(${display})`);
-        break;
-        
-      case 'nCr':
-        setDisplay(`comb(${display})`);
-        setExpression(`combinations(${display})`);
-        break;
-        
-      case '!':
-        setDisplay(`factorial(${display})`);
-        setExpression(`factorial(${display})`);
-        break;
-        
-      case 'down':
-        // Scroll down or show more functions
-        break;
-        
-      case 'ans':
-        if (ans !== null) {
-          setDisplay(ans.toString());
-        }
-        break;
-        
-      case '±':
-        if (display !== '0') {
-          setDisplay(display.startsWith('-') ? display.slice(1) : '-' + display);
-        }
-        break;
-        
-      case 'RAD':
-      case 'DEG':
-        setIsRad(!isRad);
-        break;
-        
-      default:
-        // Numbers and operators
-        if (display === '0') {
-          setDisplay(value);
-          setExpression(value);
-        } else {
-          setDisplay(display + value);
-          setExpression(expression + value);
-        }
-        break;
-    }
-  };
-
-  const handleTrigFunction = (func) => {
-    const value = parseFloat(display);
-    if (isNaN(value)) return;
-    
-    let result;
-    const radValue = isRad ? value : value * Math.PI / 180;
-    
-    switch(func) {
-      case 'sin': result = sin(radValue); break;
-      case 'cos': result = cos(radValue); break;
-      case 'tan': result = tan(radValue); break;
-      case 'asin': result = Math.asin(radValue); break;
-      case 'acos': result = Math.acos(radValue); break;
-      case 'atan': result = Math.atan(radValue); break;
-      default: return;
-    }
-    
-    const roundedResult = Math.round(result * 1e10) / 1e10;
-    setDisplay(roundedResult.toString());
-    setExpression(`${func}(${value})`);
-    
-    setHistory(prev => [...prev, {
-      expression: `${func}(${value})`,
-      result: roundedResult
-    }]);
-  };
-
-  const calculateResult = () => {
-    try {
-      let exprToEval = expression;
-      
-      exprToEval = exprToEval
-        .replace(/×/g, '*')
-        .replace(/÷/g, '/')
-        .replace(/π/g, 'pi')
-        .replace(/√/g, 'sqrt')
-        .replace(/³√/g, 'cbrt')
-        .replace(/log\(/g, 'log10(')
-        .replace(/ln\(/g, 'log(')
-        .replace(/abs\(/g, 'abs(')
-        .replace(/round\(/g, 'round(')
-        .replace(/mean\(/g, 'mean(')
-        .replace(/stdev\(/g, 'std(')
-        .replace(/stdevp\(/g, 'std(, "uncorrected")')
-        .replace(/perm\(/g, 'permutations(')
-        .replace(/comb\(/g, 'combinations(')
-        .replace(/factorial\(/g, 'factorial(')
-        .replace(/e\^/g, 'exp');
-      
-      const result = evaluate(exprToEval);
-      const roundedResult = Math.round(result * 1e10) / 1e10;
-      
-      setDisplay(roundedResult.toString());
-      setAns(roundedResult);
-      
-      setHistory(prev => [...prev, {
-        expression: expression,
-        result: roundedResult
-      }]);
-      
-    } catch (error) {
-      console.error('Calculation error:', error);
-      setDisplay('Error');
-    }
-  };
-
-  const CalcButton = ({ value, displayText, className = '' }) => (
-    <button
-      className={`flex items-center justify-center p-2 text-xs font-medium rounded transition-all duration-200 active:scale-95 hover:opacity-90 ${className}`}
-      onClick={() => handleButtonClick(value)}
-    >
-      {displayText || value}
-    </button>
-  );
-
-  return (
-    <div className="bg-gray-900 p-3 rounded-lg shadow-xl w-[500px]">
-      {/* Top Header */}
-      <div className="flex justify-between items-center mb-3">
-        <div className="text-white text-sm font-bold">Calculator</div>
-        <div className="flex gap-1">
-          {modeButtons.map((mode) => (
-            <button
-              key={mode.id}
-              className={`px-3 py-1 text-xs rounded ${mode.className} ${activeMode === mode.id ? 'ring-2 ring-blue-300' : ''}`}
-              onClick={() => setActiveMode(mode.id)}
-            >
-              {mode.label}
-            </button>
-          ))}
-          <button
-            className={`px-3 py-1 text-xs rounded ${isRad ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white'}`}
-            onClick={() => setIsRad(!isRad)}
-          >
-            {isRad ? 'RAD' : 'DEG'}
-          </button>
-          <button
-            className="px-3 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700"
-            onClick={() => handleButtonClick('clear all')}
-          >
-            clear all
-          </button>
-        </div>
-      </div>
-
-      {/* Display */}
-      <div className="bg-gray-950 rounded-lg p-3 mb-3">
-        <div className="text-gray-400 text-xs mb-1 truncate">Expression: {expression}</div>
-        <div className="text-white text-2xl font-mono text-right overflow-x-auto whitespace-nowrap">
-          {display}
-        </div>
-      </div>
-
-      {/* Main Mode (8x4 grid) */}
-      {activeMode === 'main' && (
-        <div className="grid grid-cols-8 gap-1">
-          {mainButtons.map((button, index) => (
-            <CalcButton
-              key={index}
-              value={button.value}
-              displayText={button.displayText}
-              className={button.className}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Function Mode (6x4 grid) */}
-      {activeMode === 'function' && (
-        <div className="grid grid-cols-6 gap-1">
-          {functionButtons.map((button, index) => (
-            <CalcButton
-              key={index}
-              value={button.value}
-              displayText={button.displayText}
-              className={button.className}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Bottom Status Bar */}
-      <div className="mt-3 pt-2 border-t border-gray-700 flex justify-between items-center">
-        <div className="text-gray-400 text-xs">
-          Memory: {memory} | Ans: {ans !== null ? ans : '--'}
-        </div>
-        <details className="text-gray-300 relative">
-          <summary className="text-xs cursor-pointer hover:text-white">
-            History ({history.length})
-          </summary>
-          <div className="absolute right-0 mt-1 bg-gray-800 rounded p-2 max-h-32 overflow-y-auto text-xs w-48 z-10 shadow-lg">
-            {history.slice().reverse().map((item, index) => (
-              <div key={index} className="text-gray-300 border-b border-gray-700 py-1">
-                <div className="truncate">{item.expression}</div>
-                <div className="text-green-400">= {item.result}</div>
-              </div>
-            ))}
-          </div>
-        </details>
-      </div>
-    </div>
-  );
+const toneClasses = {
+  number: 'border-slate-700 bg-slate-800 text-white hover:bg-slate-700',
+  function: 'border-indigo-800/80 bg-indigo-950/70 text-indigo-200 hover:bg-indigo-900',
+  utility: 'border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600',
+  operator: 'border-cyan-600/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25',
+  danger: 'border-rose-500/30 bg-rose-500/15 text-rose-200 hover:bg-rose-500/25',
+  equals: 'border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-500',
 };
 
-export default ScientificCalculator;
+const formatExpression = (value) => value
+  .replaceAll('*', '×')
+  .replaceAll('/', '÷')
+  .replaceAll('sqrt', '√')
+  .replaceAll('log10', 'log');
+
+const formatResult = (value) => {
+  if (!Number.isFinite(value)) return 'Math error';
+  if (Math.abs(value) > 1e12 || (Math.abs(value) > 0 && Math.abs(value) < 1e-9)) {
+    return value.toExponential(8).replace(/\.?0+e/, 'e');
+  }
+  return Number(value.toPrecision(12)).toString();
+};
+
+export default function ScientificCalculator() {
+  const [expression, setExpression] = useState('');
+  const [result, setResult] = useState('0');
+  const [angleMode, setAngleMode] = useState('DEG');
+  const [memory, setMemory] = useState(0);
+  const [answer, setAnswer] = useState(0);
+  const [history, setHistory] = useState([]);
+  const [justEvaluated, setJustEvaluated] = useState(false);
+
+  const scope = useMemo(() => {
+    const toRadians = (value) => angleMode === 'DEG' ? value * Math.PI / 180 : value;
+    const fromRadians = (value) => angleMode === 'DEG' ? value * 180 / Math.PI : value;
+
+    return {
+      sin: (value) => Math.sin(toRadians(value)),
+      cos: (value) => Math.cos(toRadians(value)),
+      tan: (value) => Math.tan(toRadians(value)),
+      asin: (value) => fromRadians(Math.asin(value)),
+      acos: (value) => fromRadians(Math.acos(value)),
+      atan: (value) => fromRadians(Math.atan(value)),
+    };
+  }, [angleMode]);
+
+  const calculate = () => {
+    if (!expression.trim()) return;
+
+    try {
+      const calculated = evaluate(expression, scope);
+      if (typeof calculated !== 'number') throw new Error('Result is not numeric');
+
+      const formatted = formatResult(calculated);
+      setResult(formatted);
+      setAnswer(calculated);
+      setHistory((items) => [{ expression, result: formatted }, ...items].slice(0, 8));
+      setJustEvaluated(true);
+    } catch {
+      setResult('Syntax error');
+      setJustEvaluated(true);
+    }
+  };
+
+  const appendValue = (value) => {
+    const startsNewExpression = justEvaluated && /^[\d.(]|pi$|e$/.test(value);
+    setExpression((current) => startsNewExpression ? value : current + value);
+    setResult('0');
+    setJustEvaluated(false);
+  };
+
+  const numericResult = () => {
+    const value = Number(result);
+    return Number.isFinite(value) ? value : answer;
+  };
+
+  const handleAction = (action) => {
+    switch (action) {
+      case 'clear':
+        setExpression('');
+        setResult('0');
+        setJustEvaluated(false);
+        break;
+      case 'delete':
+        setExpression((current) => current.slice(0, -1));
+        setJustEvaluated(false);
+        break;
+      case 'calculate':
+        calculate();
+        break;
+      case 'square':
+        appendValue('^2');
+        break;
+      case 'reciprocal':
+        setExpression((current) => current ? `1/(${current})` : '1/(');
+        setJustEvaluated(false);
+        break;
+      case 'percent':
+        setExpression((current) => current ? `(${current})/100` : '');
+        setJustEvaluated(false);
+        break;
+      case 'negate':
+        setExpression((current) => current ? `-(${current})` : '-');
+        setJustEvaluated(false);
+        break;
+      case 'answer':
+        appendValue(`(${answer})`);
+        break;
+      case 'memory-clear':
+        setMemory(0);
+        break;
+      case 'memory-recall':
+        appendValue(`(${memory})`);
+        break;
+      case 'memory-add':
+        setMemory((current) => current + numericResult());
+        break;
+      default:
+        break;
+    }
+  };
+
+  const pressButton = ({ value, action }) => {
+    if (action) handleAction(action);
+    else appendValue(value);
+  };
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (/^[0-9.]$/.test(event.key)) appendValue(event.key);
+      else if (['+', '-', '*', '/', '(', ')', '^'].includes(event.key)) appendValue(event.key);
+      else if (event.key === 'Enter' || event.key === '=') {
+        event.preventDefault();
+        calculate();
+      } else if (event.key === 'Backspace') handleAction('delete');
+      else if (event.key === 'Escape') handleAction('clear');
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
+  return (
+    <div className="w-full select-none rounded-2xl bg-slate-950 p-3 text-white shadow-2xl sm:p-4">
+      <div className="mb-3 flex items-center justify-between px-1">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">PTRS Scientific</p>
+          <p className="mt-0.5 text-xs text-slate-500">Natural display calculator</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {memory !== 0 && <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-[10px] font-bold text-emerald-300">M</span>}
+          <button type="button" onClick={() => setAngleMode((mode) => mode === 'DEG' ? 'RAD' : 'DEG')} className="rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-1.5 text-[10px] font-bold text-indigo-200 transition hover:bg-indigo-500/25">{angleMode}</button>
+        </div>
+      </div>
+
+      <div className="mb-3 overflow-hidden rounded-xl border border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 p-3 shadow-inner">
+        <div className="h-6 overflow-x-auto whitespace-nowrap text-right font-mono text-xs text-slate-400">{expression ? formatExpression(expression) : 'Ready'}</div>
+        <div data-calculator-result className={`mt-1 overflow-x-auto whitespace-nowrap text-right font-mono text-3xl font-semibold tracking-tight ${result.includes('error') ? 'text-rose-300' : 'text-white'}`}>{result}</div>
+      </div>
+
+      <div className="mb-2 grid grid-cols-5 gap-1.5">
+        {scientificButtons.map((button) => <CalculatorButton key={button.label} button={button} onPress={pressButton} />)}
+      </div>
+
+      <div className="grid grid-cols-5 gap-1.5">
+        {keypadButtons.map((button) => <CalculatorButton key={button.label} button={button} onPress={pressButton} />)}
+      </div>
+
+      <details className="mt-3 border-t border-slate-800 pt-2">
+        <summary className="cursor-pointer text-[10px] font-semibold text-slate-500 transition hover:text-slate-300">History ({history.length})</summary>
+        <div className="mt-2 max-h-24 space-y-1.5 overflow-y-auto rounded-lg bg-slate-900 p-2">
+          {history.length === 0 ? <p className="text-[10px] text-slate-600">No calculations yet.</p> : history.map((entry, index) => (
+            <button type="button" key={`${entry.expression}-${index}`} onClick={() => { setExpression(entry.expression); setResult(entry.result); }} className="block w-full rounded-md px-2 py-1 text-right font-mono text-[10px] text-slate-400 hover:bg-slate-800">
+              <span className="block truncate">{formatExpression(entry.expression)}</span><span className="text-emerald-300">= {entry.result}</span>
+            </button>
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+function CalculatorButton({ button, onPress }) {
+  const tone = toneClasses[button.tone || 'number'];
+  return (
+    <button type="button" onClick={() => onPress(button)} className={`flex min-h-10 items-center justify-center rounded-lg border px-1 text-xs font-semibold shadow-sm transition active:scale-95 sm:min-h-11 ${tone} ${button.colSpan ? 'col-span-2' : ''} ${button.rowSpan ? 'row-span-2' : ''}`}>
+      {button.label}
+    </button>
+  );
+}

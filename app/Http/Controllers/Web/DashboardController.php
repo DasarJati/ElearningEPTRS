@@ -16,11 +16,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
 public function index()
 {
+    $dashboardStats = $this->emptyDashboardStats();
+    $activityCalendar = $this->emptyActivityCalendar();
+
     // DEBUG: Log semua language sources
     Log::info('=== DASHBOARD LANGUAGE DEBUG START ===');
     Log::info('Session locale:', ['value' => Session::get('locale')]);
@@ -72,6 +77,8 @@ public function index()
         
         // Get pending friend requests
         $pendingRequests = $this->getPendingRequests($user);
+        $dashboardStats = $this->calculateDashboardStats($user->id);
+        $activityCalendar = $this->buildMonthlyActivityCalendar($user->id);
 
         // Prepare profile data from student information
         $profileData = [
@@ -108,16 +115,9 @@ public function index()
         ->limit(7)
         ->get();
 
-    // Courses and assignments data
-    $courses = [
-        [
-            'title' => "Bahasa Melayu",
-            'topic' => "Graphic Stimuli",
-            'progress' => 0,
-            'total' => 4
-        ],
-        // ... other courses
-    ];
+    // Show every active course with progress calculated from the learner's
+    // latest practice result for each published topic.
+    $courses = $this->getDashboardCourses(Auth::id());
 
     $assignments = [
         [
@@ -148,8 +148,308 @@ public function index()
         'locale' => $locale, 
         'translations' => $translations, 
         'availableLocales' => ['en', 'ms'],
+        'dashboardStats' => $dashboardStats,
+        'activityCalendar' => $activityCalendar,
     ]);
 }
+
+    /**
+     * Return all active Form 4 subjects and their real course completion.
+     *
+     * A topic is complete when the learner's latest objective or subjective
+     * practice for that topic has a passing score (70% or higher). This
+     * mirrors the completion rule used on the subject course page.
+     */
+    private function getDashboardCourses(?int $userId): array
+    {
+        $subjects = DB::table('subject')
+            ->where('is_active', 1)
+            ->where('level_id', 10)
+            ->select('id', 'name', 'abbr', 'level_id', 'seq')
+            ->orderBy('seq')
+            ->get();
+
+        if ($subjects->isEmpty()) {
+            return [];
+        }
+
+        $subjectIds = $subjects->pluck('id');
+        $learningUnits = DB::table('topics as parent')
+            ->leftJoin('topics as child', function ($join) {
+                $join->on('child.parent_id', '=', 'parent.id')
+                    ->where('child.is_active', 1)
+                    ->where('child.is_published', 1);
+            })
+            ->whereIn('parent.subject_id', $subjectIds)
+            ->where('parent.level_id', 10)
+            ->where(function ($query) {
+                $query->whereNull('parent.parent_id')
+                    ->orWhere('parent.parent_id', 0);
+            })
+            ->where('parent.is_active', 1)
+            ->where('parent.is_published', 1)
+            ->selectRaw('parent.subject_id')
+            ->selectRaw('COALESCE(child.id, parent.id) as topic_id')
+            ->selectRaw('COALESCE(child.name, parent.name) as topic_name')
+            ->distinct()
+            ->get();
+
+        $unitsBySubject = $learningUnits->groupBy('subject_id');
+        $latestPractice = collect();
+
+        if ($userId && $learningUnits->isNotEmpty()) {
+            $unitTopicIds = $learningUnits->pluck('topic_id')->unique()->values();
+
+            $latestPractice = DB::table('practice_session')
+                ->where('user_id', $userId)
+                ->whereIn('subject_id', $subjectIds)
+                ->whereIn('question_type_id', [1, 2])
+                ->where(function ($query) use ($unitTopicIds) {
+                    $query->whereIn('subtopic_id', $unitTopicIds)
+                        ->orWhere(function ($topicQuery) use ($unitTopicIds) {
+                            $topicQuery->where(function ($subtopicQuery) {
+                                $subtopicQuery->whereNull('subtopic_id')
+                                    ->orWhere('subtopic_id', 0);
+                            })->whereIn('topic_id', $unitTopicIds);
+                        });
+                })
+                ->select([
+                    'subject_id',
+                    'topic_id',
+                    'subtopic_id',
+                    'question_type_id',
+                    'score',
+                    'created_at',
+                ])
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->get()
+                ->map(function ($session) {
+                    $session->course_topic_id = $session->subtopic_id
+                        ? (int) $session->subtopic_id
+                        : (int) $session->topic_id;
+
+                    return $session;
+                })
+                ->unique(fn ($session) => $session->course_topic_id . ':' . $session->question_type_id);
+        }
+
+        return $subjects->map(function ($subject) use ($unitsBySubject, $latestPractice) {
+            $units = $unitsBySubject->get($subject->id, collect());
+            $completed = $units->filter(function ($unit) use ($latestPractice) {
+                return $latestPractice->contains(function ($session) use ($unit) {
+                    return $session->course_topic_id === (int) $unit->topic_id
+                        && (float) $session->score >= 70;
+                });
+            })->count();
+            $total = $units->count();
+
+            return [
+                'id' => (int) $subject->id,
+                'name' => $subject->name,
+                'abbr' => $subject->abbr,
+                'level_id' => (int) $subject->level_id,
+                'progress' => $completed,
+                'total' => $total,
+                'progress_percentage' => $total > 0
+                    ? (int) round(($completed / $total) * 100)
+                    : 0,
+                'topic' => $total > 0
+                    ? "{$completed} of {$total} topics completed"
+                    : 'Course content is coming soon',
+            ];
+        })->all();
+    }
+
+    /**
+     * Build the current month's learning calendar.
+     *
+     * Completing a session requires authentication, so historical completed
+     * sessions are also treated as verified login dates.
+     */
+    private function buildMonthlyActivityCalendar(int $userId): array
+    {
+        $today = Carbon::today();
+        $monthStart = $today->copy()->startOfMonth();
+        $monthEnd = $today->copy()->endOfMonth();
+
+        $loginDates = DB::table('user_login_activities')
+            ->where('user_id', $userId)
+            ->whereBetween('login_date', [
+                $monthStart->toDateString(),
+                $monthEnd->toDateString(),
+            ])
+            ->pluck('login_date')
+            ->map(fn ($date) => Carbon::parse($date)->toDateString())
+            ->flip();
+
+        $sessionDates = DB::table('practice_session')
+            ->where('user_id', $userId)
+            ->whereNotNull('end_at')
+            ->whereBetween('end_at', [
+                $monthStart->copy()->startOfDay(),
+                $monthEnd->copy()->endOfDay(),
+            ])
+            ->selectRaw('DATE(end_at) as activity_date')
+            ->selectRaw('COUNT(*) as sessions_completed')
+            ->groupByRaw('DATE(end_at)')
+            ->pluck('sessions_completed', 'activity_date');
+
+        $days = collect(range(1, $monthStart->daysInMonth))
+            ->map(function (int $day) use ($monthStart, $today, $loginDates, $sessionDates) {
+                $date = $monthStart->copy()->day($day);
+                $dateKey = $date->toDateString();
+                $completedSessions = (int) ($sessionDates[$dateKey] ?? 0);
+                $loggedIn = $loginDates->has($dateKey) || $completedSessions > 0;
+
+                return [
+                    'date' => $dateKey,
+                    'day' => $day,
+                    'is_today' => $date->isSameDay($today),
+                    'is_future' => $date->isAfter($today),
+                    'logged_in' => $loggedIn,
+                    'sessions_completed' => $completedSessions,
+                    'is_active' => $loggedIn && $completedSessions > 0,
+                ];
+            });
+
+        $weekStart = $today->copy()->startOfWeek(Carbon::MONDAY);
+        $weekEnd = $today->copy()->endOfWeek(Carbon::SUNDAY);
+        $weeklyCompleted = $days
+            ->filter(fn ($day) => $day['is_active'])
+            ->filter(function ($day) use ($weekStart, $weekEnd) {
+                return Carbon::parse($day['date'])->betweenIncluded($weekStart, $weekEnd);
+            })
+            ->count();
+
+        return [
+            'month_label' => $monthStart->format('F Y'),
+            'days_in_month' => $monthStart->daysInMonth,
+            'first_day_offset' => $monthStart->dayOfWeekIso - 1,
+            'days' => $days->values(),
+            'active_days' => $days->where('is_active', true)->count(),
+            'login_days' => $days->where('logged_in', true)->count(),
+            'weekly_goal' => 5,
+            'weekly_completed' => $weeklyCompleted,
+        ];
+    }
+
+    private function emptyActivityCalendar(): array
+    {
+        return [
+            'month_label' => now()->format('F Y'),
+            'days_in_month' => now()->daysInMonth,
+            'first_day_offset' => now()->startOfMonth()->dayOfWeekIso - 1,
+            'days' => [],
+            'active_days' => 0,
+            'login_days' => 0,
+            'weekly_goal' => 5,
+            'weekly_completed' => 0,
+        ];
+    }
+
+    /**
+     * Calculate objective-practice performance from first-attempt records.
+     *
+     * Skipped questions remain in the denominator so a partially completed
+     * session cannot become the student's best score unfairly.
+     */
+    private function calculateDashboardStats(int $userId): array
+    {
+        $sessions = DB::table('practice_session as ps')
+            ->leftJoin('quiz_attempts as qa', function ($join) use ($userId) {
+                $join->on('qa.session_id', '=', 'ps.id')
+                    ->where('qa.user_id', '=', $userId)
+                    ->where('qa.question_type_id', '=', 1);
+            })
+            ->where('ps.user_id', $userId)
+            ->where('ps.question_type_id', 1)
+            ->select([
+                'ps.id',
+                'ps.total_skipped',
+                'ps.total_time_seconds',
+                'ps.created_at',
+            ])
+            ->selectRaw('COUNT(DISTINCT qa.question_id) as total_answered')
+            ->selectRaw('COUNT(DISTINCT CASE WHEN qa.answer_status = 1 THEN qa.question_id END) as total_correct')
+            ->groupBy(
+                'ps.id',
+                'ps.total_skipped',
+                'ps.total_time_seconds',
+                'ps.created_at'
+            )
+            ->get()
+            ->map(function ($session) {
+                $answered = (int) $session->total_answered;
+                $skipped = max(0, (int) $session->total_skipped);
+                $correct = (int) $session->total_correct;
+                $totalQuestions = $answered > 0
+                    ? $answered
+                    : $correct + $skipped;
+
+                return [
+                    'session_id' => (int) $session->id,
+                    'total_answered' => $answered,
+                    'total_correct' => $correct,
+                    'total_skipped' => $skipped,
+                    'total_questions' => $totalQuestions,
+                    'percentage' => $totalQuestions > 0
+                        ? round(($correct / $totalQuestions) * 100, 1)
+                        : 0,
+                    'total_time_seconds' => (int) ($session->total_time_seconds ?? 0),
+                    'completed_at' => $session->created_at,
+                ];
+            })
+            ->filter(fn ($session) => $session['total_questions'] > 0)
+            ->values();
+
+        if ($sessions->isEmpty()) {
+            return $this->emptyDashboardStats();
+        }
+
+        $bestSession = $sessions
+            ->sort(function ($left, $right) {
+                $leftTime = $left['total_time_seconds'] > 0
+                    ? $left['total_time_seconds']
+                    : PHP_INT_MAX;
+                $rightTime = $right['total_time_seconds'] > 0
+                    ? $right['total_time_seconds']
+                    : PHP_INT_MAX;
+
+                return ($right['percentage'] <=> $left['percentage'])
+                    ?: ($right['total_questions'] <=> $left['total_questions'])
+                    ?: ($leftTime <=> $rightTime)
+                    ?: strcmp((string) $right['completed_at'], (string) $left['completed_at']);
+            })
+            ->first();
+
+        $totalCorrect = $sessions->sum('total_correct');
+        $totalAnswered = $sessions->sum('total_answered');
+        $totalQuestions = $sessions->sum('total_questions');
+
+        return [
+            'practice_sessions' => $sessions->count(),
+            'total_answered' => $totalAnswered,
+            'total_correct' => $totalCorrect,
+            'total_questions' => $totalQuestions,
+            'accuracy_percentage' => $totalQuestions > 0
+                ? round(($totalCorrect / $totalQuestions) * 100, 1)
+                : 0,
+            'best_session' => $bestSession,
+        ];
+    }
+
+    private function emptyDashboardStats(): array
+    {
+        return [
+            'practice_sessions' => 0,
+            'total_answered' => 0,
+            'total_correct' => 0,
+            'total_questions' => 0,
+            'accuracy_percentage' => 0,
+            'best_session' => null,
+        ];
+    }
 
 private function loadPhpTranslations($locale)
 {

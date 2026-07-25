@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\UserLoginActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +58,16 @@ class AuthenticatedSessionController extends Controller
     $request->authenticate();
 
     $request->session()->regenerate();
+
+    UserLoginActivity::updateOrCreate(
+        [
+            'user_id' => Auth::id(),
+            'login_date' => now()->toDateString(),
+        ],
+        [
+            'last_login_at' => now(),
+        ]
+    );
 
     // 2. Check for preserved locale in flash data
     $preservedLocale = Session::get('preserved_locale');

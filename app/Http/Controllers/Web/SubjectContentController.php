@@ -208,21 +208,38 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
         ->groupBy('topic_id');
 
     // ✅ STEP 4: Batch get practice data (1 query for all topics, only if logged in)
-    $practiceData = [];
+    $practiceData = collect();
     if ($userId) {
-        $practiceData = DB::table('practice_session')
-            ->whereIn(DB::raw('COALESCE(subtopic_id, topic_id)'), $allTopicIds)
-            ->where('user_id', $userId)
+        $attemptCounts = DB::table('quiz_attempts')
+            ->selectRaw('session_id, COUNT(DISTINCT question_id) as total_questions')
+            ->groupBy('session_id');
+
+        $practiceData = DB::table('practice_session as ps')
+            ->leftJoinSub($attemptCounts, 'attempt_counts', function ($join) {
+                $join->on('attempt_counts.session_id', '=', 'ps.id');
+            })
+            ->whereIn(
+                DB::raw('CASE WHEN ps.subtopic_id IS NOT NULL AND ps.subtopic_id <> 0 THEN ps.subtopic_id ELSE ps.topic_id END'),
+                $allTopicIds
+            )
+            ->where('ps.user_id', $userId)
             ->selectRaw('
-                COALESCE(subtopic_id, topic_id) as topic_id,
-                question_type_id,
-                score,
-                total_correct,
-                total_skipped,
-                total_time_seconds,
-                created_at
+                ps.id,
+                CASE WHEN ps.subtopic_id IS NOT NULL AND ps.subtopic_id <> 0 THEN ps.subtopic_id ELSE ps.topic_id END as topic_id,
+                ps.question_type_id,
+                ps.score,
+                ps.total_correct,
+                ps.total_skipped,
+                ps.total_time_seconds,
+                ps.created_at,
+                CASE
+                    WHEN COALESCE(attempt_counts.total_questions, 0) > 0
+                        THEN attempt_counts.total_questions
+                    ELSE COALESCE(ps.total_correct, 0) + COALESCE(ps.total_skipped, 0)
+                END as total_questions
             ')
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('ps.created_at')
+            ->orderByDesc('ps.id')
             ->get()
             ->groupBy(['topic_id', 'question_type_id']);
     }
@@ -262,7 +279,8 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
             $subjectiveCount = $counts->where('question_type_id', 2)->sum('count');
             
             // Get practice data (from cache)
-            $objectivePractice = $practiceData[$topicId][1][0] ?? null;
+            $objectiveSessions = collect($practiceData[$topicId][1] ?? []);
+            $objectivePractice = $objectiveSessions->first();
             $subjectivePractice = $practiceData[$topicId][2][0] ?? null;
             
             $section['subSections'][] = [
@@ -277,7 +295,8 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
                 'lastPractice' => [
                     'objective' => $objectivePractice ? $this->formatPracticeData($objectivePractice) : null,
                     'subjective' => $subjectivePractice ? $this->formatPracticeData($subjectivePractice) : null
-                ]
+                ],
+                'mastery' => $this->calculateTopicMastery($objectiveSessions),
             ];
         }
         
@@ -292,7 +311,15 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
      */
     private function formatPracticeData($session)
     {
-        $totalQuestions = $session->total_correct + $session->total_skipped;
+        $totalQuestions = (int) ($session->total_questions ?? 0);
+        if ($totalQuestions === 0 && (float) $session->score > 0) {
+            $totalQuestions = (int) round(
+                ((int) $session->total_correct * 100) / (float) $session->score
+            );
+        }
+        if ($totalQuestions === 0) {
+            $totalQuestions = (int) $session->total_correct + (int) $session->total_skipped;
+        }
         $averageTime = $totalQuestions > 0 ? $session->total_time_seconds / $totalQuestions : 0;
         
         return [
@@ -301,6 +328,59 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
             'total_questions' => $totalQuestions,
             'last_practice_at' => date('d/m/Y, g:i A', strtotime($session->created_at)),
             'average_time_per_question' => round($averageTime, 1)
+        ];
+    }
+
+    /**
+     * Calculate a five-level topic status from recent objective practice.
+     *
+     * Mastery needs evidence of consistency: more than five completed
+     * sessions and at least 80% accuracy across the latest five sessions.
+     */
+    private function calculateTopicMastery($sessions): array
+    {
+        $sessions = collect($sessions);
+        $sessionCount = $sessions->count();
+
+        if ($sessionCount === 0) {
+            return [
+                'level' => 1,
+                'label' => 'Not started',
+                'session_count' => 0,
+                'recent_session_count' => 0,
+                'recent_correct' => 0,
+                'recent_questions' => 0,
+                'accuracy_percentage' => 0,
+            ];
+        }
+
+        $recentSessions = $sessions->take(5);
+        $recentCorrect = (int) $recentSessions->sum('total_correct');
+        $recentQuestions = (int) $recentSessions->sum(function ($session) {
+            return $this->formatPracticeData($session)['total_questions'];
+        });
+        $accuracy = $recentQuestions > 0
+            ? round(($recentCorrect / $recentQuestions) * 100)
+            : 0;
+
+        if ($sessionCount >= 6 && $accuracy >= 80) {
+            [$level, $label] = [5, 'Mastered'];
+        } elseif ($accuracy >= 60) {
+            [$level, $label] = [4, 'Proficient'];
+        } elseif ($accuracy >= 40) {
+            [$level, $label] = [3, 'Developing'];
+        } else {
+            [$level, $label] = [2, 'Beginner'];
+        }
+
+        return [
+            'level' => $level,
+            'label' => $label,
+            'session_count' => $sessionCount,
+            'recent_session_count' => $recentSessions->count(),
+            'recent_correct' => $recentCorrect,
+            'recent_questions' => $recentQuestions,
+            'accuracy_percentage' => $accuracy,
         ];
     }
 

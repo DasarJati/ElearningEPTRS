@@ -297,7 +297,7 @@ export default function ObjectiveQuestion() {
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   const [calculatorMinimized, setCalculatorMinimized] = useState(false);
-  const [calculatorPosition, setCalculatorPosition] = useState({ x: window.innerWidth - 350, y: 100 });
+  const [calculatorPosition, setCalculatorPosition] = useState({ x: Math.max(12, window.innerWidth - 460), y: 88 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
@@ -1208,9 +1208,13 @@ export default function ObjectiveQuestion() {
     const handleMouseMove = (e) => {
       if (!isDragging) return;
 
+      const calculatorWidth = Math.min(window.innerWidth * 0.94, 430);
+      const maxX = Math.max(8, window.innerWidth - calculatorWidth - 8);
+      const maxY = Math.max(8, window.innerHeight - 80);
+
       setCalculatorPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y
+        x: Math.min(Math.max(8, e.clientX - dragOffset.x), maxX),
+        y: Math.min(Math.max(8, e.clientY - dragOffset.y), maxY)
       });
     };
 
@@ -1588,7 +1592,7 @@ export default function ObjectiveQuestion() {
             top: `${calculatorPosition.y}px`
           }}
         >
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-300 w-90">
+          <div className="w-[min(94vw,430px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl">
             {/* Calculator Header - Draggable area */}
             <div
               className="flex justify-between items-center p-3 bg-gray-800 text-white rounded-t-xl cursor-move"
@@ -1634,7 +1638,7 @@ export default function ObjectiveQuestion() {
             </div>
 
             {/* Calculator Body */}
-            <div className="p-2 max-h-72 overflow-y-auto">
+            <div className="max-h-[min(72vh,680px)] overflow-y-auto p-2">
               <Calculator />
             </div>
 
@@ -1643,7 +1647,7 @@ export default function ObjectiveQuestion() {
               <button
                 onClick={() => {
                   // Copy calculator result to clipboard
-                  const display = document.querySelector('.text-3xl.font-mono');
+                  const display = document.querySelector('[data-calculator-result]');
                   if (display) {
                     navigator.clipboard.writeText(display.textContent || '0');
                   }

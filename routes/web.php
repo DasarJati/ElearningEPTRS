@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/subject/{subject}', [SubjectContentController::class, 'index'])->name('subject-page');
 
-    Route::get('/subject/{subject}/mission', [MissionController::class, 'index'])->name('subject-mission-page');
+    // Route::get('/subject/{subject}/mission', [MissionController::class, 'index'])->name('subject-mission-page');
 
     Route::get('/objective-page', [ObjectiveController::class, 'index'])->name('objective-page');
     Route::post('/practice-session/objective', [ObjectiveController::class, 'completePractice']);

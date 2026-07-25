@@ -42,7 +42,7 @@ export default function SubjectLayout({
 
   const tabs = useMemo(() => [
     { key: 'practice', label: t('practice', 'Learn'), icon: AcademicCapIcon, routeName: 'subject-page' },
-    { key: 'mission', label: t('mission', 'Practice'), icon: SparklesIcon, routeName: 'subject-mission-page' },
+    // { key: 'mission', label: t('mission', 'Practice'), icon: SparklesIcon, routeName: 'subject-mission-page' },
     { key: 'report', label: t('report', 'Progress'), icon: ChartBarIcon, routeName: 'subject-report-page' },
   ], [t, locale]);
 
@@ -91,7 +91,7 @@ export default function SubjectLayout({
                 <span>{selectedStandard}</span><ChevronDownIcon className={`h-4 w-4 transition ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-slate-700 shadow-2xl">
+                <div className="absolute right-0 bottom-10 z-40 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-slate-700 shadow-2xl">
                   {['Form 4', 'Form 5'].map((standard) => (
                     <button key={standard} onClick={() => selectStandard(standard)} className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm ${selectedStandard === standard ? 'bg-indigo-50 font-semibold text-indigo-700' : 'hover:bg-slate-50'}`}>
                       {standard}{selectedStandard === standard && <CheckIcon className="h-4 w-4" />}
@@ -102,7 +102,7 @@ export default function SubjectLayout({
             </div>
           </div>
 
-          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+          {/* <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
               <div className="flex items-center justify-between text-xs text-slate-300"><span>Level {stats.level}</span><TrophyIcon className="h-4 w-4 text-amber-300" /></div>
               <p className="mt-2 text-xl font-semibold">Silver Scholar</p>
@@ -116,7 +116,7 @@ export default function SubjectLayout({
               <div className="flex items-center justify-between text-xs text-slate-300"><span>Study streak</span><FireIcon className="h-4 w-4 text-orange-300" /></div>
               <p className="mt-2 text-xl font-semibold">{stats.streak} days</p>
             </div>
-          </div>
+          </div> */}
         </div>
       </header>
 

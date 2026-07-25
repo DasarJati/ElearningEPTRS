@@ -15,6 +15,45 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Restore semantic HTML formatting removed by Tailwind's base reset.
+   Question content is stored as HTML in the database. */
+:where(.question-content, .smart-question-renderer, .prose) ul {
+  margin: 0.75rem 0;
+  padding-inline-start: 1.6rem;
+  list-style-type: disc;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) ol {
+  margin: 0.75rem 0;
+  padding-inline-start: 1.6rem;
+  list-style-type: decimal;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) li {
+  margin: 0.35rem 0;
+  padding-inline-start: 0.2rem;
+  line-height: 1.65;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) li::marker {
+  color: #000000;
+  font-weight: 700;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) ul ul {
+  margin: 0.25rem 0;
+  list-style-type: circle;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) ul ul ul {
+  list-style-type: square;
+}
+
+:where(.question-content, .smart-question-renderer, .prose) ol ol {
+  margin: 0.25rem 0;
+  list-style-type: lower-alpha;
+}
+
 /* global.css */
 ::-webkit-scrollbar {
   width: 8px;
