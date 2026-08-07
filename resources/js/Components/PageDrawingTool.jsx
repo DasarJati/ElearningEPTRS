@@ -77,7 +77,7 @@ const PageDrawingTool = ({ isActive, onClose }) => {
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
-        className="fixed inset-0 pointer-events-auto cursor-crosshair z-40"
+        className="fixed inset-0 z-[9998] pointer-events-auto cursor-crosshair"
         style={{ 
           touchAction: 'none',
           background: 'transparent'
@@ -86,7 +86,7 @@ const PageDrawingTool = ({ isActive, onClose }) => {
 
       {/* Floating Toolbar */}
       <div 
-        className="fixed bg-white rounded-xl shadow-2xl border border-gray-300 z-50"
+        className="fixed z-[9999] bg-white rounded-xl shadow-2xl border border-gray-300"
         style={{ 
           left: `${position.x}px`, 
           top: `${position.y}px`,

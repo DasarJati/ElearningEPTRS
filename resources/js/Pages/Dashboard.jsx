@@ -53,10 +53,10 @@ export default function Dashboard() {
   } = usePage().props;
 
   const user = auth?.user || {};
-  const firstName = (profileData?.name || user.name || 'Learner').split(' ')[0];
+  const firstName = (profileData?.name || user.name || t('learner')).split(' ')[0];
   const profilePicture = student?.profile_picture || profileData?.profile_picture;
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 12 ? t('good_morning') : hour < 18 ? t('good_afternoon') : t('good_evening');
 
   const averageScore = Number(dashboardStats.accuracy_percentage || 0);
   const bestSession = dashboardStats.best_session;
@@ -91,20 +91,20 @@ export default function Dashboard() {
 
   const stats = [
     {
-      label: 'Learning accuracy',
+      label: t('learning_accuracy'),
       value: `${averageScore}%`,
       helper: dashboardStats.total_questions
-        ? `${dashboardStats.total_correct}/${dashboardStats.total_questions} correct across ${dashboardStats.practice_sessions} sessions`
-        : 'Start your first practice',
+        ? `${dashboardStats.total_correct}/${dashboardStats.total_questions} ${t('correct_across')} ${dashboardStats.practice_sessions} ${t('sessions')}`
+        : t('start_first_practice'),
       icon: ChartBarIcon,
       tone: 'text-indigo-600 bg-indigo-50',
     },
     {
-      label: 'Best score',
+      label: t('best_score'),
       value: bestSession ? `${bestSession.percentage}%` : '—',
       helper: bestSession
-        ? `${bestSession.total_correct}/${bestSession.total_questions} correct${bestSession.total_time_seconds ? ` · ${formatTime(bestSession.total_time_seconds)}` : ''}`
-        : 'No score yet',
+        ? `${bestSession.total_correct}/${bestSession.total_questions} ${t('correct')}${bestSession.total_time_seconds ? ` · ${formatTime(bestSession.total_time_seconds)}` : ''}`
+        : t('no_score_yet'),
       icon: TrophyIcon,
       tone: 'text-amber-600 bg-amber-50',
     },
@@ -126,18 +126,18 @@ export default function Dashboard() {
             <div className="max-w-2xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-indigo-100 backdrop-blur-sm">
                 <SparklesIcon className="h-4 w-4" />
-                Your learning space
+                {t('learning_space')}
               </div>
               <h1 className="text-2xl font-semibold tracking-tight sm:text-4xl">
                 {greeting}, {firstName}.
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
-                Pick up where you left off, build your streak, and make today&apos;s study session count.
+                {t('dashboard_intro')}
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link href={primarySubjectUrl} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-50 sm:w-auto">
                   <PlayIcon className="h-4 w-4" />
-                  Continue learning
+                  {t('continue_learning')}
                 </Link>
                 {/* <Link href={route('quiz-page')} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15 sm:w-auto">
                   <BoltIcon className="h-4 w-4" />
@@ -156,10 +156,10 @@ export default function Dashboard() {
               </div>
               <div className="min-w-0">
                 <p className="truncate font-semibold">{profileData?.name || user.name}</p>
-                <p className="mt-0.5 truncate text-xs text-slate-300">{profileData?.school || 'Add your school'}</p>
+                <p className="mt-0.5 truncate text-xs text-slate-300">{profileData?.school || t('add_your_school')}</p>
                 <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-300">
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  Ready to learn
+                  {t('ready_to_learn')}
                 </div>
               </div>
             </div>
@@ -188,10 +188,10 @@ export default function Dashboard() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">{t('my_courses', 'My courses')}</h2>
-                  <p className="mt-1 text-sm text-slate-500">Everything you need to keep moving forward.</p>
+                  <p className="mt-1 text-sm text-slate-500">{t('courses_intro')}</p>
                 </div>
                 <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hidden items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700 sm:flex">
-                  Explore courses <ArrowRightIcon className="h-4 w-4" />
+                  {t('explore_courses')} <ArrowRightIcon className="h-4 w-4" />
                 </button>
               </div>
 
@@ -212,9 +212,9 @@ export default function Dashboard() {
                         <ArrowRightIcon className="h-4 w-4 text-slate-300 transition group-hover:translate-x-1 group-hover:text-indigo-500" />
                       </div>
                       <h3 className="mt-5 font-semibold text-slate-900">{subject.name || subject.title}</h3>
-                      <p className="mt-1 text-xs text-slate-500">{subject.topic || 'Continue your latest topic'}</p>
+                      <p className="mt-1 text-xs text-slate-500">{subject.topic || t('continue_latest_topic')}</p>
                       <div className="mt-4 flex items-center justify-between text-xs">
-                        <span className="font-medium text-slate-500">Course progress</span>
+                        <span className="font-medium text-slate-500">{t('course_progress')}</span>
                         <span className="font-semibold text-slate-700">{progress}%</span>
                       </div>
                       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
@@ -225,7 +225,7 @@ export default function Dashboard() {
                 }) : (
                   <div className="col-span-full rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center">
                     <AcademicCapIcon className="mx-auto h-8 w-8 text-slate-400" />
-                    <p className="mt-3 text-sm font-medium text-slate-700">Your courses will appear here</p>
+                    <p className="mt-3 text-sm font-medium text-slate-700">{t('courses_appear_here')}</p>
                   </div>
                 )}
               </div>
@@ -265,8 +265,8 @@ export default function Dashboard() {
             <motion.section {...cardMotion} transition={{ duration: 0.35, delay: 0.2 }} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-slate-900">{activityCalendar.month_label || 'Learning activity'}</h2>
-                  <p className="mt-1 text-xs text-slate-500">{activityCalendar.days_in_month || calendarDays.length} days · {activityCalendar.active_days || 0} active</p>
+                  <h2 className="font-semibold text-slate-900">{activityCalendar.month_label || t('learning_activity')}</h2>
+                  <p className="mt-1 text-xs text-slate-500">{activityCalendar.days_in_month || calendarDays.length} {t('days')} · {activityCalendar.active_days || 0} {t('active')}</p>
                 </div>
                 <div className="rounded-xl bg-orange-50 p-2.5 text-orange-500"><FireIcon className="h-5 w-5" /></div>
               </div>
@@ -304,15 +304,15 @@ export default function Dashboard() {
               </div>
 
               <div className="mt-4 flex items-center gap-4 text-[10px] text-slate-500">
-                <span className="flex items-center gap-1.5"><FireIcon className="h-3.5 w-3.5 fill-orange-500 text-orange-500" /> Session finished</span>
-                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-indigo-500" /> Login only</span>
+                <span className="flex items-center gap-1.5"><FireIcon className="h-3.5 w-3.5 fill-orange-500 text-orange-500" /> {t('session_finished')}</span>
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-indigo-500" /> {t('login_only')}</span>
               </div>
 
               <div className={`mt-4 rounded-xl px-4 py-3 text-xs leading-5 ${weeklyRemaining === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-indigo-50 text-indigo-700'}`}>
-                <span className="font-semibold">{weeklyCompleted} of {weeklyGoal} days this week.</span>{' '}
+                <span className="font-semibold">{weeklyCompleted}/{weeklyGoal} {t('days_this_week')}</span>{' '}
                 {weeklyRemaining === 0
-                  ? 'Weekly goal complete—excellent consistency!'
-                  : `${weeklyRemaining} more learning day${weeklyRemaining === 1 ? '' : 's'} to reach your goal.`}
+                  ? t('weekly_goal_complete')
+                  : `${weeklyRemaining} ${t(weeklyRemaining === 1 ? 'more_learning_day' : 'more_learning_days')}`}
               </div>
             </motion.section>
 

@@ -50,12 +50,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/subject/{subject}/mission', [MissionController::class, 'index'])->name('subject-mission-page');
 
     Route::get('/objective-page', [ObjectiveController::class, 'index'])->name('objective-page');
-    Route::post('/practice-session/objective', [ObjectiveController::class, 'completePractice']);
+    Route::post('/practice-session/objective', [ObjectiveController::class, 'completePractice'])->name('practice.objective.complete');
     Route::post('/objective-page/restart', [ObjectiveController::class, 'restart'])->name('objective-page.restart');
 
 
     Route::get('/subjective-page', [SubjectiveController::class, 'index'])->name('subjective-page');
-    Route::post('/practice-session/subjective', [SubjectiveController::class, 'completePractice']);
+    Route::post('/practice-session/subjective', [SubjectiveController::class, 'completePractice'])->name('practice.subjective.complete');
 
 
     Route::get('/subtopic/{subtopicId}/details', [ReportController::class, 'getSubtopicDetails'])->name('subtopic-details');

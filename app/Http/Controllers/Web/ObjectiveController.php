@@ -8,9 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\TopicNavigationService;
 
 class ObjectiveController extends Controller
 {
+    public function __construct(
+        private readonly TopicNavigationService $topicNavigation
+    ) {}
+
     /**
      * Display the objective questions page
      */
@@ -64,7 +69,22 @@ class ObjectiveController extends Controller
             'questions' => $questions,
             'question_count' => count($questions),
             'total_available' => $topicId ? $this->getTotalAvailableQuestions($topicId) : 0,
+            'next_topic' => $this->getNextTopic($topicId, $request, 1),
         ]);
+    }
+
+    private function getNextTopic($topicId, Request $request, int $questionTypeId): ?array
+    {
+        if (!$topicId || !$request->subject_id || !$request->level_id) {
+            return null;
+        }
+
+        return $this->topicNavigation->nextPracticeTopic(
+            (int) $topicId,
+            (int) $request->subject_id,
+            (int) $request->level_id,
+            $questionTypeId
+        );
     }
 
     /**
@@ -578,15 +598,10 @@ class ObjectiveController extends Controller
         $this->saveQuizAttempts($questionAttempts, $sessionId, $mainTopicId, $subtopicId);
     }
 
-    // return response()->json([
-    //     'success' => true,
-    //     'session_id' => $sessionId,
-    //     'topic_info' => [
-    //         'is_subtopic' => $isSubtopic,
-    //         'main_topic_id' => $mainTopicId,
-    //         'subtopic_id' => $subtopicId,
-    //     ]
-    // ]);
+    return response()->json([
+        'success' => true,
+        'session_id' => $sessionId,
+    ]);
 }
 
     /**

@@ -45,7 +45,7 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
 
         {/* Tablet view */}
         <span className="hidden sm:flex lg:hidden flex-col items-start">
-          <span className="text-xs text-white/80">Menu</span>
+          <span className="text-xs text-white/80">{t('menu')}</span>
           <span className="flex items-center text-sm font-semibold">
             {title}
             <svg
@@ -65,7 +65,7 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
         {/* Desktop view */}
         <span className="hidden lg:flex items-center gap-2">
           <span className="text-lg">📚</span>
-          <span className='text-black'>Subjects</span>
+          <span className='text-black'>{t('subjects')}</span>
           <svg
             className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             fill="currentColor"
@@ -208,7 +208,7 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
           <div className="mt-6 pt-4 border-t border-amber-100 flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center gap-2">
               <span className="text-amber-400">💡</span>
-              <span>Complete subjects to earn XP and unlock new adventures!</span>
+              <span>{t('xp_tip')}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-amber-400">🏆</span>

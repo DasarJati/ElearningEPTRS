@@ -13,9 +13,6 @@ use App\Models\User;
 use App\Models\Friend;
 use App\Models\FriendRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
@@ -26,46 +23,10 @@ public function index()
     $dashboardStats = $this->emptyDashboardStats();
     $activityCalendar = $this->emptyActivityCalendar();
 
-    // DEBUG: Log semua language sources
-    Log::info('=== DASHBOARD LANGUAGE DEBUG START ===');
-    Log::info('Session locale:', ['value' => Session::get('locale')]);
-    Log::info('User language:', ['value' => Auth::check() ? Auth::user()->language : 'guest']);
-    Log::info('Current App locale:', ['value' => App::getLocale()]);
-    Log::info('Request has locale?', ['value' => request()->has('locale')]);
-    
-    // ⭐⭐⭐ CRITICAL FIX: ALWAYS get locale from Session first
-    $locale = Session::get('locale', 'en');
-    
-    // ⭐⭐⭐ CRITICAL FIX: ALWAYS set app locale
-    App::setLocale($locale);
-    
-    // ⭐⭐⭐ CRITICAL FIX: ALWAYS load translations
-    $translations = $this->loadPhpTranslations($locale);
-    
-    Log::info('Final language settings:', [
-        'selected_locale' => $locale,
-        'translations_count' => count($translations),
-        'sample_translation' => $translations['dashboard']['school'] ?? 'NOT FOUND'
-    ]);
-    
     // Check if user is authenticated
     if (Auth::check()) {
         $user = Auth::user();
         $user->load('student');
-        
-       if ($user->language) {
-            $userLang = $user->language;  
-            
-            if ($userLang !== $locale) {
-                $user->update(['language' => $locale]);  
-                
-                Log::info('Language synced:', [
-                    'user_was' => $userLang,
-                    'user_now' => $locale,
-                    'session_is' => $locale
-                ]);
-            }
-        }
         
         // Get the student profile data
         $student = Student::with(['school', 'level'])
@@ -128,13 +89,6 @@ public function index()
         ]
     ];
     
-    Log::info('=== DASHBOARD LANGUAGE DEBUG END ===');
-    Log::info('Returning to Inertia:', [
-        'locale' => $locale,
-        'has_translations' => !empty($translations),
-        'auth_user_id' => Auth::check() ? Auth::id() : null
-    ]);
-    
     return Inertia::render('Dashboard', [
         'title' => 'Dashboard',
         'profileData' => $profileData,
@@ -145,9 +99,6 @@ public function index()
         'friends' => $friends,
         'pendingRequests' => $pendingRequests,
         'auth' => $authData,
-        'locale' => $locale, 
-        'translations' => $translations, 
-        'availableLocales' => ['en', 'ms'],
         'dashboardStats' => $dashboardStats,
         'activityCalendar' => $activityCalendar,
     ]);
@@ -451,28 +402,6 @@ public function index()
         ];
     }
 
-private function loadPhpTranslations($locale)
-{
-    $fallbackLocale = 'en';
-    
-    try {
-        // Load the dashboard.php file for the requested locale
-        $translations = trans('common', [], $locale);
-        
-        // If no translations found, try fallback
-        if (is_array($translations) && !empty($translations)) {
-            return $translations;
-        }
-        
-        // Fallback to English
-        return trans('common', [], $fallbackLocale);
-        
-    } catch (\Exception $e) {
-        // If translation file doesn't exist, return empty
-        Log::error('Failed to load translations: ' . $e->getMessage());
-        return [];
-    }
-}
     /**
      * Get friends data for the current user
      */

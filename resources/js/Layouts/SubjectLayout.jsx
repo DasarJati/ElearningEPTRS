@@ -41,9 +41,9 @@ export default function SubjectLayout({
   const xpPercentage = Math.min(100, Math.round((stats.xp / stats.xpToNextLevel) * 100));
 
   const tabs = useMemo(() => [
-    { key: 'practice', label: t('practice', 'Learn'), icon: AcademicCapIcon, routeName: 'subject-page' },
+    { key: 'practice', label: t('learn'), icon: AcademicCapIcon, routeName: 'subject-page' },
     // { key: 'mission', label: t('mission', 'Practice'), icon: SparklesIcon, routeName: 'subject-mission-page' },
-    { key: 'report', label: t('report', 'Progress'), icon: ChartBarIcon, routeName: 'subject-report-page' },
+    { key: 'report', label: t('progress'), icon: ChartBarIcon, routeName: 'subject-report-page' },
   ], [t, locale]);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function SubjectLayout({
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-2xl">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
-            <p className="text-sm font-semibold text-slate-700">Loading your course…</p>
+            <p className="text-sm font-semibold text-slate-700">{t('loading_course')}</p>
           </div>
         </div>
       )}
@@ -81,10 +81,10 @@ export default function SubjectLayout({
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
               <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
-                <AcademicCapIcon className="h-4 w-4" /> Course workspace
+                <AcademicCapIcon className="h-4 w-4" /> {t('course_workspace')}
               </div>
               <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">Learn each topic at your pace, practise your skills, and track every milestone.</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">{t('course_workspace_intro')}</p>
             </div>
             <div className="relative">
               <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex min-w-[150px] items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/15">
@@ -94,7 +94,7 @@ export default function SubjectLayout({
                 <div className="absolute right-0 bottom-10 z-40 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-slate-700 shadow-2xl">
                   {['Form 4', 'Form 5'].map((standard) => (
                     <button key={standard} onClick={() => selectStandard(standard)} className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm ${selectedStandard === standard ? 'bg-indigo-50 font-semibold text-indigo-700' : 'hover:bg-slate-50'}`}>
-                      {standard}{selectedStandard === standard && <CheckIcon className="h-4 w-4" />}
+                      {standard === 'Form 4' ? t('form_4') : t('form_5')}{selectedStandard === standard && <CheckIcon className="h-4 w-4" />}
                     </button>
                   ))}
                 </div>
@@ -121,7 +121,7 @@ export default function SubjectLayout({
       </header>
 
       <div className="sticky top-[72px] z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-4 sm:px-6 lg:px-8" aria-label="Course sections">
+        <nav className="mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-4 sm:px-6 lg:px-8" aria-label={t('course_sections')}>
           {tabs.map((tab) => {
             const active = route().current(tab.routeName);
             const TabIcon = tab.icon;

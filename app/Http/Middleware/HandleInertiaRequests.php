@@ -1,17 +1,13 @@
 <?php
-// app/Http/Middleware/HandleInertiaRequests.php
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
-use Inertia\Middleware;
-use App\Models\Student;
 use App\Http\Controllers\Web\MenuController;
+use App\Models\Student;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -26,16 +22,6 @@ class HandleInertiaRequests extends Middleware
     {
         $locale = App::getLocale();
 
-        // 🔍 DEBUG - Add translation loading debug
-        $translations = $this->getTranslations($locale);
-
-        Log::info('HandleInertiaRequests - Translations loaded:', [
-            'locale' => $locale,
-            'translation_keys' => array_keys($translations),
-            'has_common_key' => isset($translations['common']),
-            'translations_sample' => array_slice($translations, 0, 3),
-        ]);
-
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
@@ -49,41 +35,33 @@ class HandleInertiaRequests extends Middleware
                         ->first();
                 },
             ],
-
-            'schoolSubjects' => fn() => (new MenuController())->getSchoolSubjects(),
-
+            'schoolSubjects' => fn () => (new MenuController())->getSchoolSubjects(),
             'flash' => [
-                'message' => fn() => $request->session()->get('message'),
-                'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'message' => fn () => $request->session()->get('message'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
-
-            // Language data
             'locale' => $locale,
-            'translations' => $translations, // Already loaded above
-            'availableLocales' => ['en', 'ms'],
-
+            'translations' => $this->getTranslations($locale),
+            'availableLocales' => config('app.available_locales', ['en', 'ms']),
             'appName' => config('app.name'),
             'appUrl' => config('app.url'),
         ]);
     }
 
-    // app/Http/Middleware/HandleInertiaRequests.php
+    /**
+     * Return a flat translation map because the frontend calls t('courses').
+     */
     private function getTranslations(string $locale): array
     {
         $translations = [];
 
-        // Load common.php
-        $commonPath = lang_path("{$locale}/common.php");
-        if (File::exists($commonPath)) {
-            // ✅ Nest under 'common' key as expected by frontend
-            $translations['common'] = require $commonPath;
-        }
+        foreach (['common', 'other'] as $filename) {
+            $path = lang_path("{$locale}/{$filename}.php");
 
-        // Load other translation files if needed
-        $otherPath = lang_path("{$locale}/other.php");
-        if (File::exists($otherPath)) {
-            $translations['other'] = require $otherPath;
+            if (File::exists($path)) {
+                $translations = array_replace($translations, require $path);
+            }
         }
 
         return $translations;

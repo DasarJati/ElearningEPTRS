@@ -2,8 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import avatars from '@/Data/avatars';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function ProfileDropdown({ user, student }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [browseMode, setBrowseMode] = useState(false);
@@ -120,7 +122,7 @@ export default function ProfileDropdown({ user, student }) {
             </div>
 
             <h2 className="mt-4 text-lg font-semibold text-gray-800">
-              Hi, {user?.name ?? 'User'}!
+              {t('hello')}, {user?.name ?? t('learner')}!
             </h2>
 
             <Link
@@ -128,7 +130,7 @@ export default function ProfileDropdown({ user, student }) {
               onClick={() => setOpen(false)}
               className="mt-3 px-6 py-2 text-sm text-black font-medium rounded-full border border-gray-300 hover:bg-gray-100 transition"
             >
-              Manage your account
+              {t('manage_account')}
             </Link>
 
           </div>
@@ -146,7 +148,7 @@ export default function ProfileDropdown({ user, student }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
               </svg>
-              <span className="text-sm font-medium text-gray-900">Settings</span>
+              <span className="text-sm font-medium text-gray-900">{t('settings')}</span>
             </Link>
 
             <Link
@@ -160,7 +162,7 @@ export default function ProfileDropdown({ user, student }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
               </svg>
-              <span className="text-sm font-medium text-red-700">Sign out</span>
+              <span className="text-sm font-medium text-red-700">{t('sign_out')}</span>
             </Link>
           </div>
         </div>
@@ -186,7 +188,7 @@ export default function ProfileDropdown({ user, student }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <h3 className="text-lg font-semibold text-white">Change profile picture</h3>
+              <h3 className="text-lg font-semibold text-white">{t('change_profile_picture')}</h3>
               <div className="w-8" />
             </div>
 
@@ -241,7 +243,7 @@ export default function ProfileDropdown({ user, student }) {
                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <span className="text-sm text-gray-300">Choose Avatar</span>
+                      <span className="text-sm text-gray-300">{t('choose_avatar')}</span>
                     </button>
 
                     <label
@@ -254,7 +256,7 @@ export default function ProfileDropdown({ user, student }) {
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                       </div>
-                      <span className="text-sm text-gray-300">Upload Photo</span>
+                      <span className="text-sm text-gray-300">{t('upload_photo')}</span>
                     </label>
                   </div>
 
@@ -279,7 +281,7 @@ export default function ProfileDropdown({ user, student }) {
                         disabled={processing}
                         className="w-full py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 transition"
                       >
-                        {processing ? 'Saving...' : 'Save'}
+                        {processing ? t('saving') : t('save')}
                       </button>
                     </div>
                   )}
@@ -293,7 +295,7 @@ export default function ProfileDropdown({ user, student }) {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                    Back
+                    {t('back')}
                   </button>
 
                   {/* Avatars Grid */}
@@ -330,7 +332,7 @@ export default function ProfileDropdown({ user, student }) {
                         disabled={processing}
                         className="w-full py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 transition"
                       >
-                        {processing ? 'Saving...' : 'Save'}
+                        {processing ? t('saving') : t('save')}
                       </button>
                     </div>
                   )}

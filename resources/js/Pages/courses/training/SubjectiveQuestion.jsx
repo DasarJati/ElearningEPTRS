@@ -3,6 +3,7 @@ import SubjectiveQuestionLayout from "@/Layouts/SubjectiveQuestionLayout";
 import ResultQuestion from "@/Pages/courses/training/ResultQuestion";
 import { Head, usePage, router } from '@inertiajs/react'; // Added router import
 import QuestionReportButton from '@/Components/QuestionReportButton';
+import axios from 'axios';
 
 export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
   const pageProps = usePage().props;
@@ -19,7 +20,8 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
     subject_id,
     level_id,
     question_count,
-    total_available
+    total_available,
+    next_topic
   } = pageProps;
 
 
@@ -80,6 +82,8 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
       answered: answered,
       skipped: skipped,
       timeElapsed: timeElapsed,
+      isComplete: skipped === 0,
+      completionType: skipped === 0 ? 'all_questions' : 'partial',
       questions: questions.map((q, index) => ({
         question: q.question,
         answered: answers[index].trim() !== "",
@@ -166,7 +170,7 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
   useEffect(() => {
     let interval = null;
 
-    if (timerRunning) {
+    if (timerRunning && !showScore) {
       interval = setInterval(() => {
         setTimeElapsed(seconds => seconds + 1);
       }, 1000);
@@ -175,7 +179,7 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
     }
 
     return () => clearInterval(interval);
-  }, [timerRunning]);
+  }, [timerRunning, showScore]);
 
   // Start timer when component mounts
   useEffect(() => {
@@ -343,7 +347,7 @@ const processHtmlContent = (html) => {
       const totalQuestions = questions.length;
       const skippedQuestions = totalQuestions - answeredQuestions;
 
-      const response = await router.post('/practice-session/subjective', {
+      await axios.post(route('practice.subjective.complete'), {
         subject_id: subject_id,
         topic_id: topic_id,
         start_at: practiceStartTime,
@@ -464,14 +468,9 @@ const processHtmlContent = (html) => {
   const footerContent = (
     <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-3 px-4 md:px-10 py-3">
       {/* Tools Button - Hidden on mobile, visible on tablet and up */}
-      <button className="hidden sm:flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+      <button className="hidden md:flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
         <span>🔧</span>
         <span className="hidden md:inline">Tools</span>
-      </button>
-
-      {/* Mobile Tools Button */}
-      <button className="sm:hidden flex items-center gap-2 px-3 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-        <span>🔧</span>
       </button>
 
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -769,6 +768,7 @@ const processHtmlContent = (html) => {
         form={standard}
         level_id={level_id}
         subject_id={subject_id}
+        nextTopic={next_topic}
       />
     );
   }

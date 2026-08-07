@@ -193,7 +193,7 @@ const AutoNotes = ({ isActive, addNoteTrigger }) => { // Changed prop name
       {notes.map(note => (
         <div
           key={note.id}
-          className="fixed z-40 shadow-lg rounded-lg max-w-xs min-w-[180px] select-none"
+          className="fixed z-[9999] shadow-lg rounded-lg max-w-xs min-w-[180px] select-none"
           style={{
             left: `${note.x}px`,
             top: `${note.y}px`,
@@ -285,7 +285,7 @@ const AutoNotes = ({ isActive, addNoteTrigger }) => { // Changed prop name
       {/* Click overlay to save edit */}
       {editingNote && (
         <div 
-          className="fixed inset-0 z-30"
+          className="fixed inset-0 z-[9998]"
           onClick={() => saveEdit(editingNote)}
           style={{ cursor: 'default', userSelect: 'none' }}
         />
@@ -294,7 +294,7 @@ const AutoNotes = ({ isActive, addNoteTrigger }) => { // Changed prop name
       {/* Drag overlay to prevent text selection */}
       {dragging && (
         <div 
-          className="fixed inset-0 z-30"
+          className="fixed inset-0 z-[9998]"
           style={{ 
             cursor: 'grabbing',
             userSelect: 'none',

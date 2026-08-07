@@ -1,6 +1,7 @@
 // resources/js/Pages/courses/training/ResultQuestion.jsx
 import React from "react";
-import { Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function ResultQuestion({
   objectiveResults,
@@ -17,19 +18,45 @@ export default function ResultQuestion({
   form,
   level_id,
   subject_id,
-   isEarlyExit = false
+  nextTopic,
+  isEarlyExit = false
 }) {
+  const { t } = useLanguage();
   const results = quizType === "objective" ? objectiveResults : subjectiveResults;
 
   const handleBackToSubject = () => {
-    // Construct the URL with all required parameters
-    const params = new URLSearchParams({
-      form: form || '',
-      level_id: level_id || '',
-      subject_id: subject_id || ''
-    }).toString();
+    router.visit(route('subject-page', {
+      subject,
+      form: form || standard,
+      level_id,
+      subject_id,
+    }));
+  };
 
-    window.location.href = `/subject/${subject}?${params}`;
+  const handleNextTopic = () => {
+    if (!nextTopic?.id) return;
+
+    router.get(route(quizType === 'objective' ? 'objective-page' : 'subjective-page'), {
+      subject,
+      standard: standard || form,
+      sectionId: nextTopic.section_id,
+      sectionTitle: nextTopic.section_title,
+      contentId,
+      topic: nextTopic.name,
+      topic_id: nextTopic.id,
+      subject_id,
+      level_id,
+    });
+  };
+
+  const handleViewReport = () => {
+    router.visit(route('subject-report-page', {
+      subject,
+      form: form || standard,
+      level_id,
+      subject_id,
+      question_type: quizType === 'objective' ? 'Objective' : 'Subjective',
+    }));
   };
 
   // 🖨️ Print the received props to verify
@@ -62,7 +89,10 @@ export default function ResultQuestion({
   };
 
   // Calculate average time per question
-  const averageTime = Math.round(results.timeElapsed / results.totalQuestions);
+  const totalQuestions = Number(results.totalQuestions || 0);
+  const averageTime = totalQuestions > 0
+    ? Math.round(Number(results.timeElapsed || 0) / totalQuestions)
+    : 0;
   const averageTimeFormatted = `${Math.floor(averageTime / 60)} minutes ${averageTime % 60} seconds`;
 
   // For objective quizzes: use correctAnswers, for subjective: all answered are correct
@@ -72,8 +102,8 @@ export default function ResultQuestion({
 
   // Calculate accuracy based on quiz type
   const accuracyRate = quizType === "objective"
-    ? Math.round((correctAnswers / results.totalQuestions) * 100)
-    : Math.round((results.answered / results.totalQuestions) * 100);
+    ? (totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0)
+    : (totalQuestions > 0 ? Math.round((results.answered / totalQuestions) * 100) : 0);
 
   const isComplete = results.isComplete || 
                      (results.completionType === 'all_questions') || 
@@ -258,31 +288,32 @@ export default function ResultQuestion({
             </div>
 
             {/* Action Buttons */}
-            {/* <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
               <button
                 onClick={onTryAgain}
                 className="px-6 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg lg:rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg hover:scale-105 text-base lg:text-lg flex items-center justify-center"
               >
                 <span className="mr-2">🔄</span>
-                Try more
+                {t('repeat_topic')}
               </button>
 
-              <Link
-                href="/dashboard"
+              <button
+                type="button"
+                onClick={isComplete && nextTopic?.id ? handleNextTopic : handleBackToSubject}
                 className="px-6 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg lg:rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 font-medium shadow-lg hover:scale-105 text-base lg:text-lg flex items-center justify-center text-center"
               >
                 <span className="mr-2">📚</span>
-                Next sub-topic
-              </Link>
-            </div> */}
+                {isComplete && nextTopic?.id ? `${t('next_topic')}: ${nextTopic.name}` : t('back_to_subject')}
+              </button>
+            </div>
           </div>
 
           {/* Review Section */}
           <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg p-4 lg:p-6 border border-gray-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <h3 className="text-lg lg:text-xl font-bold text-gray-800">Review</h3>
-              <button className="px-3 py-2 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium w-full sm:w-auto text-center">
-                View Detailed Report
+              <button onClick={handleViewReport} className="px-3 py-2 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium w-full sm:w-auto text-center">
+                {t('view_detailed_report')}
               </button>
             </div>
             <p className="text-sm lg:text-base text-gray-600 mt-2">Review your answers and see detailed explanations.</p>

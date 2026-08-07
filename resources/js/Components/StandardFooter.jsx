@@ -1,7 +1,9 @@
 // components/StandardFooter.jsx
 import React from 'react';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 const StandardFooter = () => {
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -14,17 +16,17 @@ const StandardFooter = () => {
           <div>
             <h3 className="text-2xl font-semibold text-white tracking-wide">EduLearn</h3>
             <p className="text-gray-400 text-sm mt-2 max-w-xs">
-              Empowering students through quality education.
+              {t('footer_intro')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
             {[
-              { label: "About Us", href: "/about" },
-              { label: "Contact", href: "/contact" },
-              { label: "Privacy Policy", href: "/privacy" },
-              { label: "Terms of Service", href: "/terms" },
+              { label: t('about_us'), href: "/about" },
+              { label: t('contact'), href: "/contact" },
+              { label: t('privacy_policy'), href: "/privacy" },
+              { label: t('terms_of_service'), href: "/terms" },
             ].map((link) => (
               <a
                 key={link.href}
@@ -73,7 +75,7 @@ const StandardFooter = () => {
         {/* Divider & Copyright */}
         <div className="border-t border-gray-700 pt-5 text-center">
           <p className="text-gray-500 text-sm">
-            © {currentYear} <span className="text-white font-medium">EduLearn</span>. All rights reserved.
+            © {currentYear} <span className="text-white font-medium">EduLearn</span>. {t('all_rights_reserved')}
           </p>
         </div>
       </div>

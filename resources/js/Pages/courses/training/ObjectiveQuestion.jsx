@@ -6,6 +6,7 @@ import Calculator from '@/Components/ScientificCalculator';
 import PageDrawingTool from '@/Components/PageDrawingTool';
 import AutoNotes from '@/Components/AutoNotes';
 import QuestionReportButton from '@/Components/QuestionReportButton';
+import axios from 'axios';
 
 const processQuestionHtml = (html) => html
   .replace(/<img\b([^>]*)>/gi, (match, attributes) => {
@@ -263,7 +264,8 @@ export default function ObjectiveQuestion() {
     subject_id,
     level_id,
     question_count,
-    total_available
+    total_available,
+    next_topic
   } = usePage().props;
 
   // Quiz Data State
@@ -289,6 +291,7 @@ export default function ObjectiveQuestion() {
   // Timer State
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const completedTimeRef = useRef(null);
   const [practiceStartTime, setPracticeStartTime] = useState(null);
   const [questionAttempts, setQuestionAttempts] = useState([]);
   const [questionStartTime, setQuestionStartTime] = useState(null);
@@ -396,7 +399,7 @@ export default function ObjectiveQuestion() {
         unfinishedQuestions: allQuestionAttempts.length - questionAttempts.length
       });
 
-      await router.post('/practice-session/objective', {
+      await axios.post(route('practice.objective.complete'), {
         subject_id: subject_id,
         topic_id: topic_id,
         start_at: practiceStartTime,
@@ -502,7 +505,7 @@ export default function ObjectiveQuestion() {
         }
       });
 
-      await router.post('/practice-session/objective', {
+      await axios.post(route('practice.objective.complete'), {
         subject_id: subject_id,
         topic_id: topic_id,
         start_at: practiceStartTime,
@@ -660,7 +663,7 @@ export default function ObjectiveQuestion() {
   useEffect(() => {
     let interval = null;
 
-    if (timerRunning) {
+    if (timerRunning && !quizCompleted && !showEarlyExitResults) {
       interval = setInterval(() => {
         setTimeElapsed(seconds => seconds + 1);
       }, 1000);
@@ -669,7 +672,7 @@ export default function ObjectiveQuestion() {
     }
 
     return () => clearInterval(interval);
-  }, [timerRunning]);
+  }, [timerRunning, quizCompleted, showEarlyExitResults]);
 
   /**
    * Reset timer for each new question
@@ -766,7 +769,7 @@ export default function ObjectiveQuestion() {
       });
 
       // Use await to ensure the save completes before continuing
-      await router.post('/practice-session/objective', {
+      await axios.post(route('practice.objective.complete'), {
         subject_id: subject_id,
         topic_id: topic_id,
         start_at: practiceStartTime,
@@ -781,9 +784,6 @@ export default function ObjectiveQuestion() {
           first_try_result: result ? result.isCorrect : null,
           chosen_answer_id: result ? result.answerId : 0 // 0 for unfinished
         }))
-      }, {
-        preserveState: true, // This is important - preserves component state
-        preserveScroll: true
       });
 
       console.log('✅ Practice session saved successfully with all questions');
@@ -1015,6 +1015,7 @@ export default function ObjectiveQuestion() {
       setQuestionStartTime(Date.now());
     } else {
       // If last question, complete quiz
+      completedTimeRef.current = timeElapsed;
       setTimerRunning(false); // STOP THE TIMER FIRST
 
       try {
@@ -1036,57 +1037,42 @@ export default function ObjectiveQuestion() {
    * Restarts the quiz with new questions
    * Resets all state and fetches new questions
    */
-  const handleRestartQuiz = () => {
+  const handleRestartQuiz = async () => {
     setLoading(true);
 
-    router.post('/objective-page/restart', {
-      topic_id: topic_id,
-      topic: topic,
-      subject: subject,
-    }, {
-      onSuccess: (page) => {
-        const newQuestions = page.props.questions || [];
-        setQuestions(newQuestions);
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer({
-          index: null,
-          id: null
-        });
-        setShowExplanation(false);
-        setScore(0);
-        setQuizCompleted(false);
-        setAnsweredQuestions(new Set());
-        setIncorrectAnswers(new Set());
-        setIsAnswerCorrect(null);
-        setFirstTryResults(Array(newQuestions.length).fill(null));
-        setHasCheckedFirstTry(false);
-        setShowCelebration(false);
-        setTimeElapsed(0);
-        setTimerRunning(true);
-        setQuestionAttempts([]);
-        setLoading(false);
-      },
-      onError: () => {
-        setLoading(false);
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer({
-          index: null,
-          id: null
-        });
-        setShowExplanation(false);
-        setScore(0);
-        setQuizCompleted(false);
-        setAnsweredQuestions(new Set());
-        setIncorrectAnswers(new Set());
-        setIsAnswerCorrect(null);
-        setFirstTryResults(Array(questions.length).fill(null));
-        setHasCheckedFirstTry(false);
-        setShowCelebration(false);
-        setTimeElapsed(0);
-        setTimerRunning(true);
-        setQuestionAttempts([]);
+    try {
+      const { data } = await axios.post(route('objective-page.restart'), {
+        topic_id,
+        topic,
+        subject,
+      });
+      const newQuestions = data.questions || [];
+
+      if (!newQuestions.length) {
+        throw new Error('No questions are available for this topic.');
       }
-    });
+
+      setQuestions(newQuestions);
+      setCurrentQuestionIndex(0);
+      setSelectedAnswer({ index: null, id: null });
+      setShowExplanation(false);
+      setScore(0);
+      setQuizCompleted(false);
+      setAnsweredQuestions(new Set());
+      setIncorrectAnswers(new Set());
+      setIsAnswerCorrect(null);
+      setFirstTryResults(Array(newQuestions.length).fill(null));
+      setHasCheckedFirstTry(false);
+      setShowCelebration(false);
+      setTimeElapsed(0);
+      completedTimeRef.current = null;
+      setTimerRunning(true);
+      setQuestionAttempts([]);
+    } catch (error) {
+      console.error('Failed to restart objective practice:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // ============================
@@ -1242,7 +1228,7 @@ export default function ObjectiveQuestion() {
   const FooterContent = () => (
     <div className="max-w-full mx-auto flex flex-wrap justify-between items-center gap-3">
       {/* Left side: Tools button with dropdown */}
-      <div className="relative">
+      <div className="relative z-[9998] hidden md:block">
         <button
           onClick={() => setShowToolsDropdown(!showToolsDropdown)}
           className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow-md transition-all duration-300 hover:bg-gray-700 hover:scale-[1.03] hover:shadow-lg flex items-center gap-2"
@@ -1271,7 +1257,7 @@ export default function ObjectiveQuestion() {
 
         {/* Tools Dropdown Menu */}
         {showToolsDropdown && (
-          <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+          <div className="absolute bottom-full left-0 z-[9999] mb-2 w-48 rounded-lg border border-gray-200 bg-white shadow-xl">
             <div className="py-1">
               <button
                 onClick={() => {
@@ -1459,6 +1445,7 @@ export default function ObjectiveQuestion() {
         form={standard}
         level_id={level_id}
         subject_id={subject_id}
+        nextTopic={next_topic}
         customBackAction={handleBackToQuiz}
         isEarlyExit={true}
       />
@@ -1486,7 +1473,7 @@ export default function ObjectiveQuestion() {
       answered: answeredQuestions.size,
       correctAnswers: correctAnswers, // Use score which tracks correct answers
       skippedAnswers: skippedAnswers,
-      timeElapsed: timeElapsed,
+      timeElapsed: completedTimeRef.current ?? timeElapsed,
       score: Math.round((correctAnswers / questions.length) * 100),
       isComplete: true,
       isEarlyExit: false,
@@ -1519,6 +1506,7 @@ export default function ObjectiveQuestion() {
         form={standard}
         level_id={level_id}
         subject_id={subject_id}
+        nextTopic={next_topic}
         isEarlyExit={false}
       />
     );
@@ -1586,7 +1574,7 @@ export default function ObjectiveQuestion() {
       {/* Calculator Modal - Draggable */}
       {showCalculator && (
         <div
-          className="fixed z-50"
+          className="fixed z-[9999]"
           style={{
             left: `${calculatorPosition.x}px`,
             top: `${calculatorPosition.y}px`

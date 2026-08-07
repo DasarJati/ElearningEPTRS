@@ -17,15 +17,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\App;
-use App\Traits\InertiaLocaleTrait;
 
 
 class ReportController extends Controller
 {
-    use InertiaLocaleTrait;
-
     public function index(Request $request, $subject)
     {
         $subjectId = $request->get('subject_id');
@@ -35,12 +30,6 @@ class ReportController extends Controller
 
         $userId = Auth::id();
         Auth::user()->load('student');
-
-        $locale = Session::get('locale', 'en');
-        App::setLocale($locale);
-
-        // Load translations
-        $translations = $this->loadPhpTranslations($locale);
 
         Log::info('ReportPage Request:', [
             'subject_param' => $subject,
@@ -141,7 +130,7 @@ class ReportController extends Controller
             $subjectiveData = $questionType === 'Subjective' ? $currentData : [];
         }
 
-        return $this->renderWithLocale('courses/SubjectReportPage', [
+        return Inertia::render('courses/SubjectReportPage', [
             'subject' => $subjectData->name,
             'subject_abbr' => $subjectData->abbr,
             'subject_id' => $subjectId,
@@ -154,33 +143,7 @@ class ReportController extends Controller
             'selectedStandard' => $form,
             'availableLevels' => $availableLevels,
             'availableSubjects' => $availableSubjects,
-            'locale' => $locale,
-            'translations' => $translations,
-
-            'availableLocales' => ['en', 'ms'],
         ]);
-    }
-
-    private function loadPhpTranslations($locale)
-    {
-        $fallbackLocale = 'en';
-
-        try {
-            // Load the common.php file for the requested locale
-            $translations = trans('common', [], $locale);
-
-            // If no translations found, try fallback
-            if (is_array($translations) && !empty($translations)) {
-                return $translations;
-            }
-
-            // Fallback to English
-            return trans('common', [], $fallbackLocale);
-        } catch (\Exception $e) {
-            // If translation file doesn't exist, return empty
-            Log::error('Failed to load translations: ' . $e->getMessage());
-            return [];
-        }
     }
 
     /**

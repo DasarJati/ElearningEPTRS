@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\TopicNavigationService;
 
 
 class SubjectiveController extends Controller
 {
+    public function __construct(
+        private readonly TopicNavigationService $topicNavigation
+    ) {}
+
     /**
      * Display the subjective questions page
      */
@@ -58,7 +63,22 @@ class SubjectiveController extends Controller
             'level_id' => $request->level_id,
             'question_count' => count($questions),
             'total_available' => $topicId ? $this->getTotalAvailableQuestions($topicId) : 0,
+            'next_topic' => $this->getNextTopic($topicId, $request, 2),
         ]);
+    }
+
+    private function getNextTopic($topicId, Request $request, int $questionTypeId): ?array
+    {
+        if (!$topicId || !$request->subject_id || !$request->level_id) {
+            return null;
+        }
+
+        return $this->topicNavigation->nextPracticeTopic(
+            (int) $topicId,
+            (int) $request->subject_id,
+            (int) $request->level_id,
+            $questionTypeId
+        );
     }
 
     /**

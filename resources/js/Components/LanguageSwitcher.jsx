@@ -3,13 +3,14 @@ import React from 'react';
 import { useLanguage } from '../Contexts/LanguageContext';
 
 const LanguageSwitcher = ({ type = 'buttons' }) => {
-    const { locale, changeLanguage, isEnglish, isMalay } = useLanguage();
+    const { locale, changeLanguage, isChanging, isEnglish, isMalay } = useLanguage();
     
     if (type === 'dropdown') {
         return (
             <select 
                 value={locale}
                 onChange={(e) => changeLanguage(e.target.value)}
+                disabled={isChanging}
                 className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#30918F] focus:border-[#30918F] transition"
             >
                 <option value="en">English</option>
@@ -22,7 +23,7 @@ const LanguageSwitcher = ({ type = 'buttons' }) => {
         <div className="inline-flex rounded-lg shadow-sm overflow-hidden border border-gray-300">
             <button
                 onClick={() => changeLanguage('en')}
-                disabled={isEnglish}
+                disabled={isEnglish || isChanging}
                 className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                     isEnglish 
                         ? 'bg-[#30918F] text-white' 
@@ -34,7 +35,7 @@ const LanguageSwitcher = ({ type = 'buttons' }) => {
             
             <button
                 onClick={() => changeLanguage('ms')}
-                disabled={isMalay}
+                disabled={isMalay || isChanging}
                 className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                     isMalay 
                         ? 'bg-[#30918F] text-white' 

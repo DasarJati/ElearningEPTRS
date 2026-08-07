@@ -3,8 +3,10 @@ import { usePage, router } from '@inertiajs/react';
 import SubjectLayout from '@/Layouts/SubjectLayout';
 import DonutChart from '@/Components/ChartJsDonut';
 import SubtopicDetailModal from '@/Components/SubtopicDetailModal';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function SubjectReportPage() {
+  const { t } = useLanguage();
   const { props } = usePage();
 
   const {
@@ -159,7 +161,7 @@ export default function SubjectReportPage() {
                     Loading...
                   </div>
                 ) : (
-                  'Objective'
+                  t('objective_type')
                 )}
               </button>
 
@@ -177,7 +179,7 @@ export default function SubjectReportPage() {
                     Loading...
                   </div>
                 ) : (
-                  'Subjective'
+                  t('subjective_type')
                 )}
               </button>
             </div>
@@ -188,7 +190,7 @@ export default function SubjectReportPage() {
             <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-gray-700">Loading {activeTab.toLowerCase()} data...</p>
+                <p className="text-gray-700">{t('loading_data')}</p>
               </div>
             </div>
           )}
@@ -196,21 +198,21 @@ export default function SubjectReportPage() {
           {/* Progress Details */}
           <div className="mb-8 border border-gray-300 rounded-lg bg-gray-50 shadow-sm transition-opacity duration-300">
             <div className="flex items-center justify-between mb-2 bg-slate-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-800">Progress Details</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t('progress_details')}</h3>
 
               {/* Time range */}
               <div className="gap-2 flex">
-                <span className="text-sm text-gray-600">Activity from :</span>
+                <span className="text-sm text-gray-600">{t('activity_from')}</span>
                 <select
                   value={timeRange}
                   onChange={(e) => handleTimeRangeChange(e.target.value)}
                   className="border border-gray-300 rounded-md px-3 py-0 text-sm bg-white"
                   disabled={isLoading}
                 >
-                  <option>Last 7 Days</option>
-                  <option>Last 30 Days</option>
-                  <option>Last 3 Months</option>
-                  <option>All Time</option>
+                  <option value="Last 7 Days">{t('last_7_days')}</option>
+                  <option value="Last 30 Days">{t('last_30_days')}</option>
+                  <option value="Last 3 Months">{t('last_3_months')}</option>
+                  <option value="All Time">{t('all_time')}</option>
                 </select>
               </div>
             </div>
@@ -224,7 +226,7 @@ export default function SubjectReportPage() {
                   <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <p className="text-gray-500 text-lg">No {activeTab.toLowerCase()} topics with questions available</p>
+                  <p className="text-gray-500 text-lg">{t('no_topics_available')}</p>
                 </div>
               ) : (
                 topics.map((topic) => (
@@ -261,20 +263,20 @@ export default function SubjectReportPage() {
                         {/* Table header */}
                         <div className="px-6 py-3">
                           <div className="grid grid-cols-5 gap-4 text-sm font-medium text-gray-700">
-                            <div className="border-b-2 border-gray-50">Subtopics</div>
-                            <div className="text-center border-b-2 border-gray-50">Total Session</div>
+                            <div className="border-b-2 border-gray-50">{t('subtopics')}</div>
+                            <div className="text-center border-b-2 border-gray-50">{t('total_sessions')}</div>
 
                             {activeTab === 'Objective' && (
                               <>
-                                <div className="text-center border-b-2 border-gray-50">Score Statistic</div>
-                                <div className="text-center border-b-2 border-gray-50">Average Score</div>
-                                <div className="text-center border-b-2 border-gray-50">Last Session</div>
+                                <div className="text-center border-b-2 border-gray-50">{t('score_statistic')}</div>
+                                <div className="text-center border-b-2 border-gray-50">{t('average_score')}</div>
+                                <div className="text-center border-b-2 border-gray-50">{t('last_session')}</div>
                               </>
                             )}
 
                             {activeTab === 'Subjective' && (
                               <>
-                                <div className="text-center border-b-2 border-gray-50">Last Session</div>
+                                <div className="text-center border-b-2 border-gray-50">{t('last_session')}</div>
                               </>
                             )}
                           </div>

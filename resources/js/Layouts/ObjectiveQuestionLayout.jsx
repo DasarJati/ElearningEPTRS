@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import SubjectNavbar from '@/Layouts/SubjectNavbar';
-import StandardFooter from '@/Components/StandardFooter';
 
 const ObjectiveQuestionLayout = ({
   children,
@@ -22,13 +20,6 @@ const ObjectiveQuestionLayout = ({
   const [showNavbar, setShowNavbar] = useState(true);
   const [showColoredHeader, setShowColoredHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-
-  const formatSubjectName = (subject) => {
-    if (!subject) return "Subject";
-    return subject.split('-').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
-  };
 
    // Handle back/exit logic
   const handleBackButtonClick = () => {
@@ -72,17 +63,9 @@ const ObjectiveQuestionLayout = ({
   return (
     <div className="flex flex-col min-h-screen">
       {/* ✅ Navbar - hides on scroll down */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
-          showNavbar ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-        <SubjectNavbar title={formatSubjectName(subject)} />
-      </div>
-
       {/* ✅ White Header Section - hides on scroll down */}
       <div
-        className={`bg-white shadow-xl p-4 md:p-6 sticky top-0 z-40 mt-20 transition-transform duration-300 ${
+        className={`bg-white shadow-xl p-4 md:p-6 sticky top-0 z-40 transition-transform duration-300 ${
           showNavbar ? 'translate-y-0' : '-translate-y-full'
         }`}
       >

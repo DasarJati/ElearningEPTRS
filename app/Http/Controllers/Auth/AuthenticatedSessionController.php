@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,51 +42,33 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
-{
-    // 1. Save current locale to flash data BEFORE authentication
-    $previousLocale = Session::get('locale', 'en');
-    
-    // Store in session flash so it survives redirects
-    Session::flash('preserved_locale', $previousLocale);
-    
-    Log::info('LoginController - Saving locale to flash:', [
-        'locale' => $previousLocale,
-        'session_id' => Session::getId()
-    ]);
+    {
+        $request->authenticate();
 
-    $request->authenticate();
+        $request->session()->regenerate();
 
-    $request->session()->regenerate();
+        UserLoginActivity::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'login_date' => now()->toDateString(),
+            ],
+            [
+                'last_login_at' => now(),
+            ]
+        );
 
-    UserLoginActivity::updateOrCreate(
-        [
-            'user_id' => Auth::id(),
-            'login_date' => now()->toDateString(),
-        ],
-        [
-            'last_login_at' => now(),
-        ]
-    );
+        $availableLocales = config('app.available_locales', ['en', 'ms']);
+        $userLocale = Auth::user()?->language;
 
-    // 2. Check for preserved locale in flash data
-    $preservedLocale = Session::get('preserved_locale');
-    if ($preservedLocale && in_array($preservedLocale, ['en', 'ms'])) {
-        Session::put('locale', $preservedLocale);
-        
-        // Also update user's language preference
-        // $user = Auth::user();
-        // if ($user && $user->language !== $preservedLocale) {
-        //     $user->update(['language' => $preservedLocale]);
-        // }
-        
-        Log::info('LoginController - Restored locale from flash:', [
-            'locale' => $preservedLocale,
-            'user_id' => Auth::id()
-        ]);
+        Session::put(
+            'locale',
+            in_array($userLocale, $availableLocales, true)
+                ? $userLocale
+                : config('app.locale', 'en')
+        );
+
+        return redirect()->intended(route('dashboard', absolute: false));
     }
-
-    return redirect()->intended(route('dashboard', absolute: false));
-}
 
     /**
      * Destroy an authenticated session.

@@ -8,12 +8,10 @@ use App\Models\Topic;
 use App\Models\Level;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class SubjectContentController extends Controller
 {
@@ -29,14 +27,6 @@ class SubjectContentController extends Controller
         if (!Auth::user()->relationLoaded('student')) {
             Auth::user()->load('student');
         }
-
-        $locale = Session::get('locale', 'en');
-        App::setLocale($locale);
-        
-        // ✅ OPTIMIZATION 2: Cache translations globally (1 hour)
-        $translations = Cache::remember("translations_{$locale}", 3600, function () use ($locale) {
-            return $this->loadPhpTranslations($locale);
-        });
 
         // ✅ OPTIMIZATION 3: Cache levels & subjects (30 minutes)
         $availableLevels = Cache::remember('available_levels', 1800, function () {
@@ -115,9 +105,6 @@ class SubjectContentController extends Controller
             'selectedStandard' => $form,
             'availableLevels' => $availableLevels,
             'availableSubjects' => $availableSubjects,
-            'locale' => $locale,
-            'translations' => $translations,
-            'availableLocales' => ['en', 'ms'],
         ]);
     }
 
@@ -126,12 +113,20 @@ class SubjectContentController extends Controller
  */
 private function getOptimizedContent($subjectId, $levelId, $userId = null)
 {
-    // Cache key for structure (shared across users)
-    $structureCacheKey = "content_structure_{$subjectId}_{$levelId}";
+    // Version the cache with the latest topic update so active-status changes
+    // do not continue serving an old topic/subtopic structure.
+    $latestTopicUpdate = DB::table('topics')
+        ->where('subject_id', $subjectId)
+        ->where('level_id', $levelId)
+        ->max('updated_at');
+    $structureVersion = $latestTopicUpdate
+        ? strtotime((string) $latestTopicUpdate)
+        : 0;
+    $structureCacheKey = "active_published_content_structure_v1_{$subjectId}_{$levelId}_{$structureVersion}";
     
     // ✅ STEP 1: Get cached structure (topics + subtopics) - 15 min cache
     $structure = Cache::remember($structureCacheKey, 900, function () use ($subjectId, $levelId) {
-        // Single query with LEFT JOIN to get ALL topics and subtopics
+        // Single query: only active and published parent topics/subtopics.
         return DB::table('topics as parent')
             ->leftJoin('topics as child', function ($join) {
                 $join->on('child.parent_id', '=', 'parent.id')
@@ -350,7 +345,10 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
                 'recent_session_count' => 0,
                 'recent_correct' => 0,
                 'recent_questions' => 0,
+                'raw_accuracy_percentage' => 0,
                 'accuracy_percentage' => 0,
+                'inactive_weeks' => 0,
+                'inactivity_penalty_percentage' => 0,
             ];
         }
 
@@ -359,9 +357,19 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
         $recentQuestions = (int) $recentSessions->sum(function ($session) {
             return $this->formatPracticeData($session)['total_questions'];
         });
-        $accuracy = $recentQuestions > 0
+        $rawAccuracy = $recentQuestions > 0
             ? round(($recentCorrect / $recentQuestions) * 100)
             : 0;
+
+        // Deduct two percentage points for every full seven-day period
+        // since the learner's most recent objective practice for this topic.
+        $lastPracticeAt = Carbon::parse($sessions->first()->created_at);
+        $inactiveSeconds = $lastPracticeAt->isPast()
+            ? (int) $lastPracticeAt->diffInSeconds(now())
+            : 0;
+        $inactiveWeeks = intdiv($inactiveSeconds, 7 * 24 * 60 * 60);
+        $inactivityPenalty = $inactiveWeeks * 2;
+        $accuracy = max(0, $rawAccuracy - $inactivityPenalty);
 
         if ($sessionCount >= 6 && $accuracy >= 80) {
             [$level, $label] = [5, 'Mastered'];
@@ -380,27 +388,11 @@ private function getOptimizedContent($subjectId, $levelId, $userId = null)
             'recent_session_count' => $recentSessions->count(),
             'recent_correct' => $recentCorrect,
             'recent_questions' => $recentQuestions,
+            'raw_accuracy_percentage' => $rawAccuracy,
             'accuracy_percentage' => $accuracy,
+            'inactive_weeks' => $inactiveWeeks,
+            'inactivity_penalty_percentage' => $inactivityPenalty,
         ];
-    }
-
-    /**
-     * Load PHP translations with caching
-     */
-    private function loadPhpTranslations($locale)
-    {
-        try {
-            $translations = trans('common', [], $locale);
-            
-            if (is_array($translations) && !empty($translations)) {
-                return $translations;
-            }
-            
-            return trans('common', [], 'en');
-        } catch (\Exception $e) {
-            Log::error('Failed to load translations: ' . $e->getMessage());
-            return [];
-        }
     }
 
     /**
