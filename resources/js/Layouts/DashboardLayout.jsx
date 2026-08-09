@@ -46,7 +46,7 @@ export default function DashboardLayout({ header, children }) {
                 <ApplicationLogo className="h-9 w-9 object-contain" />
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-bold leading-none tracking-tight text-slate-900">PTRS Learning</p>
+                <p className="text-sm font-bold leading-none tracking-tight text-slate-900">PTRS Praktis</p>
                 <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">{t('student_portal')}</p>
               </div>
             </Link>

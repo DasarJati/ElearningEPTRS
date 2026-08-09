@@ -49,7 +49,7 @@ export default function Register() {
 
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg"><ApplicationLogo className="h-10 w-10 object-contain" /></span>
-            <div><p className="text-sm font-bold">PTRS Learning</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-300">Student portal</p></div>
+            <div><p className="text-sm font-bold">PTRS Praktis</p><p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-300">Student portal</p></div>
           </motion.div>
 
           <motion.div variants={container} initial="hidden" animate="show" className="relative z-10 my-auto max-w-lg">
@@ -61,7 +61,7 @@ export default function Register() {
             </motion.div>
           </motion.div>
 
-          <p className="relative z-10 border-t border-white/10 pt-5 text-[11px] text-slate-500">© {new Date().getFullYear()} PTRS Learning</p>
+          <p className="relative z-10 border-t border-white/10 pt-5 text-[11px] text-slate-500">© {new Date().getFullYear()} PTRS Praktis</p>
         </section>
 
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-10 sm:px-8 lg:px-12">
@@ -70,7 +70,7 @@ export default function Register() {
 
           <motion.div variants={container} initial="hidden" animate="show" className="relative z-10 w-full max-w-lg rounded-3xl border border-white/80 bg-white/90 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl sm:p-9">
             <motion.div variants={item} className="mb-7 flex items-center justify-between">
-              <div className="flex items-center gap-3 lg:hidden"><span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-950"><ApplicationLogo className="h-9 w-9 object-contain" /></span><p className="text-sm font-bold text-slate-900">PTRS Learning</p></div>
+              <div className="flex items-center gap-3 lg:hidden"><span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-950"><ApplicationLogo className="h-9 w-9 object-contain" /></span><p className="text-sm font-bold text-slate-900">PTRS Praktis</p></div>
               <Link href={route('login')} className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition hover:text-indigo-600"><ArrowLeftIcon className="h-4 w-4" /> Back to sign in</Link>
             </motion.div>
 
