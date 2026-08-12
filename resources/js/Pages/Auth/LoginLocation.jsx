@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
@@ -9,14 +9,16 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function LoginLocation() {
-    const requested = useRef(false);
-    const [state, setState] = useState('requesting');
-    const [message, setMessage] = useState('Your browser may ask for location permission.');
+    const [state, setState] = useState('choice');
+    const [message, setMessage] = useState('Would you like to allow PTRS to access your current location?');
+    const [submitting, setSubmitting] = useState(false);
 
     const submitResult = (payload) => {
+        setSubmitting(true);
         router.post(route('login.location.store'), payload, {
             preserveScroll: true,
             onError: () => {
+                setSubmitting(false);
                 setState('error');
                 setMessage('We could not save the location result. Please try again.');
             },
@@ -57,11 +59,11 @@ export default function LoginLocation() {
         );
     };
 
-    useEffect(() => {
-        if (requested.current) return;
-        requested.current = true;
-        requestLocation();
-    }, []);
+    const rejectLocation = () => {
+        setState('denied');
+        setMessage('Location access rejected. Opening your dashboard...');
+        submitResult({ permission_status: 'denied' });
+    };
 
     const Icon = state === 'captured'
         ? CheckCircleIcon
@@ -86,9 +88,9 @@ export default function LoginLocation() {
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500 shadow-lg shadow-indigo-500/25">
                             <Icon className="h-7 w-7" />
                         </div>
-                        <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-indigo-300">Login security step</p>
-                        <h1 className="mt-3 text-3xl font-semibold tracking-tight">Confirm your learning location</h1>
-                        <p className="mt-4 text-sm leading-6 text-slate-400">PTRS records your current coordinates after login to help measure learning reach. Your browser stays in control of permission.</p>
+                        <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-indigo-300">Before entering your dashboard</p>
+                        <h1 className="mt-3 text-3xl font-semibold tracking-tight">Can PTRS access your location?</h1>
+                        <p className="mt-4 text-sm leading-6 text-slate-400">Choose Allow or Reject below. If you choose Allow, your browser will show its official location permission prompt.</p>
                     </div>
 
                     <div className="px-8 py-8 sm:px-10">
@@ -100,10 +102,29 @@ export default function LoginLocation() {
                             <p className="text-sm font-medium leading-6 text-slate-700">{message}</p>
                         </div>
 
+                        {state === 'choice' && (
+                            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                <button
+                                    type="button"
+                                    onClick={requestLocation}
+                                    disabled={submitting}
+                                    className="h-12 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60"
+                                >
+                                    Allow location
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={rejectLocation}
+                                    disabled={submitting}
+                                    className="h-12 rounded-xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60"
+                                >
+                                    Reject and continue
+                                </button>
+                            </div>
+                        )}
+
                         {state === 'error' && (
-                            <button type="button" onClick={requestLocation} className="mt-5 h-12 w-full rounded-xl bg-slate-950 text-sm font-semibold text-white transition hover:bg-indigo-700">
-                                Try again
-                            </button>
+                            <div className="mt-5 grid gap-3 sm:grid-cols-2"><button type="button" onClick={requestLocation} className="h-12 rounded-xl bg-slate-950 text-sm font-semibold text-white transition hover:bg-indigo-700">Try location again</button><button type="button" onClick={rejectLocation} className="h-12 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-600 hover:bg-slate-50">Reject and continue</button></div>
                         )}
 
                         <div className="mt-6 flex items-start gap-3 border-t border-slate-100 pt-6 text-xs leading-5 text-slate-400">
