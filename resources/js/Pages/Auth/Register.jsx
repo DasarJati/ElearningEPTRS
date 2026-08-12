@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import InputError from '@/Components/InputError';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { motion } from 'framer-motion';
 import {
   AcademicCapIcon,
@@ -12,6 +14,8 @@ import {
   LockClosedIcon,
   SparklesIcon,
   UserIcon,
+  BuildingLibraryIcon,
+  ChevronUpDownIcon,
 } from '@heroicons/react/24/outline';
 
 const ease = [0.22, 1, 0.36, 1];
@@ -26,11 +30,12 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
 };
 
-export default function Register() {
+export default function Register({ schools = [] }) {
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     ic_number: '',
     email: '',
+    school_id: '',
   });
 
   const submit = (event) => {
@@ -85,6 +90,7 @@ export default function Register() {
               <Field label="Full name" name="name" value={data.name} error={errors.name} placeholder="Your full name" autoComplete="name" icon={UserIcon} onChange={(value) => setData('name', value)} autoFocus />
               <Field label="IC number" name="ic_number" value={data.ic_number} error={errors.ic_number} placeholder="e.g. 010203040506" autoComplete="username" inputMode="numeric" maxLength={14} icon={IdentificationIcon} onChange={(value) => setData('ic_number', value)} />
               <Field label="Email address" name="email" value={data.email} error={errors.email} placeholder="student@example.com" autoComplete="email" type="email" icon={AtSymbolIcon} onChange={(value) => setData('email', value)} />
+              <SchoolField schools={schools} value={data.school_id} error={errors.school_id} onChange={(value) => setData('school_id', value)} />
 
               <div className="flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50/70 p-3.5 text-xs leading-5 text-indigo-800">
                 <LockClosedIcon className="mt-0.5 h-4 w-4 flex-none" />
@@ -112,6 +118,71 @@ function Field({ label, name, value, error, icon: Icon, onChange, type = 'text',
         <Icon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
         <input id={name} name={name} type={type} value={value} onChange={(event) => onChange(event.target.value)} required className="h-12 w-full rounded-xl border-slate-200 bg-slate-50/70 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-indigo-500" {...props} />
       </div>
+      <InputError message={error} className="mt-2" />
+    </div>
+  );
+}
+
+function SchoolField({ schools, value, error, onChange }) {
+  const [query, setQuery] = useState('');
+  const selectedSchool = schools.find((school) => String(school.id) === String(value));
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const filteredSchools = normalizedQuery === ''
+    ? schools
+    : schools.filter((school) => school.name.toLocaleLowerCase().includes(normalizedQuery));
+
+  return (
+    <div>
+      <label htmlFor="school_id" className="text-sm font-semibold text-slate-700">School</label>
+      <Combobox
+        value={selectedSchool || null}
+        onChange={(school) => onChange(school ? String(school.id) : '')}
+        onClose={() => setQuery('')}
+      >
+        <div className="relative mt-2">
+          <BuildingLibraryIcon className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <ComboboxInput
+            id="school_id"
+            name="school_name_search"
+            required={!value}
+            aria-label="Search and select your school"
+            displayValue={(school) => school?.name || ''}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search school name..."
+            autoComplete="off"
+            className="h-12 w-full rounded-xl border-slate-200 bg-slate-50/70 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-indigo-500"
+          />
+          <ComboboxButton className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-slate-400 transition hover:text-indigo-600" aria-label="Show schools">
+            <ChevronUpDownIcon className="h-5 w-5" />
+          </ComboboxButton>
+
+          <ComboboxOptions
+            transition
+            className="absolute z-50 mt-2 max-h-60 w-full origin-top overflow-auto rounded-xl border border-slate-200 bg-white p-1.5 text-sm shadow-xl transition duration-100 ease-out empty:invisible data-[closed]:scale-95 data-[closed]:opacity-0"
+          >
+            {filteredSchools.length === 0 ? (
+              <div className="px-3 py-4 text-center text-sm text-slate-500">No school found for “{query}”</div>
+            ) : (
+              filteredSchools.map((school) => (
+                <ComboboxOption
+                  key={school.id}
+                  value={school}
+                  className="group flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-slate-700 outline-none data-[focus]:bg-indigo-50 data-[focus]:text-indigo-800"
+                >
+                  <span className="min-w-0 truncate">{school.name}</span>
+                  <CheckCircleIcon className="hidden h-4 w-4 flex-none text-emerald-600 group-data-[selected]:block" />
+                </ComboboxOption>
+              ))
+            )}
+          </ComboboxOptions>
+        </div>
+      </Combobox>
+      {selectedSchool && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+          <CheckCircleIcon className="h-4 w-4" />
+          Selected: {selectedSchool.name}
+        </p>
+      )}
       <InputError message={error} className="mt-2" />
     </div>
   );

@@ -66,6 +66,10 @@ class School extends Model
     /**
      * Get the students for the school.
      */
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'school_id', 'id');
+    }
 
     /**
      * Get the quiz sessions for the school.

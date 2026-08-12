@@ -67,7 +67,12 @@ class AuthenticatedSessionController extends Controller
                 : config('app.locale', 'en')
         );
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $request->session()->put(
+            'location_redirect_to',
+            $request->session()->pull('url.intended', route('dashboard', absolute: false))
+        );
+
+        return redirect()->route('login.location');
     }
 
     /**

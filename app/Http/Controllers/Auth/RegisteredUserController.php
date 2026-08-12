@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\School;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,14 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'schools' => School::query()
+                ->select('id', 'name')
+                ->whereNotNull('name')
+                ->where('name', '!=', '')
+                ->orderBy('name')
+                ->get(),
+        ]);
     }
 
     /**
@@ -46,9 +54,12 @@ class RegisteredUserController extends Controller
                 'digits:12',
                 Rule::unique((new Student)->getTable(), 'ic_number'),
             ],
+            'school_id' => ['required', 'integer', 'exists:school,id'],
         ], [
             'ic_number.digits' => 'Please enter a valid 12-digit IC number.',
             'ic_number.unique' => 'An account already exists for this IC number.',
+            'school_id.required' => 'Please select your school.',
+            'school_id.exists' => 'The selected school is not available.',
         ]);
 
         $user = DB::transaction(function () use ($request) {
@@ -63,6 +74,7 @@ class RegisteredUserController extends Controller
 
             Student::create([
                 'user_id' => $user->id,
+                'school_id' => $request->school_id,
                 'ic_number' => $request->ic_number,
                 'full_name' => $request->name,
             ]);

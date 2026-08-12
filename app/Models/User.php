@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'user_id', 'id');
     }
 
+    public function location()
+    {
+        return $this->hasOne(UserLocation::class);
+    }
+
     /**
      * Get all friends where this user is the initiator
      */

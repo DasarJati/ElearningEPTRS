@@ -1,7 +1,7 @@
 // Layouts/QuestionLayout.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import QuestionNavbar from './QuestionNavbar';
-import Calculator from '../Components/Calculator'; // Import kalkulator
+import ScientificCalculator from '../Components/ScientificCalculator';
 
 const QuizLayout = ({ 
   children, 
@@ -36,8 +36,8 @@ const QuizLayout = ({
   }, []);
 
   // Handle calculator drag events
-  const handleMouseDown = (e) => {
-    if (!calculatorVisible) return;
+  const handlePointerDown = (e) => {
+    if (!calculatorVisible || e.target.closest('button')) return;
     
     setIsDragging(true);
     const rect = calculatorRef.current.getBoundingClientRect();
@@ -49,15 +49,16 @@ const QuizLayout = ({
     e.preventDefault();
   };
 
-  const handleMouseMove = (e) => {
+  const handlePointerMove = (e) => {
     if (!isDragging || !calculatorVisible) return;
     
     const newX = e.clientX - dragOffset.x;
     const newY = e.clientY - dragOffset.y;
     
-    // Ensure calculator stays within viewport bounds
-    const maxX = window.innerWidth - 400; // Calculator width
-    const maxY = window.innerHeight - 500; // Calculator height
+    const calculatorWidth = calculatorRef.current?.offsetWidth ?? 310;
+    const calculatorHeight = calculatorRef.current?.offsetHeight ?? 500;
+    const maxX = window.innerWidth - calculatorWidth - 8;
+    const maxY = window.innerHeight - calculatorHeight - 8;
     
     setCalculatorPosition({
       x: Math.max(0, Math.min(newX, maxX)),
@@ -65,27 +66,27 @@ const QuizLayout = ({
     });
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     setIsDragging(false);
   };
 
   // Add event listeners for dragging
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('pointermove', handlePointerMove);
+      document.addEventListener('pointerup', handlePointerUp);
       document.body.style.cursor = 'grabbing';
       document.body.style.userSelect = 'none';
     } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
@@ -164,27 +165,28 @@ const QuizLayout = ({
       {calculatorVisible && (
         <div
           ref={calculatorRef}
-          className="fixed z-50 shadow-2xl rounded-lg overflow-hidden cursor-move transition-transform duration-200"
+          className="fixed z-50 w-[min(92vw,310px)] max-h-[calc(100dvh-16px)] shadow-2xl rounded-lg overflow-hidden transition-transform duration-200"
           style={{
             left: `${calculatorPosition.x}px`,
             top: `${calculatorPosition.y}px`,
-            transform: isDragging ? 'scale(1.02)' : 'scale(1)',
-            minWidth: '380px'
+            transform: isDragging ? 'scale(1.01)' : 'scale(1)'
           }}
-          onMouseDown={handleMouseDown}
         >
           {/* Calculator Header */}
-          <div className="bg-gray-800 px-4 py-2 flex justify-between items-center border-b border-gray-700">
+          <div
+            className="flex touch-none cursor-move items-center justify-between border-b border-gray-700 bg-gray-800 px-3 py-1.5"
+            onPointerDown={handlePointerDown}
+          >
             <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              <span className="text-white font-medium">Scientific Calculator</span>
+              <span className="text-sm text-white font-medium">Scientific Calculator</span>
             </div>
             <div className="flex space-x-1">
               <button
                 onClick={() => setCalculatorVisible(false)}
-                className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs transition-colors"
+                className="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs transition-colors"
                 title="Close"
               >
                 ×
@@ -193,8 +195,8 @@ const QuizLayout = ({
           </div>
           
           {/* Calculator Content */}
-          <div className="max-h-[600px] overflow-y-auto">
-            <Calculator />
+          <div className="max-h-[calc(100dvh-52px)] overflow-y-auto p-1">
+            <ScientificCalculator />
           </div>
         </div>
       )}
@@ -206,8 +208,6 @@ const QuizLayout = ({
           onClick={() => setCalculatorVisible(false)}
         />
       )}
-      
-      <QuizBanner />
       
       <main className="mx-auto">
         {children}

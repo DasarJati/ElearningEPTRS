@@ -181,9 +181,11 @@ const ObjectiveQuestionLayout = ({
         </div>
       </div>
 
-      {/* ✅ Footer */}
-      <footer className="bg-white border-t border-gray-200 shadow-lg p-2 z-30">
-        {footerContent}
+      {/* ✅ Sticky quiz action footer */}
+      <footer className="sticky bottom-0 z-30 mt-auto border-t border-gray-200 bg-white/95 px-3 py-2 shadow-[0_-4px_16px_rgba(15,23,42,0.10)] backdrop-blur md:px-6">
+        <div className="mx-auto w-full max-w-7xl">
+          {footerContent}
+        </div>
       </footer>
     </div>
   );

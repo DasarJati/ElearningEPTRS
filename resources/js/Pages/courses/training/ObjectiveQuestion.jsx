@@ -300,9 +300,13 @@ export default function ObjectiveQuestion() {
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   const [calculatorMinimized, setCalculatorMinimized] = useState(false);
-  const [calculatorPosition, setCalculatorPosition] = useState({ x: Math.max(12, window.innerWidth - 460), y: 88 });
+  const [calculatorPosition, setCalculatorPosition] = useState(() => ({
+    x: typeof window === 'undefined' ? 12 : Math.max(12, window.innerWidth - 322),
+    y: 72
+  }));
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const calculatorRef = useRef(null);
 
   // Drawing and Notes State
   const [showPageDrawing, setShowPageDrawing] = useState(false);
@@ -1191,12 +1195,13 @@ export default function ObjectiveQuestion() {
    * Allows dragging the calculator modal around the screen
    */
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handlePointerMove = (e) => {
       if (!isDragging) return;
 
-      const calculatorWidth = Math.min(window.innerWidth * 0.94, 430);
+      const calculatorWidth = calculatorRef.current?.offsetWidth ?? Math.min(window.innerWidth * 0.92, 310);
+      const calculatorHeight = calculatorRef.current?.offsetHeight ?? Math.min(window.innerHeight - 16, 500);
       const maxX = Math.max(8, window.innerWidth - calculatorWidth - 8);
-      const maxY = Math.max(8, window.innerHeight - 80);
+      const maxY = Math.max(8, window.innerHeight - calculatorHeight - 8);
 
       setCalculatorPosition({
         x: Math.min(Math.max(8, e.clientX - dragOffset.x), maxX),
@@ -1204,17 +1209,17 @@ export default function ObjectiveQuestion() {
       });
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsDragging(false);
     };
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('pointermove', handlePointerMove);
+      document.addEventListener('pointerup', handlePointerUp);
 
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('pointermove', handlePointerMove);
+        document.removeEventListener('pointerup', handlePointerUp);
       };
     }
   }, [isDragging, dragOffset]);
@@ -1228,10 +1233,13 @@ export default function ObjectiveQuestion() {
   const FooterContent = () => (
     <div className="max-w-full mx-auto flex flex-wrap justify-between items-center gap-3">
       {/* Left side: Tools button with dropdown */}
-      <div className="relative z-[9998] hidden md:block">
+      <div className="relative z-[9998] hidden shrink-0 lg:block">
         <button
+          type="button"
           onClick={() => setShowToolsDropdown(!showToolsDropdown)}
-          className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow-md transition-all duration-300 hover:bg-gray-700 hover:scale-[1.03] hover:shadow-lg flex items-center gap-2"
+          className="flex min-h-10 items-center gap-1.5 rounded-lg bg-gray-600 px-3 py-2 text-sm font-medium text-white shadow-md transition-all duration-300 hover:bg-gray-700 hover:scale-[1.03] hover:shadow-lg md:gap-2 md:px-4"
+          aria-expanded={showToolsDropdown}
+          aria-haspopup="menu"
         >
           <svg
             className="w-5 h-5"
@@ -1252,12 +1260,12 @@ export default function ObjectiveQuestion() {
               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          Tools
+          <span>Tools</span>
         </button>
 
         {/* Tools Dropdown Menu */}
         {showToolsDropdown && (
-          <div className="absolute bottom-full left-0 z-[9999] mb-2 w-48 rounded-lg border border-gray-200 bg-white shadow-xl">
+          <div className="absolute bottom-full left-0 z-[9999] mb-2 w-48 max-w-[calc(100vw-16px)] rounded-lg border border-gray-200 bg-white shadow-xl" role="menu">
             <div className="py-1">
               <button
                 onClick={() => {
@@ -1345,8 +1353,9 @@ export default function ObjectiveQuestion() {
         )}
       </div>
 
-      {/* Middle: Answer check buttons */}
-      <div className="flex items-center flex-wrap gap-3">
+      {/* Right side: answer and navigation actions */}
+      <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
+      <div className="flex items-center flex-wrap justify-end gap-3">
         {/* Check Answer button (first attempt) */}
         {!hasCheckedFirstTry && firstTryResults[currentQuestionIndex] === null && (
           <button
@@ -1357,7 +1366,7 @@ export default function ObjectiveQuestion() {
               : "bg-green-600 text-white hover:bg-green-700"
               }`}
           >
-            Check Answer
+            Check Answer / Periksa Jawapan
           </button>
         )}
 
@@ -1378,7 +1387,7 @@ export default function ObjectiveQuestion() {
                   : "bg-orange-600 text-white hover:bg-orange-700"
                   }`}
               >
-                {isCheckAgainDisabled ? "Checking..." : "Check Again"}
+                {isCheckAgainDisabled ? "Checking..." : "Check Again / Periksa Semula"}
               </button>
             </div>
           )}
@@ -1395,6 +1404,7 @@ export default function ObjectiveQuestion() {
             : "Finish Quiz"}
         </button>
       )}
+      </div>
     </div>
   );
 
@@ -1574,20 +1584,22 @@ export default function ObjectiveQuestion() {
       {/* Calculator Modal - Draggable */}
       {showCalculator && (
         <div
-          className="fixed z-[9999]"
+          ref={calculatorRef}
+          className="fixed z-[9999] max-h-[calc(100dvh-16px)]"
           style={{
             left: `${calculatorPosition.x}px`,
             top: `${calculatorPosition.y}px`
           }}
         >
-          <div className="w-[min(94vw,430px)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl">
+          <div className="w-[min(92vw,310px)] overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-2xl">
             {/* Calculator Header - Draggable area */}
             <div
-              className="flex justify-between items-center p-3 bg-gray-800 text-white rounded-t-xl cursor-move"
-              onMouseDown={(e) => {
+              className="flex touch-none justify-between items-center px-2.5 py-1.5 bg-gray-800 text-white rounded-t-lg cursor-move"
+              onPointerDown={(e) => {
                 // Only start dragging if not clicking a button
                 if (e.target.closest('button')) return;
 
+                e.preventDefault();
                 setIsDragging(true);
                 const rect = e.currentTarget.getBoundingClientRect();
                 setDragOffset({
@@ -1626,12 +1638,12 @@ export default function ObjectiveQuestion() {
             </div>
 
             {/* Calculator Body */}
-            <div className="max-h-[min(72vh,680px)] overflow-y-auto p-2">
+            <div className="max-h-[calc(100dvh-120px)] overflow-y-auto p-1">
               <Calculator />
             </div>
 
             {/* Mini Controls */}
-            <div className="border-t border-gray-200 p-2 flex justify-between items-center">
+            <div className="border-t border-slate-700 px-2 py-1 flex justify-between items-center">
               <button
                 onClick={() => {
                   // Copy calculator result to clipboard

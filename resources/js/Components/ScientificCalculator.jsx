@@ -191,32 +191,32 @@ export default function ScientificCalculator() {
   });
 
   return (
-    <div className="w-full select-none rounded-2xl bg-slate-950 p-3 text-white shadow-2xl sm:p-4">
-      <div className="mb-3 flex items-center justify-between px-1">
+    <div className="w-full select-none rounded-lg bg-slate-950 p-1.5 text-white shadow-2xl">
+      <div className="mb-1.5 flex items-center justify-between px-0.5">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">PTRS Scientific</p>
-          <p className="mt-0.5 text-xs text-slate-500">Natural display calculator</p>
+          <p className="text-[9px] text-slate-500">Natural display</p>
         </div>
         <div className="flex items-center gap-2">
           {memory !== 0 && <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-[10px] font-bold text-emerald-300">M</span>}
-          <button type="button" onClick={() => setAngleMode((mode) => mode === 'DEG' ? 'RAD' : 'DEG')} className="rounded-lg border border-indigo-500/30 bg-indigo-500/15 px-2.5 py-1.5 text-[10px] font-bold text-indigo-200 transition hover:bg-indigo-500/25">{angleMode}</button>
+          <button type="button" onClick={() => setAngleMode((mode) => mode === 'DEG' ? 'RAD' : 'DEG')} className="rounded-md border border-indigo-500/30 bg-indigo-500/15 px-2 py-1 text-[10px] font-bold text-indigo-200 transition hover:bg-indigo-500/25">{angleMode}</button>
         </div>
       </div>
 
-      <div className="mb-3 overflow-hidden rounded-xl border border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 p-3 shadow-inner">
-        <div className="h-6 overflow-x-auto whitespace-nowrap text-right font-mono text-xs text-slate-400">{expression ? formatExpression(expression) : 'Ready'}</div>
-        <div data-calculator-result className={`mt-1 overflow-x-auto whitespace-nowrap text-right font-mono text-3xl font-semibold tracking-tight ${result.includes('error') ? 'text-rose-300' : 'text-white'}`}>{result}</div>
+      <div className="mb-1.5 overflow-hidden rounded-md border border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 p-1.5 shadow-inner">
+        <div className="h-4 overflow-x-auto whitespace-nowrap text-right font-mono text-[10px] text-slate-400">{expression ? formatExpression(expression) : 'Ready'}</div>
+        <div data-calculator-result className={`overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-semibold leading-tight tracking-tight ${result.includes('error') ? 'text-rose-300' : 'text-white'}`}>{result}</div>
       </div>
 
-      <div className="mb-2 grid grid-cols-5 gap-1.5">
+      <div className="mb-1.5 grid grid-cols-5 gap-1">
         {scientificButtons.map((button) => <CalculatorButton key={button.label} button={button} onPress={pressButton} />)}
       </div>
 
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-5 gap-1">
         {keypadButtons.map((button) => <CalculatorButton key={button.label} button={button} onPress={pressButton} />)}
       </div>
 
-      <details className="mt-3 border-t border-slate-800 pt-2">
+      <details className="mt-1.5 border-t border-slate-800 pt-1">
         <summary className="cursor-pointer text-[10px] font-semibold text-slate-500 transition hover:text-slate-300">History ({history.length})</summary>
         <div className="mt-2 max-h-24 space-y-1.5 overflow-y-auto rounded-lg bg-slate-900 p-2">
           {history.length === 0 ? <p className="text-[10px] text-slate-600">No calculations yet.</p> : history.map((entry, index) => (
@@ -233,7 +233,7 @@ export default function ScientificCalculator() {
 function CalculatorButton({ button, onPress }) {
   const tone = toneClasses[button.tone || 'number'];
   return (
-    <button type="button" onClick={() => onPress(button)} className={`flex min-h-10 items-center justify-center rounded-lg border px-1 text-xs font-semibold shadow-sm transition active:scale-95 sm:min-h-11 ${tone} ${button.colSpan ? 'col-span-2' : ''} ${button.rowSpan ? 'row-span-2' : ''}`}>
+    <button type="button" onClick={() => onPress(button)} className={`flex min-h-7 items-center justify-center rounded border px-1 text-[10px] font-semibold shadow-sm transition active:scale-95 ${tone} ${button.colSpan ? 'col-span-2' : ''} ${button.rowSpan ? 'row-span-2' : ''}`}>
       {button.label}
     </button>
   );

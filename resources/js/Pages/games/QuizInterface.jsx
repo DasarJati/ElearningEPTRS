@@ -41,10 +41,11 @@ const QuestionOptions = memo(({
           transition={{ delay: 0.1 + index * 0.05 }}
           onClick={() => handleOptionSelect(index)}
           disabled={showExplanation && answeredQuestions[currentQuestion] !== null}
-          className={`w-full p-4 text-left transition-all duration-200 rounded-xl border-2 ${
+          aria-pressed={selectedOption === index}
+          className={`group w-full p-3.5 sm:p-4 text-left transition-all duration-200 rounded-xl border-2 ${
             selectedOption === index
-              ? "border-yellow-500 bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg transform scale-[1.02]"
-              : "border-gray-300 bg-white hover:border-blue-300 hover:bg-blue-50"
+              ? "border-yellow-500 bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg sm:scale-[1.01]"
+              : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:shadow-md"
           } ${
             showExplanation && index === questions[currentQuestion].correctAnswer
               ? "border-green-500 bg-gradient-to-r from-green-400 to-emerald-400 text-white"
@@ -534,13 +535,19 @@ if (submittingResults) {
         {showConfetti && <Confetti />}
       </AnimatePresence>
 
-      <div className=" bg-cover bg-bottom bg-no-repeat min-h-screen" style={{ backgroundImage: 'url(/images/background_quiz.jpg)' }}>
-        <div className="max-w-4xl mx-auto py-6 px-4">
+      <div
+        className="relative overflow-hidden bg-cover bg-bottom bg-no-repeat"
+        style={{ backgroundImage: 'linear-gradient(135deg, rgba(30,64,175,0.16), rgba(88,28,135,0.20)), url(/images/background_quiz.jpg)' }}
+      >
+        <div className="pointer-events-none absolute -left-16 top-12 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-12 bottom-8 h-44 w-44 rounded-full bg-purple-500/20 blur-3xl" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-3 pt-4 pb-2 sm:px-4 sm:pt-6">
           {/* Compact Header */}
-          <div className="flex justify-between items-center mb-4">
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg shadow px-4 py-2 border-2 border-yellow-400">
-              <span className="font-bold">🎯 Quest </span>
-              <span className="text-yellow-300 font-bold">5</span>
+          <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
+            <div className="rounded-xl border border-yellow-300/80 bg-gradient-to-r from-purple-700 to-blue-700 px-3 py-2 text-white shadow-lg sm:px-4">
+              <span className="font-bold">🎯 Quiz Quest</span>
+              <span className="ml-2 hidden text-xs text-blue-100 sm:inline">5 quick questions</span>
             </div>
             
             <TimerDisplay timeElapsed={timeElapsed} />
@@ -552,27 +559,39 @@ if (submittingResults) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-yellow-400"
+            className="overflow-hidden rounded-2xl border-2 border-yellow-400 bg-white/95 shadow-2xl backdrop-blur-sm"
           >
             {/* Compact Progress Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 border-b-2 border-yellow-400">
+            <div className="border-b-2 border-yellow-400 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 p-3.5 sm:p-4">
               <div className="flex justify-between items-center">
-                <div className="text-white font-bold">
-                  🗡️ {currentQuestion + 1}/5
-                  <span className="ml-2 text-xs bg-yellow-400 text-gray-900 px-2 py-1 rounded-full">
+                <div className="min-w-0 text-white font-bold">
+                  <span>Question {currentQuestion + 1} of {questions.length}</span>
+                  <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-yellow-400 px-2 py-1 align-middle text-xs text-gray-900 sm:max-w-none">
                     {questions[currentQuestion]?.category}
                   </span>
                 </div>
-                <div className="text-yellow-300 text-xs font-bold">
-                  ⚔️ Quest
+                <div className="shrink-0 text-right text-xs font-bold text-yellow-300">
+                  ⭐ {correctAnswersCount} correct
                 </div>
+              </div>
+              <div className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`Question ${currentQuestion + 1} of ${questions.length}`}>
+                {questions.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-1.5 rounded-full transition-colors ${
+                      index < currentQuestion
+                        ? firstAnswers[index] === true ? 'bg-emerald-400' : 'bg-rose-400'
+                        : index === currentQuestion ? 'bg-yellow-300' : 'bg-white/25'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Question text - Compact */}
               <motion.h2
-                className="text-xl font-bold text-gray-800 mb-6 text-center bg-blue-50 p-4 rounded-xl border border-blue-200"
+                className="mb-5 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 text-left text-lg font-bold leading-relaxed text-gray-800 sm:mb-6 sm:p-5 sm:text-center sm:text-xl"
                 initial={{ y: -5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
@@ -580,7 +599,7 @@ if (submittingResults) {
                 {questions[currentQuestion].question}
               </motion.h2>
 
-              <div className="text-sm font-bold text-gray-600 mb-4 text-center">🎯 Choose Answer:</div>
+              <div className="mb-3 text-sm font-bold text-gray-600 sm:mb-4">🎯 Choose your answer</div>
 
               {/* Options */}
               <QuestionOptions
@@ -614,7 +633,7 @@ if (submittingResults) {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   transition={{ duration: 0.2 }}
-                  className="bg-green-50 p-4 rounded-xl border-2 border-green-400 mt-4"
+                  className={`mt-4 rounded-xl border-2 p-4 ${isCorrect ? 'border-green-400 bg-green-50' : 'border-amber-400 bg-amber-50'}`}
                 >
                   <div className="flex items-start">
                     <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg mr-3 ${

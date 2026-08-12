@@ -22,8 +22,9 @@ const QuizLeaderboard = ({ schools = [], quizSessions = [] }) => {
   const [submittingQuiz, setSubmittingQuiz] = useState(false);
 
   const selectedSchool = schools?.find(s => s.id == userInfo.school);
-  const filteredSchools = schools?.filter(school => 
-    school.name.toLowerCase().includes(schoolSearch.toLowerCase())
+  const normalizedSchoolSearch = schoolSearch.trim().toLocaleLowerCase();
+  const filteredSchools = schools?.filter((school) =>
+    school.name.toLocaleLowerCase().includes(normalizedSchoolSearch)
   ) || [];
 
   const formatTime = (seconds) => {
@@ -236,7 +237,7 @@ const handleQuizComplete = async (results) => {
         {/* Registration Modal */}
         {showForm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 p-4">
-            <div className="bg-gray-800 rounded-2xl shadow-2xl border-2 border-blue-500 w-full max-w-md">
+            <div className="max-h-[calc(100vh-32px)] w-full max-w-md overflow-y-auto rounded-2xl border-2 border-blue-500 bg-gray-800 shadow-2xl">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-t-2xl">
                 <h2 className="text-2xl font-bold text-white text-center">Join the Challenge</h2>
               </div>
@@ -313,6 +314,16 @@ const handleQuizComplete = async (results) => {
       </option>
     ))}
   </select>
+
+  {selectedSchool && (
+    <div className="mt-3 flex items-start gap-3 rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2.5" role="status">
+      <span className="mt-0.5 text-emerald-400" aria-hidden="true">✓</span>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Selected school</p>
+        <p className="break-words text-sm font-medium text-white">{selectedSchool.name}</p>
+      </div>
+    </div>
+  )}
   
   <div className="mt-2 text-sm">
     {!schools || schools.length === 0 ? (
@@ -324,6 +335,7 @@ const handleQuizComplete = async (results) => {
         Found {filteredSchools.length} of {schools.length} schools
         {schoolSearch && (
           <button 
+            type="button"
             onClick={() => setSchoolSearch('')}
             className="ml-2 text-blue-400 hover:text-blue-300 underline"
           >
@@ -456,6 +468,19 @@ const handleQuizComplete = async (results) => {
           </div>
         </div>
       </div>
+
+      {/* Quiz Arena page footer */}
+      <footer className="mx-auto mt-10 mb-20 max-w-6xl rounded-xl border border-blue-500/40 bg-gray-900/90 px-5 py-5 text-center shadow-lg backdrop-blur-sm">
+        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row sm:text-left">
+          <div>
+            <p className="font-semibold text-white">PTRS Quiz Arena</p>
+            <p className="text-xs text-gray-400">Learn, challenge yourself, and improve every day.</p>
+          </div>
+          <p className="text-xs text-gray-500">
+            © {new Date().getFullYear()} PTRS. All rights reserved.
+          </p>
+        </div>
+      </footer>
       
       {/* Start Button */}
       <div className="fixed bottom-8 right-8">
