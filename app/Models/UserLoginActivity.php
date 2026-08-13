@@ -10,6 +10,8 @@ class UserLoginActivity extends Model
         'user_id',
         'login_date',
         'last_login_at',
+        'ip_address',
+        'user_agent',
     ];
 
     protected function casts(): array

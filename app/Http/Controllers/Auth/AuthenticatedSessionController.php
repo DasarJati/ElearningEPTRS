@@ -48,15 +48,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        UserLoginActivity::updateOrCreate(
-            [
-                'user_id' => Auth::id(),
-                'login_date' => now()->toDateString(),
-            ],
-            [
-                'last_login_at' => now(),
-            ]
-        );
+        UserLoginActivity::create([
+            'user_id' => Auth::id(),
+            'login_date' => now()->toDateString(),
+            'last_login_at' => now(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         $availableLocales = config('app.available_locales', ['en', 'ms']);
         $userLocale = Auth::user()?->language;
