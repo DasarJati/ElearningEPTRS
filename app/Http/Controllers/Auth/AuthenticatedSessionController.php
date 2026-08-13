@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\UserLoginActivity;
+use App\Models\UserLocation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,12 +68,16 @@ class AuthenticatedSessionController extends Controller
                 : config('app.locale', 'en')
         );
 
-        $request->session()->put(
-            'location_redirect_to',
-            $request->session()->pull('url.intended', route('dashboard', absolute: false))
-        );
+        if (! UserLocation::query()->where('user_id', Auth::id())->exists()) {
+            $request->session()->put(
+                'location_redirect_to',
+                $request->session()->pull('url.intended', route('dashboard', absolute: false))
+            );
 
-        return redirect()->route('login.location');
+            return redirect()->route('login.location');
+        }
+
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

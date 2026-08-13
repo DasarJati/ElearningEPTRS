@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\School;
 use App\Models\User;
+use App\Models\UserLocation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -85,6 +86,12 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        if (! UserLocation::query()->where('user_id', $user->getKey())->exists()) {
+            $request->session()->put('location_redirect_to', route('dashboard', absolute: false));
+
+            return redirect()->route('login.location');
+        }
 
         return redirect(route('dashboard', absolute: false));
     }

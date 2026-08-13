@@ -12,8 +12,12 @@ use Inertia\Response;
 
 class LoginLocationController extends Controller
 {
-    public function create(): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        if (UserLocation::query()->where('user_id', $request->user()->getKey())->exists()) {
+            return redirect($this->redirectDestination($request));
+        }
+
         return Inertia::render('Auth/LoginLocation');
     }
 
@@ -31,15 +35,18 @@ class LoginLocationController extends Controller
             [...$data, 'captured_at' => now()],
         );
 
+        return redirect($this->redirectDestination($request));
+    }
+
+    private function redirectDestination(Request $request): string
+    {
         $destination = $request->session()->pull(
             'location_redirect_to',
             route('dashboard', absolute: false)
         );
 
-        if (! is_string($destination) || ! str_starts_with($destination, '/')) {
-            $destination = route('dashboard', absolute: false);
-        }
-
-        return redirect($destination);
+        return is_string($destination) && str_starts_with($destination, '/')
+            ? $destination
+            : route('dashboard', absolute: false);
     }
 }

@@ -10,4 +10,5 @@ class LoginLocationTest extends TestCase
     {
         $this->get('/login/location')->assertRedirect('/login');
     }
+
 }
