@@ -41,7 +41,7 @@ export default function SubjectNavbar({ title }) {
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-7">
           <Link href={route('dashboard')} className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-950 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-100 shadow-sm">
               <ApplicationLogo className="h-9 w-9 object-contain" />
             </div>
             <div className="hidden sm:block">
