@@ -1,82 +1,64 @@
-// components/StandardFooter.jsx
 import React from 'react';
+import { EnvelopeIcon } from '@heroicons/react/24/solid';
+import { FaChrome, FaFirefoxBrowser } from 'react-icons/fa6';
 import { useLanguage } from '@/Contexts/LanguageContext';
+
+const partners = [
+  { name: 'PTRS', src: '/images/logo_PTRS.png', className: 'object-contain p-2' },
+  { name: 'Quality Award', src: '/images/logo_award.png', className: 'object-contain p-3' },
+];
 
 const StandardFooter = () => {
   const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-gray-300 py-10 px-6 mt-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Top Section */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-start text-center md:text-left space-y-6 md:space-y-0">
-          
-          {/* Brand Section */}
-          <div>
-            <h3 className="text-2xl font-semibold text-white tracking-wide">EduLearn</h3>
-            <p className="text-gray-400 text-sm mt-2 max-w-xs">
-              {t('footer_intro')}
-            </p>
-          </div>
+    <footer className="mt-0 bg-[#202020] text-slate-300">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(220px,.55fr)] lg:gap-14">
+          <section className="max-w-2xl">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">{t('footer_about_title')}</h2>
+            <p className="mt-4 text-sm font-medium leading-7 text-slate-300 sm:text-[15px]">{t('footer_program_description')}</p>
+          </section>
 
-          {/* Quick Links */}
-          <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
-            {[
-              { label: t('about_us'), href: "/about" },
-              { label: t('contact'), href: "/contact" },
-              { label: t('privacy_policy'), href: "/privacy" },
-              { label: t('terms_of_service'), href: "/terms" },
-            ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-gray-400 hover:text-white text-sm transition-all duration-300 hover:underline underline-offset-4"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
+          <section>
+            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">{t('footer_collaboration')}</h2>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {partners.map((partner) => (
+                <div key={partner.name} className="flex h-20 w-28 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm sm:h-24 sm:w-36">
+                  <img src={partner.src} alt={partner.name} className={`h-full w-full ${partner.className}`} />
+                </div>
+              ))}
+            </div>
+          </section>
 
-          {/* Social Icons */}
-          <div className="flex space-x-4">
-            {[
-              {
-                label: "Facebook",
-                path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-              },
-              {
-                label: "Twitter",
-                path: "M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
-              },
-              {
-                label: "Instagram",
-                path: "M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987c6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.22 14.815 3.73 13.664 3.73 12.367s.49-2.448 1.396-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.906.875 1.396 2.026 1.396 3.323s-.49 2.448-1.396 3.323c-.875.807-2.026 1.297-3.323 1.297z"
-              },
-            ].map((icon, i) => (
-              <a
-                key={i}
-                href="#"
-                aria-label={icon.label}
-                className="hover:text-white transition-all duration-300 hover:scale-110"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d={icon.path} />
-                </svg>
-              </a>
-            ))}
-          </div>
+          <section className="lg:justify-self-end">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-100">{t('footer_contact_us')}</h2>
+            <a href="mailto:help.eptrs@gmail.com" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-200 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-[#202020]">
+              <EnvelopeIcon className="h-5 w-5" aria-hidden="true" />
+              <span>help.eptrs@gmail.com</span>
+            </a>
+          </section>
         </div>
 
-        {/* Divider & Copyright */}
-        <div className="border-t border-gray-700 pt-5 text-center">
-          <p className="text-gray-500 text-sm">
-            © {currentYear} <span className="text-white font-medium">EduLearn</span>. {t('all_rights_reserved')}
-          </p>
+        <section className="mt-12 border-y border-white/10 py-8 text-center sm:mt-14">
+          <h2 className="text-lg font-semibold text-slate-100">{t('footer_browser_title')}</h2>
+          <p className="mt-2 text-sm font-medium text-slate-300">{t('footer_browser_description')}</p>
+          <div className="mt-5 flex justify-center gap-6">
+            <a href="https://www.mozilla.org/firefox/" target="_blank" rel="noreferrer" aria-label="Firefox" className="group flex flex-col items-center gap-1.5 text-sm font-medium text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-[#202020]">
+              <FaFirefoxBrowser className="h-9 w-9 transition-transform group-hover:-translate-y-0.5" aria-hidden="true" />
+              <span>Firefox</span>
+            </a>
+            <a href="https://www.google.com/chrome/" target="_blank" rel="noreferrer" aria-label="Chrome" className="group flex flex-col items-center gap-1.5 text-sm font-medium text-slate-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-[#202020]">
+              <FaChrome className="h-9 w-9 transition-transform group-hover:-translate-y-0.5" aria-hidden="true" />
+              <span>Chrome</span>
+            </a>
+          </div>
+        </section>
+
+        <div className="flex flex-col gap-3 pt-6 text-center text-sm font-semibold text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          <p>© {currentYear} Program Tuisyen Rakyat Selangor. {t('all_rights_reserved')}</p>
+          <a href="/privacy" className="transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-[#202020]">{t('privacy_policy')}</a>
         </div>
       </div>
     </footer>

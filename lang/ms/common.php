@@ -96,6 +96,12 @@ return [
     'contact' => 'Hubungi Kami',
     'privacy_policy' => 'Dasar Privasi',
     'terms_of_service' => 'Terma Perkhidmatan',
+    'footer_about_title' => 'Tentang Program Tuisyen Rakyat Selangor (PTRS)',
+    'footer_program_description' => 'Program Tuisyen Rakyat ialah program khusus yang dijalankan bagi meningkatkan, memenuhi dan merealisasikan agenda untuk memastikan kebajikan rakyat, kualiti hidup rakyat, memantapkan ekonomi rakyat serta menyempurnakan definisi pendidikan kepada 5M (membaca, menulis, mengira, memikir dan mengamalkan).',
+    'footer_collaboration' => 'Kerjasama',
+    'footer_contact_us' => 'Hubungi Kami',
+    'footer_browser_title' => 'Pelayar Internet yang Disyorkan',
+    'footer_browser_description' => 'Untuk pengalaman penuh, anda memerlukan salah satu daripada pelayar berikut:',
 
     // Papan pemuka
     'learner' => 'Pelajar',

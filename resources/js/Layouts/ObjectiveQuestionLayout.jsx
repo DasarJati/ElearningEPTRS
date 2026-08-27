@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import StandardFooter from '@/Components/StandardFooter';
 
 const ObjectiveQuestionLayout = ({
   children,
@@ -78,7 +79,7 @@ const ObjectiveQuestionLayout = ({
                 title="Back / Exit Quiz"
               >
                 <svg
-                  className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-red-600"
+                  className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-[#202020]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -109,7 +110,7 @@ const ObjectiveQuestionLayout = ({
 
       {/* ✅ Colored compact header (appears when scrolling up after hiding) */}
       <div 
-        className={`bg-[#8F3091] text-white p-3 shadow-lg fixed py-4 top-0 left-0 right-0 z-40 transition-transform duration-300 ${
+        className={`bg-[#202020] text-white p-3 shadow-lg fixed py-4 top-0 left-0 right-0 z-40 transition-transform duration-300 ${
           showColoredHeader ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
@@ -122,7 +123,7 @@ const ObjectiveQuestionLayout = ({
                 title="Back / Exit Quiz"
               >
                 <svg
-                  className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-red-600"
+                  className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-[#202020]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -145,7 +146,9 @@ const ObjectiveQuestionLayout = ({
               Topic: {currentTopic}
             </p>
           </div>
-          <div>{progressCircles}</div>
+          <div className="relative w-full md:w-auto">
+            {progressCircles}
+          </div>
         </div>
       </div>
 
@@ -187,6 +190,7 @@ const ObjectiveQuestionLayout = ({
           {footerContent}
         </div>
       </footer>
+      <StandardFooter />
     </div>
   );
 };

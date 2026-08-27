@@ -469,19 +469,6 @@ const handleQuizComplete = async (results) => {
         </div>
       </div>
 
-      {/* Quiz Arena page footer */}
-      <footer className="mx-auto mt-10 mb-20 max-w-6xl rounded-xl border border-blue-500/40 bg-gray-900/90 px-5 py-5 text-center shadow-lg backdrop-blur-sm">
-        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row sm:text-left">
-          <div>
-            <p className="font-semibold text-white">PTRS Quiz Arena</p>
-            <p className="text-xs text-gray-400">Learn, challenge yourself, and improve every day.</p>
-          </div>
-          <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} PTRS. All rights reserved.
-          </p>
-        </div>
-      </footer>
-      
       {/* Start Button */}
       <div className="fixed bottom-8 right-8">
         <button

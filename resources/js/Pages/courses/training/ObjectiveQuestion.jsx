@@ -287,6 +287,7 @@ export default function ObjectiveQuestion() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isCheckAgainDisabled, setIsCheckAgainDisabled] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   // Timer State
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -312,6 +313,18 @@ export default function ObjectiveQuestion() {
   const [showPageDrawing, setShowPageDrawing] = useState(false);
   const [noteClickCount, setNoteClickCount] = useState(0);
   const [showAutoNotes, setShowAutoNotes] = useState(false);
+
+  const handleObjectiveImageClick = (event) => {
+    const image = event.target.closest?.('img');
+    if (!image) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setZoomedImage({
+      src: image.currentSrc || image.src,
+      alt: image.alt || 'Question image',
+    });
+  };
 
   // Get current question based on index
   const currentQuestion = questions[currentQuestionIndex] || { options: [] };
@@ -1434,6 +1447,23 @@ export default function ObjectiveQuestion() {
     };
   }, [showToolsDropdown, showCalculator]);
 
+  useEffect(() => {
+    if (!zoomedImage) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleZoomKeyDown = (event) => {
+      if (event.key === 'Escape') setZoomedImage(null);
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleZoomKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleZoomKeyDown);
+    };
+  }, [zoomedImage]);
+
   // ============================
   // RENDER LOGIC
   // ============================
@@ -1668,6 +1698,37 @@ export default function ObjectiveQuestion() {
         </div>
       )}
 
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Enlarged question image"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setZoomedImage(null);
+          }}
+        >
+          <div className="relative flex max-h-[calc(100dvh-32px)] max-w-[calc(100vw-32px)] items-center justify-center">
+            <img
+              src={zoomedImage.src}
+              alt={zoomedImage.alt}
+              className="max-h-[calc(100dvh-32px)] max-w-[calc(100vw-32px)] cursor-zoom-out rounded-xl bg-white object-contain shadow-2xl"
+              onClick={() => setZoomedImage(null)}
+            />
+            <button
+              type="button"
+              onClick={() => setZoomedImage(null)}
+              className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-slate-950/80 text-white shadow-lg transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-white"
+              aria-label="Close enlarged image"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Quiz Layout */}
       <ObjectiveQuestionLayout
         subject={subject}
@@ -1685,7 +1746,7 @@ export default function ObjectiveQuestion() {
         handleBackNavigation={handleBackNavigation}
         onExitWithResults={handleExitConfirmation}
       >
-        <div className="relative p-0">
+        <div className="relative p-0" onClickCapture={handleObjectiveImageClick}>
           {/* Desktop Feedback Messages (Correct Answer) */}
           {isAnswerCorrect === true && (
             <>

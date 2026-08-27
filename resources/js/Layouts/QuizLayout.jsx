@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QuestionNavbar from './QuestionNavbar';
 import ScientificCalculator from '../Components/ScientificCalculator';
+import StandardFooter from '@/Components/StandardFooter';
 
 const QuizLayout = ({ 
   children, 
@@ -214,6 +215,7 @@ const QuizLayout = ({
       </main>
       
       {footer}
+      <StandardFooter />
     </div>
   );
 };

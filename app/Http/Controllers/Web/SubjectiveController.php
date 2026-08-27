@@ -646,12 +646,24 @@ class SubjectiveController extends Controller
      */
     private function getQuestionFileUrl($filename)
     {
+        $filename = trim((string) $filename);
+
+        if ($filename === '') {
+            return null;
+        }
+
         if (filter_var($filename, FILTER_VALIDATE_URL)) {
             return $filename;
         }
 
-        if (strpos($filename, 'https://ptrs-elearning.s3.ap-southeast-1.amazonaws.com/') === 0) {
+        if (strpos($filename, 'https://') === 0 || strpos($filename, 'http://') === 0) {
             return $filename;
+        }
+
+        $filename = ltrim($filename, '/');
+
+        if (strpos($filename, 'questions/') === 0 || strpos($filename, 'answers/') === 0) {
+            return 'https://ptrs-elearning.s3.ap-southeast-1.amazonaws.com/' . $filename;
         }
 
         return 'https://ptrs-elearning.s3.ap-southeast-1.amazonaws.com/questions/' . $filename;

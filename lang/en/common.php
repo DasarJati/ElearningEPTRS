@@ -96,6 +96,12 @@ return [
     'contact' => 'Contact',
     'privacy_policy' => 'Privacy Policy',
     'terms_of_service' => 'Terms of Service',
+    'footer_about_title' => 'About Program Tuisyen Rakyat Selangor (PTRS)',
+    'footer_program_description' => 'Program Tuisyen Rakyat is a dedicated programme that supports the welfare and quality of life of the people, strengthens the economy, and advances education through the 5M approach: reading, writing, arithmetic, thinking and practice.',
+    'footer_collaboration' => 'Collaboration',
+    'footer_contact_us' => 'Contact Us',
+    'footer_browser_title' => 'Recommended Internet Browsers',
+    'footer_browser_description' => 'For the best experience, please use one of the following browsers:',
 
     // Dashboard
     'learner' => 'Learner',

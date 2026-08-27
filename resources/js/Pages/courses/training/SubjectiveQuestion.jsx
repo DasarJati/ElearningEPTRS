@@ -3,6 +3,9 @@ import SubjectiveQuestionLayout from "@/Layouts/SubjectiveQuestionLayout";
 import ResultQuestion from "@/Pages/courses/training/ResultQuestion";
 import { Head, usePage, router } from '@inertiajs/react'; // Added router import
 import QuestionReportButton from '@/Components/QuestionReportButton';
+import Calculator from '@/Components/ScientificCalculator';
+import PageDrawingTool from '@/Components/PageDrawingTool';
+import AutoNotes from '@/Components/AutoNotes';
 import axios from 'axios';
 
 export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
@@ -85,7 +88,7 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
       isComplete: skipped === 0,
       completionType: skipped === 0 ? 'all_questions' : 'partial',
       questions: questions.map((q, index) => ({
-        question: q.question,
+        question: q.question || q.question_file || 'Image question',
         answered: answers[index].trim() !== "",
         correct: true
       }))
@@ -111,12 +114,14 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
       // Transform controller questions to match component format
       const transformedQuestions = controllerQuestions.map((q, index) => ({
         id: q.id || index,
-        question: q.question_text || 'No question available',
+        question_code: q.question_code || null,
+        question: typeof q.question_text === 'string' ? q.question_text.trim() : '',
+        question_file: typeof q.question_file === 'string' ? q.question_file.trim() : null,
         schema: q.schema || 'No schema answer available',
         explanation: q.explanation || '',
         difficulty: q.difficulty || 'medium',
         type: 'subjective',
-        question_type: q.question_type || 'html'
+        question_type: q.question_type || (q.question_file ? 'image' : 'html')
       }));
 
       return transformedQuestions;
@@ -146,6 +151,21 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
   const correctSoundRef = useRef(null);
   const wrongSoundRef = useRef(null);
   const successSoundRef = useRef(null);
+
+  // Tools state (shared behavior with Objective questions)
+  const [showToolsDropdown, setShowToolsDropdown] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showPageDrawing, setShowPageDrawing] = useState(false);
+  const [showAutoNotes, setShowAutoNotes] = useState(false);
+  const [noteClickCount, setNoteClickCount] = useState(0);
+  const [calculatorPosition, setCalculatorPosition] = useState(() => ({
+    x: typeof window === 'undefined' ? 12 : Math.max(12, window.innerWidth - 322),
+    y: 72,
+  }));
+  const [isDraggingCalculator, setIsDraggingCalculator] = useState(false);
+  const [calculatorDragOffset, setCalculatorDragOffset] = useState({ x: 0, y: 0 });
+  const calculatorRef = useRef(null);
+  const toolsMenuRef = useRef(null);
 
   // Play sound function
   const playSound = (type, volume = 1.0) => {
@@ -210,6 +230,56 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
       }
     };
   }, [currentIndex, questions]);
+
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      if (!isDraggingCalculator) return;
+
+      const calculatorWidth = calculatorRef.current?.offsetWidth ?? Math.min(window.innerWidth * 0.92, 310);
+      const calculatorHeight = calculatorRef.current?.offsetHeight ?? Math.min(window.innerHeight - 16, 500);
+      const maxX = Math.max(8, window.innerWidth - calculatorWidth - 8);
+      const maxY = Math.max(8, window.innerHeight - calculatorHeight - 8);
+
+      setCalculatorPosition({
+        x: Math.min(Math.max(8, event.clientX - calculatorDragOffset.x), maxX),
+        y: Math.min(Math.max(8, event.clientY - calculatorDragOffset.y), maxY),
+      });
+    };
+
+    const handlePointerUp = () => setIsDraggingCalculator(false);
+
+    if (isDraggingCalculator) {
+      document.addEventListener('pointermove', handlePointerMove);
+      document.addEventListener('pointerup', handlePointerUp);
+    }
+
+    return () => {
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [isDraggingCalculator, calculatorDragOffset]);
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (showToolsDropdown && !toolsMenuRef.current?.contains(event.target)) {
+        setShowToolsDropdown(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      setShowToolsDropdown(false);
+      setShowCalculator(false);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showToolsDropdown]);
 
   // Format time function
   const formatTime = (totalSeconds) => {
@@ -467,11 +537,87 @@ const processHtmlContent = (html) => {
   // Responsive Footer Content
   const footerContent = (
     <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-3 px-4 md:px-10 py-3">
-      {/* Tools Button - Hidden on mobile, visible on tablet and up */}
-      <button className="hidden md:flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-        <span>🔧</span>
-        <span className="hidden md:inline">Tools</span>
-      </button>
+      {/* Objective-style tools button and working dropdown */}
+      <div ref={toolsMenuRef} className="relative z-[9998] hidden shrink-0 lg:block">
+        <button
+          type="button"
+          onClick={() => setShowToolsDropdown((visible) => !visible)}
+          className="flex min-h-10 items-center gap-1.5 rounded-lg bg-gray-600 px-3 py-2 text-sm font-medium text-white shadow-md transition-all duration-300 hover:bg-gray-700 hover:scale-[1.03] hover:shadow-lg md:gap-2 md:px-4"
+          aria-expanded={showToolsDropdown}
+          aria-haspopup="menu"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Tools</span>
+        </button>
+
+        {showToolsDropdown && (
+          <div className="absolute bottom-full left-0 z-[9999] mb-2 w-48 max-w-[calc(100vw-16px)] rounded-lg border border-gray-200 bg-white shadow-xl" role="menu">
+            <div className="py-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCalculator(true);
+                  setShowToolsDropdown(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                role="menuitem"
+              >
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span>Calculator</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPageDrawing(true);
+                  setShowToolsDropdown(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                role="menuitem"
+              >
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                <span>Draw on Page</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAutoNotes(true);
+                  setNoteClickCount((count) => count + 1);
+                  setShowToolsDropdown(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
+                role="menuitem"
+              >
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span>Add Note</span>
+              </button>
+
+              <div className="my-1 border-t border-gray-200" />
+              <button
+                type="button"
+                onClick={() => setShowToolsDropdown(false)}
+                className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-gray-500 hover:bg-gray-100"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Close Menu
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
         {/* Check Answer button */}
@@ -583,6 +729,22 @@ const processHtmlContent = (html) => {
           transform: scale(1.05);
         }
       `}</style>
+    </div>
+  ) : questions[currentIndex]?.question_file ? (
+    <div className="flex justify-center">
+      <img
+        src={questions[currentIndex].question_file}
+        alt={`Question ${currentIndex + 1}`}
+        className="question-image max-h-[min(58vh,640px)] cursor-zoom-in rounded-lg object-contain shadow-sm"
+        loading="eager"
+        onError={(event) => {
+          event.currentTarget.classList.add('hidden');
+          event.currentTarget.nextElementSibling?.classList.remove('hidden');
+        }}
+      />
+      <div className="hidden rounded-lg border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700" role="alert">
+        The question image could not be loaded. Please report this question.
+      </div>
     </div>
   ) : (
     <p className="text-red-500">No question content available</p>
@@ -781,6 +943,81 @@ const processHtmlContent = (html) => {
       <audio ref={successSoundRef} src="/sounds/success.mp3" preload="auto" />
 
       <Head title={`${subject} - Subjective Quiz`} />
+
+      {showPageDrawing && (
+        <PageDrawingTool
+          isActive={showPageDrawing}
+          onClose={() => setShowPageDrawing(false)}
+        />
+      )}
+
+      {showAutoNotes && <AutoNotes isActive={showAutoNotes} addNoteTrigger={noteClickCount} />}
+
+      {showCalculator && (
+        <div
+          ref={calculatorRef}
+          className="fixed z-[9999] max-h-[calc(100dvh-16px)]"
+          style={{ left: `${calculatorPosition.x}px`, top: `${calculatorPosition.y}px` }}
+        >
+          <div className="w-[min(92vw,310px)] overflow-hidden rounded-lg border border-slate-700 bg-slate-950 shadow-2xl">
+            <div
+              className="flex touch-none cursor-move items-center justify-between rounded-t-lg bg-gray-800 px-2.5 py-1.5 text-white"
+              onPointerDown={(event) => {
+                if (event.target.closest('button')) return;
+                event.preventDefault();
+                setIsDraggingCalculator(true);
+                const rect = event.currentTarget.getBoundingClientRect();
+                setCalculatorDragOffset({
+                  x: event.clientX - rect.left,
+                  y: event.clientY - rect.top,
+                });
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <svg className="h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+                </svg>
+                <h3 className="text-sm font-semibold">Scientific Calculator</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCalculator(false)}
+                className="rounded-full p-1 text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
+                title="Close Calculator"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="max-h-[calc(100dvh-120px)] overflow-y-auto p-1">
+              <Calculator />
+            </div>
+
+            <div className="flex items-center justify-between border-t border-slate-700 px-2 py-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const display = document.querySelector('[data-calculator-result]');
+                  if (display) navigator.clipboard.writeText(display.textContent || '0');
+                }}
+                className="rounded px-2 py-1 text-xs text-gray-300 hover:bg-slate-800 hover:text-white"
+                title="Copy Result"
+              >
+                Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCalculator(false)}
+                className="rounded bg-gray-600 px-3 py-1 text-xs text-white transition-colors hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <SubjectiveQuestionLayout
         subject={subject}
