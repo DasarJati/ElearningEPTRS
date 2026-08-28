@@ -377,8 +377,8 @@ const handleQuizComplete = async (results) => {
         <div className="bg-gray-800 rounded-2xl shadow-2xl border-2 border-blue-500 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">
-                Leaderboard 
+              <h2 className="text-2xl font-bold text-gray-200 uppercase">
+                Leaderboard <label className="text-2xl fon-bold text-slate-100 uppercase">festival sastera kanak-kanak selangor 2026</label>
               </h2>
               <span className="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
                 {leaderboard.length} Players
