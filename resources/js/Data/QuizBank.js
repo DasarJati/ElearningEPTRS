@@ -3,7 +3,16 @@ import standardMathematicQuestions from './StandardMathematicQuestions';
 import standardScienceQuestions from './StandardScienceQuestions';
 import kemahiranHidupQuestions from './KemahiranHidupQuestions';
 import standardHistoryQuestions from './StandardHistoryQuestions';
-import generalKnowledgeQuestionBank, { GENERAL_KNOWLEDGE_TOPICS } from './GeneralKnowledgeQuestionBank';
+import generalKnowledgeQuestionBank from './GeneralKnowledgeQuestionBank';
+
+const QUIZ_TOPIC_ROTATION_STORAGE_KEY = 'ptrs-quiz-topic-rotation-index';
+const GENERAL_TOPIC_ROTATION = [
+  ['Haiwan', 'Planet'],
+  ['Tokoh Malaysia', 'Perdana Menteri Malaysia'],
+  ['Tubuh Manusia', 'Haiwan'],
+  ['Planet', 'Tokoh Malaysia'],
+  ['Perdana Menteri Malaysia', 'Tubuh Manusia'],
+];
 
 export const questionBank = {
   mathematic: standardMathematicQuestions,
@@ -591,7 +600,28 @@ class QuestionRotationManager {
     this.usedQuestions = new Set(); // Track used question IDs
     this.currentSet = 0;
     this.maxSets = 0;
+    this.generalTopicRotationIndex = this.getGeneralTopicRotationIndex();
     this.initializeQuestionBank();
+  }
+
+  getGeneralTopicRotationIndex() {
+    if (typeof window === 'undefined') return 0;
+
+    const storedIndex = Number(window.localStorage.getItem(QUIZ_TOPIC_ROTATION_STORAGE_KEY));
+    return Number.isInteger(storedIndex) && storedIndex >= 0
+      ? storedIndex % GENERAL_TOPIC_ROTATION.length
+      : 0;
+  }
+
+  getNextGeneralTopics() {
+    const topics = GENERAL_TOPIC_ROTATION[this.generalTopicRotationIndex];
+    this.generalTopicRotationIndex = (this.generalTopicRotationIndex + 1) % GENERAL_TOPIC_ROTATION.length;
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(QUIZ_TOPIC_ROTATION_STORAGE_KEY, this.generalTopicRotationIndex.toString());
+    }
+
+    return topics;
   }
 
   initializeQuestionBank() {
@@ -693,29 +723,38 @@ class QuestionRotationManager {
     return shuffleArray(selectedQuestions).map(shuffleQuestionOptions);
   }
 
-  // A quiz session contains every general-knowledge topic once and always uses
-  // two easy, two medium, and one hard question.
-  getGeneralKnowledgeSessionQuestions() {
+  getQuestionForDifficulty(questionPool, difficulty) {
+    let availableQuestions = questionPool
+      .filter(question => question.difficulty === difficulty && !this.usedQuestions.has(question.id));
+
+    // Reuse only this category and difficulty after its pool has been completed.
+    if (availableQuestions.length === 0) {
+      questionPool
+        .filter(question => question.difficulty === difficulty)
+        .forEach(question => this.usedQuestions.delete(question.id));
+      availableQuestions = questionPool.filter(question => question.difficulty === difficulty);
+    }
+
+    const selectedQuestion = shuffleArray(availableQuestions)[0];
+    this.usedQuestions.add(selectedQuestion.id);
+    return selectedQuestion;
+  }
+
+  // Every session includes Matematik, Sains and Kemahiran Hidup. The two
+  // remaining slots rotate through the five general-knowledge topics.
+  getRotatingSessionQuestions() {
     const sessionDifficulties = shuffleArray(['easy', 'easy', 'medium', 'medium', 'hard']);
-    const sessionTopics = shuffleArray(GENERAL_KNOWLEDGE_TOPICS);
-    const selectedQuestions = sessionTopics.map((topic, index) => {
-      const difficulty = sessionDifficulties[index];
-      let availableQuestions = generalKnowledgeQuestionBank[topic]
-        .filter(question => question.difficulty === difficulty && !this.usedQuestions.has(question.id));
-
-      // Restart the rotation only when this topic/difficulty pool is exhausted.
-      if (availableQuestions.length === 0) {
-        generalKnowledgeQuestionBank[topic]
-          .filter(question => question.difficulty === difficulty)
-          .forEach(question => this.usedQuestions.delete(question.id));
-        availableQuestions = generalKnowledgeQuestionBank[topic]
-          .filter(question => question.difficulty === difficulty);
-      }
-
-      const selectedQuestion = shuffleArray(availableQuestions)[0];
-      this.usedQuestions.add(selectedQuestion.id);
-      return selectedQuestion;
-    });
+    const [firstGeneralTopic, secondGeneralTopic] = this.getNextGeneralTopics();
+    const sessionPools = [
+      questionBank.mathematic,
+      questionBank.science,
+      questionBank.kemahiran_hidup,
+      generalKnowledgeQuestionBank[firstGeneralTopic],
+      generalKnowledgeQuestionBank[secondGeneralTopic],
+    ];
+    const selectedQuestions = sessionPools.map((questionPool, index) =>
+      this.getQuestionForDifficulty(questionPool, sessionDifficulties[index])
+    );
 
     this.currentSet++;
     return shuffleArray(selectedQuestions).map(shuffleQuestionOptions);
@@ -738,7 +777,7 @@ class QuestionRotationManager {
   // Specific function to get exactly 5 random questions with rotation
   getRandomQuestions(count = 5) {
     if (count === 5) {
-      return this.getGeneralKnowledgeSessionQuestions();
+      return this.getRotatingSessionQuestions();
     }
 
     return this.getMixedQuestions(count);
