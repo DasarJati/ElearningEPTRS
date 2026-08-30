@@ -5,6 +5,21 @@ import QuizFooter from '@/Components/QuizFooter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getRandomQuestions } from '../../Data/QuizBank';
 
+const QUIZ_SESSION_STORAGE_KEY = 'ptrs-quiz-arena-session';
+
+const getSavedQuizSession = () => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const savedSession = JSON.parse(window.sessionStorage.getItem(QUIZ_SESSION_STORAGE_KEY));
+    return Array.isArray(savedSession?.questions) && savedSession.questions.length === 5
+      ? savedSession
+      : null;
+  } catch {
+    return null;
+  }
+};
+
 // Memoized Timer Display Component - COMPACT GAMING STYLE
 const TimerDisplay = memo(({ timeElapsed }) => {
   const formatTime = (totalSeconds) => {
@@ -151,6 +166,7 @@ export default function QuizPage({ onQuizComplete }) {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const intervalRef = useRef(null);
+  const hasInitializedSession = useRef(false);
 
   // Load exactly 5 random questions
   const [questions, setQuestions] = useState([]);
@@ -159,11 +175,29 @@ export default function QuizPage({ onQuizComplete }) {
 
   // Initialize questions
   useEffect(() => {
-    const randomQuestions = getRandomQuestions(5);
-    setQuestions(randomQuestions);
-    setAnsweredQuestions(Array(5).fill(null));
-    setFirstAnswers(Array(5).fill(null));
+    const savedSession = getSavedQuizSession();
+    const sessionQuestions = savedSession?.questions || getRandomQuestions(5);
+
+    setQuestions(sessionQuestions);
+    setCurrentQuestion(savedSession?.currentQuestion ?? 0);
+    setAnsweredQuestions(savedSession?.answeredQuestions ?? Array(5).fill(null));
+    setFirstAnswers(savedSession?.firstAnswers ?? Array(5).fill(null));
+    setTimeElapsed(savedSession?.timeElapsed ?? 0);
+    hasInitializedSession.current = true;
   }, []);
+
+  // Retain the same session, including its questions, when the page is refreshed.
+  useEffect(() => {
+    if (!hasInitializedSession.current || questions.length !== 5 || typeof window === 'undefined') return;
+
+    window.sessionStorage.setItem(QUIZ_SESSION_STORAGE_KEY, JSON.stringify({
+      questions,
+      currentQuestion,
+      answeredQuestions,
+      firstAnswers,
+      timeElapsed,
+    }));
+  }, [questions, currentQuestion, answeredQuestions, firstAnswers, timeElapsed]);
 
   // Timer effect with useRef for better performance
   useEffect(() => {

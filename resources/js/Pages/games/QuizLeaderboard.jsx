@@ -4,15 +4,30 @@ import ObjectiveSection from './QuizInterface';
 import { router, Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
+const QUIZ_PLAYER_STORAGE_KEY = 'ptrs-quiz-arena-player';
+
+const getSavedQuizPlayer = () => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const savedPlayer = JSON.parse(window.sessionStorage.getItem(QUIZ_PLAYER_STORAGE_KEY));
+    return savedPlayer?.userInfo?.nickname && savedPlayer?.userInfo?.icNumber && savedPlayer?.userInfo?.school
+      ? savedPlayer
+      : null;
+  } catch {
+    return null;
+  }
+};
 
 const QuizLeaderboard = ({ schools = [], quizSessions = [] }) => {
-  const [userInfo, setUserInfo] = useState({
+  const savedQuizPlayer = getSavedQuizPlayer();
+  const [userInfo, setUserInfo] = useState(savedQuizPlayer?.userInfo || {
     nickname: '',
     icNumber: '',
     school: ''
   });
   
-  const [quizStarted, setQuizStarted] = useState(false);
+  const [quizStarted, setQuizStarted] = useState(Boolean(savedQuizPlayer?.isActive));
   const [leaderboard, setLeaderboard] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,6 +96,10 @@ const QuizLeaderboard = ({ schools = [], quizSessions = [] }) => {
       }
 
       setShowForm(false);
+      window.sessionStorage.setItem(QUIZ_PLAYER_STORAGE_KEY, JSON.stringify({
+        isActive: true,
+        userInfo,
+      }));
       setQuizStarted(true);
     } else {
       alert('⚠️ Please fill in all fields');
@@ -120,6 +139,8 @@ const handleQuizComplete = async (results) => {
       total_time_seconds: scoreData.time
     }, {
       onSuccess: (page) => {
+        window.sessionStorage.removeItem(QUIZ_PLAYER_STORAGE_KEY);
+        window.sessionStorage.removeItem('ptrs-quiz-arena-session');
         setQuizCompleted(true);
         setQuizStarted(false);
         setSubmittingQuiz(false);
@@ -157,7 +178,7 @@ const handleQuizComplete = async (results) => {
     return (
       <div className="game-interface">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-lg">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="max-w-4xl mx-auto flex items-center">
             <div className="flex items-center space-x-4">
               <div className="bg-white bg-opacity-20 p-2 rounded-lg">
                 <span className="text-2xl">🎯</span>
@@ -167,17 +188,6 @@ const handleQuizComplete = async (results) => {
                 <p className="text-blue-100 text-sm">Player: {userInfo.nickname} | School: {selectedSchool?.name}</p>
               </div>
             </div>
-            <button
-              onClick={() => {
-                if (confirm('Are you sure you want to exit? Your progress will be lost.')) {
-                  setQuizStarted(false);
-                  setShowForm(true);
-                }
-              }}
-              className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition duration-200"
-            >
-              🚪 Exit Quiz
-            </button>
           </div>
         </div>
 
