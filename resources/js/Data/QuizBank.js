@@ -3,6 +3,7 @@ import standardMathematicQuestions from './StandardMathematicQuestions';
 import standardScienceQuestions from './StandardScienceQuestions';
 import kemahiranHidupQuestions from './KemahiranHidupQuestions';
 import standardHistoryQuestions from './StandardHistoryQuestions';
+import generalKnowledgeQuestionBank, { GENERAL_KNOWLEDGE_TOPICS } from './GeneralKnowledgeQuestionBank';
 
 export const questionBank = {
   mathematic: standardMathematicQuestions,
@@ -691,6 +692,34 @@ class QuestionRotationManager {
 
     return shuffleArray(selectedQuestions).map(shuffleQuestionOptions);
   }
+
+  // A quiz session contains every general-knowledge topic once and always uses
+  // two easy, two medium, and one hard question.
+  getGeneralKnowledgeSessionQuestions() {
+    const sessionDifficulties = shuffleArray(['easy', 'easy', 'medium', 'medium', 'hard']);
+    const sessionTopics = shuffleArray(GENERAL_KNOWLEDGE_TOPICS);
+    const selectedQuestions = sessionTopics.map((topic, index) => {
+      const difficulty = sessionDifficulties[index];
+      let availableQuestions = generalKnowledgeQuestionBank[topic]
+        .filter(question => question.difficulty === difficulty && !this.usedQuestions.has(question.id));
+
+      // Restart the rotation only when this topic/difficulty pool is exhausted.
+      if (availableQuestions.length === 0) {
+        generalKnowledgeQuestionBank[topic]
+          .filter(question => question.difficulty === difficulty)
+          .forEach(question => this.usedQuestions.delete(question.id));
+        availableQuestions = generalKnowledgeQuestionBank[topic]
+          .filter(question => question.difficulty === difficulty);
+      }
+
+      const selectedQuestion = shuffleArray(availableQuestions)[0];
+      this.usedQuestions.add(selectedQuestion.id);
+      return selectedQuestion;
+    });
+
+    this.currentSet++;
+    return shuffleArray(selectedQuestions).map(shuffleQuestionOptions);
+  }
   // Helper function to get questions by difficulty with rotation
   getQuestionsByDifficulty(difficulty, count = 5) {
     const allQuestions = Object.values(questionBank).flat();
@@ -708,6 +737,10 @@ class QuestionRotationManager {
 
   // Specific function to get exactly 5 random questions with rotation
   getRandomQuestions(count = 5) {
+    if (count === 5) {
+      return this.getGeneralKnowledgeSessionQuestions();
+    }
+
     return this.getMixedQuestions(count);
   }
 
