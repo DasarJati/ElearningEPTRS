@@ -1154,7 +1154,17 @@ class ReportController extends Controller
                 $explanationAnswer = $answers->first(function ($answer) {
                     return !empty($answer->reason);
                 });
-                $explanation = $explanationAnswer ? $explanationAnswer->reason : "Explanation not available.";
+                if ($explanationAnswer) {
+                    $explanation = $explanationAnswer->reason;
+                } else {
+                    // Fallback: explanation stored as an image (reason_file)
+                    $reasonFileAnswer = $answers->first(function ($answer) {
+                        return !empty($answer->reason_file);
+                    });
+                    $explanation = $reasonFileAnswer
+                        ? '<img src="' . e($this->getAnswerFileUrl($reasonFileAnswer->reason_file)) . '" alt="Explanation" class="max-w-full h-auto rounded" loading="lazy" />'
+                        : "Explanation not available.";
+                }
 
                 // Get chosen answer details (from answers collection, not DB)
                 $chosenAnswer = null;

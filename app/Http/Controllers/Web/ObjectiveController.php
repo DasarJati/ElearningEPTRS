@@ -457,6 +457,15 @@ class ObjectiveController extends Controller
                     return $answer->reason;
                 }
             }
+
+            // Fallback: explanation stored as an image (reason_file)
+            foreach ($question->answers as $answer) {
+                if (!empty($answer->reason_file)) {
+                    $url = e($this->getAnswerFileUrl($answer->reason_file));
+
+                    return '<img src="' . $url . '" alt="Explanation" class="max-w-full h-auto rounded" loading="lazy" />';
+                }
+            }
         }
 
         // Fallback: check question explanation field if it exists
