@@ -1,0 +1,3102 @@
+{
+  "pools": {
+    "mathematic": [
+      {
+        "id": "1",
+        "question": "Aina membeli sarapan berharga RM7 dan membayar dengan RM10. Berapakah baki yang diterima?",
+        "options": [
+          "RM2",
+          "RM3",
+          "RM4",
+          "RM5"
+        ],
+        "correctAnswer": 1,
+        "explanation": "RM10 - RM7 = RM3.",
+        "category": "Kewangan Harian",
+        "difficulty": "easy"
+      },
+      {
+        "id": "2",
+        "question": "Sebuah mesyuarat bermula pada 9:00 pagi dan berlangsung selama 2 jam. Pukul berapakah mesyuarat tamat?",
+        "options": [
+          "10:00 pagi",
+          "11:00 pagi",
+          "12:00 tengah hari",
+          "1:00 petang"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Dua jam selepas 9:00 pagi ialah 11:00 pagi.",
+        "category": "Masa",
+        "difficulty": "easy"
+      },
+      {
+        "id": "3",
+        "question": "Empat orang berkongsi 20 biji kuih sama rata. Berapa biji kuih diterima oleh setiap orang?",
+        "options": [
+          "4",
+          "5",
+          "6",
+          "8"
+        ],
+        "correctAnswer": 1,
+        "explanation": "20 dibahagi kepada 4 orang memberikan 5 biji seorang.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "easy"
+      },
+      {
+        "id": "4",
+        "question": "Apakah nombor seterusnya dalam pola 2, 5, 11, 23, ...?",
+        "options": [
+          "35",
+          "46",
+          "47",
+          "48"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Setiap nombor didarab 2 kemudian ditambah 1. Jadi 23 × 2 + 1 = 47.",
+        "category": "Pola IQ",
+        "difficulty": "medium"
+      },
+      {
+        "id": "5",
+        "question": "Yang manakah tidak sepadan dengan yang lain?",
+        "options": [
+          "Segi tiga",
+          "Segi empat",
+          "Bulatan",
+          "Segi lima"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Bulatan tidak mempunyai sisi lurus, manakala bentuk lain mempunyai sisi lurus.",
+        "category": "Logik IQ",
+        "difficulty": "easy"
+      },
+      {
+        "id": "6",
+        "question": "Tiga helai baju berharga RM18 setiap satu. Selepas diskaun keseluruhan RM10, berapakah jumlah bayaran?",
+        "options": [
+          "RM34",
+          "RM44",
+          "RM54",
+          "RM64"
+        ],
+        "correctAnswer": 1,
+        "explanation": "3 × RM18 = RM54, kemudian RM54 - RM10 = RM44.",
+        "category": "Kewangan Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "7",
+        "question": "Empat kotak mengandungi 6 botol setiap satu. Selepas 5 botol digunakan, berapa botol yang tinggal?",
+        "options": [
+          "17",
+          "18",
+          "19",
+          "20"
+        ],
+        "correctAnswer": 2,
+        "explanation": "4 × 6 = 24 botol dan 24 - 5 = 19 botol.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "medium"
+      },
+      {
+        "id": "8",
+        "question": "Kelas bermula pada 9:00 pagi. Perjalanan mengambil masa 35 minit. Pukul berapakah waktu paling lewat untuk bertolak supaya tiba tepat pada masanya?",
+        "options": [
+          "8:15 pagi",
+          "8:25 pagi",
+          "8:35 pagi",
+          "8:45 pagi"
+        ],
+        "correctAnswer": 1,
+        "explanation": "9:00 pagi ditolak 35 minit ialah 8:25 pagi.",
+        "category": "Masa",
+        "difficulty": "medium"
+      },
+      {
+        "id": "9",
+        "question": "Sebuah kereta bergerak 60 km sejam. Berapa jauh kereta itu bergerak dalam 1 jam 30 minit pada kelajuan yang sama?",
+        "options": [
+          "75 km",
+          "80 km",
+          "90 km",
+          "120 km"
+        ],
+        "correctAnswer": 2,
+        "explanation": "1 jam 30 minit ialah 1.5 jam. Maka 60 × 1.5 = 90 km.",
+        "category": "Jarak dan Masa",
+        "difficulty": "medium"
+      },
+      {
+        "id": "10",
+        "question": "Berapa minit terdapat dalam 2 jam 45 minit?",
+        "options": [
+          "145 minit",
+          "155 minit",
+          "165 minit",
+          "175 minit"
+        ],
+        "correctAnswer": 2,
+        "explanation": "2 jam ialah 120 minit. 120 + 45 = 165 minit.",
+        "category": "Masa",
+        "difficulty": "medium"
+      },
+      {
+        "id": "11",
+        "question": "Apakah nombor seterusnya dalam urutan 3, 6, 12, 24, ...?",
+        "options": [
+          "30",
+          "36",
+          "42",
+          "48"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Setiap nombor didarab 2, jadi nombor seterusnya ialah 48.",
+        "category": "Pola IQ",
+        "difficulty": "medium"
+      },
+      {
+        "id": "12",
+        "question": "Semua burung mempunyai sayap. Helang ialah seekor burung. Apakah kesimpulan yang betul?",
+        "options": [
+          "Helang tidak mempunyai sayap",
+          "Helang mempunyai sayap",
+          "Semua haiwan ialah helang",
+          "Helang ialah ikan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Jika semua burung mempunyai sayap dan helang ialah burung, maka helang mempunyai sayap.",
+        "category": "Logik IQ",
+        "difficulty": "easy"
+      },
+      {
+        "id": "13",
+        "question": "Ali membayar RM50 untuk barang berharga RM27.80. Berapakah bakinya?",
+        "options": [
+          "RM21.20",
+          "RM22.20",
+          "RM22.80",
+          "RM23.20"
+        ],
+        "correctAnswer": 1,
+        "explanation": "RM50.00 - RM27.80 = RM22.20.",
+        "category": "Kewangan Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "14",
+        "question": "Jika hari ini hari Isnin, apakah hari selepas tiga hari?",
+        "options": [
+          "Selasa",
+          "Rabu",
+          "Khamis",
+          "Jumaat"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Tiga hari selepas Isnin ialah Khamis.",
+        "category": "Logik Harian",
+        "difficulty": "easy"
+      },
+      {
+        "id": "15",
+        "question": "Sebuah keluarga menggunakan 2 liter susu sehari selama 5 hari dan mahu menyimpan tambahan 2 liter. Berapa liter perlu dibeli?",
+        "options": [
+          "10 liter",
+          "11 liter",
+          "12 liter",
+          "14 liter"
+        ],
+        "correctAnswer": 2,
+        "explanation": "2 × 5 = 10 liter, kemudian tambah 2 liter simpanan menjadi 12 liter.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "medium"
+      },
+      {
+        "id": "16",
+        "question": "Manakah susunan yang betul daripada paling kecil kepada paling besar?",
+        "options": [
+          "0.5, 0.75, 1.05, 1.5",
+          "0.75, 0.5, 1.5, 1.05",
+          "1.5, 1.05, 0.75, 0.5",
+          "0.5, 1.05, 0.75, 1.5"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Susunan menaik yang betul ialah 0.5, 0.75, 1.05, 1.5.",
+        "category": "Nombor",
+        "difficulty": "medium"
+      },
+      {
+        "id": "17",
+        "question": "Berapakah separuh daripada 80?",
+        "options": [
+          "20",
+          "30",
+          "40",
+          "60"
+        ],
+        "correctAnswer": 2,
+        "explanation": "80 dibahagi 2 bersamaan 40.",
+        "category": "Nombor",
+        "difficulty": "easy"
+      },
+      {
+        "id": "18",
+        "question": "Tiga perempat daripada 40 orang peserta memakai baju biru. Berapa orang memakai baju biru?",
+        "options": [
+          "10",
+          "20",
+          "30",
+          "35"
+        ],
+        "correctAnswer": 2,
+        "explanation": "40 ÷ 4 = 10, kemudian 10 × 3 = 30 orang.",
+        "category": "Pecahan Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "19",
+        "question": "Sebuah van boleh membawa 8 penumpang. Berapa van diperlukan untuk membawa 25 penumpang?",
+        "options": [
+          "3",
+          "4",
+          "5",
+          "8"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tiga van hanya membawa 24 orang, jadi 4 van diperlukan.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "medium"
+      },
+      {
+        "id": "20",
+        "question": "Suhu pada waktu tengah hari ialah 24°C dan turun sebanyak 7°C pada waktu malam. Berapakah suhu pada waktu malam?",
+        "options": [
+          "15°C",
+          "16°C",
+          "17°C",
+          "18°C"
+        ],
+        "correctAnswer": 2,
+        "explanation": "24°C - 7°C = 17°C.",
+        "category": "Pengukuran",
+        "difficulty": "medium"
+      },
+      {
+        "id": "41",
+        "question": "Tiga pen berharga RM4 setiap satu dan sebuah buku berharga RM8. Berapakah jumlah bayaran?",
+        "options": [
+          "RM16",
+          "RM18",
+          "RM20",
+          "RM24"
+        ],
+        "correctAnswer": 2,
+        "explanation": "3 × RM4 = RM12, kemudian RM12 + RM8 = RM20.",
+        "category": "Kewangan Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "42",
+        "question": "Apakah huruf seterusnya dalam pola B, E, H, K, ...?",
+        "options": [
+          "L",
+          "M",
+          "N",
+          "O"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Pola bergerak tiga huruf setiap kali, jadi huruf seterusnya ialah N.",
+        "category": "Pola IQ",
+        "difficulty": "medium"
+      },
+      {
+        "id": "43",
+        "question": "Umur Amir ialah 12 tahun dan kakaknya 5 tahun lebih tua. Berapakah jumlah umur mereka selepas 3 tahun?",
+        "options": [
+          "29 tahun",
+          "31 tahun",
+          "35 tahun",
+          "41 tahun"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Sekarang umur kakak ialah 17. Selepas 3 tahun, umur mereka 15 dan 20; jumlahnya 35.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "medium"
+      },
+      {
+        "id": "44",
+        "question": "Yang manakah paling berat?",
+        "options": [
+          "950 gram",
+          "1.05 kilogram",
+          "1000 gram",
+          "0.9 kilogram"
+        ],
+        "correctAnswer": 1,
+        "explanation": "1.05 kilogram bersamaan 1050 gram, iaitu yang paling berat.",
+        "category": "Pengukuran",
+        "difficulty": "medium"
+      },
+      {
+        "id": "45",
+        "question": "Berapakah meter dalam 2.5 kilometer?",
+        "options": [
+          "250 meter",
+          "1250 meter",
+          "2000 meter",
+          "2500 meter"
+        ],
+        "correctAnswer": 3,
+        "explanation": "2.5 × 1000 = 2500 meter.",
+        "category": "Pengukuran",
+        "difficulty": "medium"
+      },
+      {
+        "id": "46",
+        "question": "Purata empat markah ialah 75. Tiga markah pertama ialah 70, 80 dan 65. Berapakah markah keempat?",
+        "options": [
+          "75",
+          "80",
+          "85",
+          "90"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Jumlah diperlukan ialah 75 × 4 = 300. Jumlah tiga markah ialah 215, jadi markah keempat ialah 85.",
+        "category": "Data dan Logik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "47",
+        "question": "Sebuah piza dipotong kepada 8 bahagian sama besar. Jika 3 bahagian dimakan, apakah pecahan piza yang tinggal?",
+        "options": [
+          "3/8",
+          "4/8",
+          "5/8",
+          "6/8"
+        ],
+        "correctAnswer": 2,
+        "explanation": "8 - 3 = 5 bahagian, jadi 5/8 piza masih tinggal.",
+        "category": "Pecahan Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "48",
+        "question": "Apakah nombor seterusnya dalam urutan 3, 5, 9, 15, 23, ...?",
+        "options": [
+          "29",
+          "31",
+          "32",
+          "33"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Perbezaannya ialah +2, +4, +6 dan +8. Seterusnya +10, jadi 23 + 10 = 33.",
+        "category": "Pola IQ",
+        "difficulty": "hard"
+      },
+      {
+        "id": "49",
+        "question": "Kedai dibuka dari 10:00 pagi hingga 6:00 petang tetapi ditutup 45 minit untuk rehat. Berapa lama kedai benar-benar beroperasi?",
+        "options": [
+          "6 jam 45 minit",
+          "7 jam",
+          "7 jam 15 minit",
+          "7 jam 45 minit"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Tempoh keseluruhan ialah 8 jam. Selepas ditolak 45 minit, bakinya 7 jam 15 minit.",
+        "category": "Masa",
+        "difficulty": "hard"
+      },
+      {
+        "id": "50",
+        "question": "Anda menghadap utara, berpusing ke kanan, berpusing ke kanan sekali lagi, kemudian berpusing ke kiri. Arah manakah yang anda hadapi?",
+        "options": [
+          "Utara",
+          "Selatan",
+          "Timur",
+          "Barat"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Utara → timur → selatan → timur.",
+        "category": "Logik Ruang",
+        "difficulty": "hard"
+      },
+      {
+        "id": "51",
+        "question": "Pakej A menawarkan 5 buku nota pada harga RM15. Pakej B menawarkan 8 buku nota pada harga RM22. Pakej manakah lebih murah bagi setiap buku?",
+        "options": [
+          "Pakej A",
+          "Pakej B",
+          "Harga sama",
+          "Tidak dapat ditentukan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pakej A ialah RM3 sebuah, manakala Pakej B ialah RM2.75 sebuah. Pakej B lebih murah.",
+        "category": "Kewangan Harian",
+        "difficulty": "hard"
+      },
+      {
+        "id": "52",
+        "question": "Lina lebih tinggi daripada Mei. Ravi lebih rendah daripada Lina tetapi lebih tinggi daripada Mei. Mei lebih tinggi daripada Sara. Siapakah kedua paling tinggi?",
+        "options": [
+          "Lina",
+          "Ravi",
+          "Mei",
+          "Sara"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Susunan daripada paling tinggi ialah Lina, Ravi, Mei dan Sara.",
+        "category": "Logik IQ",
+        "difficulty": "hard"
+      },
+      {
+        "id": "53",
+        "question": "Sebuah dewan mempunyai 100 kerusi. Sebanyak 20% telah digunakan, kemudian 15 kerusi lagi digunakan. Berapa kerusi masih kosong?",
+        "options": [
+          "55",
+          "60",
+          "65",
+          "75"
+        ],
+        "correctAnswer": 2,
+        "explanation": "20% daripada 100 ialah 20. Jumlah digunakan ialah 35, jadi 65 kerusi masih kosong.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "hard"
+      },
+      {
+        "id": "54",
+        "question": "Sebuah taman berukuran 8 m × 4 m hendak dipagar, tetapi ruang pintu selebar 2 m tidak dipagar. Berapa meter pagar diperlukan?",
+        "options": [
+          "20 m",
+          "22 m",
+          "24 m",
+          "30 m"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Jarak keliling ialah 24 m. Tolak ruang pintu 2 m, jadi 22 m pagar diperlukan.",
+        "category": "Pengukuran Harian",
+        "difficulty": "hard"
+      },
+      {
+        "id": "55",
+        "question": "Sebuah filem bermula pada 2:35 petang dan tamat pada 4:20 petang. Berapa lamakah filem itu?",
+        "options": [
+          "1 jam 35 minit",
+          "1 jam 45 minit",
+          "1 jam 55 minit",
+          "2 jam 15 minit"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Dari 2:35 hingga 3:35 ialah 1 jam, kemudian 45 minit hingga 4:20. Jumlahnya 1 jam 45 minit.",
+        "category": "Masa",
+        "difficulty": "hard"
+      },
+      {
+        "id": "56",
+        "question": "Sebuah motosikal bergerak 20 km bagi setiap liter petrol. Selepas perjalanan 85 km daripada tangki berisi 5 liter, berapa liter petrol masih ada?",
+        "options": [
+          "0.50 liter",
+          "0.75 liter",
+          "1.00 liter",
+          "1.25 liter"
+        ],
+        "correctAnswer": 1,
+        "explanation": "85 ÷ 20 = 4.25 liter digunakan. 5 - 4.25 = 0.75 liter masih ada.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "hard"
+      },
+      {
+        "id": "57",
+        "question": "Sebuah beg mengandungi 5 bola merah dan 3 bola biru. Apakah kebarangkalian memilih bola merah secara rawak?",
+        "options": [
+          "3/8",
+          "5/8",
+          "5/3",
+          "8/5"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Terdapat 5 bola merah daripada jumlah 8 bola, jadi kebarangkaliannya ialah 5/8.",
+        "category": "Kebarangkalian Harian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "58",
+        "question": "Sebuah bakul dan 5 biji epal mempunyai berat 7 kg. Bakul kosong seberat 2 kg dan semua epal sama berat. Berapakah berat sebiji epal?",
+        "options": [
+          "0.5 kg",
+          "1 kg",
+          "1.4 kg",
+          "5 kg"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Jumlah berat epal ialah 7 - 2 = 5 kg. 5 kg ÷ 5 epal = 1 kg sebiji.",
+        "category": "Logik Nombor",
+        "difficulty": "hard"
+      },
+      {
+        "id": "59",
+        "question": "Saya ialah nombor dua digit. Jumlah digit saya ialah 9 dan digit puluh ialah dua kali digit sa. Nombor apakah saya?",
+        "options": [
+          "36",
+          "54",
+          "63",
+          "72"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Bagi 63, 6 + 3 = 9 dan digit puluh 6 ialah dua kali digit sa 3.",
+        "category": "Logik IQ",
+        "difficulty": "hard"
+      },
+      {
+        "id": "60",
+        "question": "Unit manakah paling sesuai untuk mengukur berat sebuah beg beras?",
+        "options": [
+          "Liter",
+          "Kilogram",
+          "Meter",
+          "Minit"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kilogram ialah unit yang sesuai untuk mengukur berat beg beras.",
+        "category": "Pengetahuan Pengukuran",
+        "difficulty": "easy"
+      }
+    ],
+    "science": [
+      {
+        "id": "21",
+        "question": "Apakah planet yang paling hampir dengan Matahari?",
+        "options": [
+          "Utarid",
+          "Zuhrah",
+          "Bumi",
+          "Marikh"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Utarid ialah planet paling hampir dengan Matahari.",
+        "category": "Astronomi",
+        "difficulty": "easy"
+      },
+      {
+        "id": "22",
+        "question": "Apakah proses tumbuhan menghasilkan makanan menggunakan cahaya matahari?",
+        "options": [
+          "Respirasi",
+          "Fotosintesis",
+          "Penyejatan",
+          "Pereputan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tumbuhan menghasilkan makanan melalui fotosintesis.",
+        "category": "Biologi",
+        "difficulty": "easy"
+      },
+      {
+        "id": "23",
+        "question": "Gas manakah diperlukan manusia untuk bernafas?",
+        "options": [
+          "Oksigen",
+          "Hidrogen",
+          "Karbon dioksida",
+          "Helium"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Oksigen diperlukan dalam proses respirasi.",
+        "category": "Sains Umum",
+        "difficulty": "easy"
+      },
+      {
+        "id": "24",
+        "question": "Organ manakah mengepam darah ke seluruh badan?",
+        "options": [
+          "Paru-paru",
+          "Jantung",
+          "Perut",
+          "Buah pinggang"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Jantung mengepam darah ke seluruh badan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "25",
+        "question": "Alat manakah digunakan untuk mengukur suhu?",
+        "options": [
+          "Pembaris",
+          "Termometer",
+          "Neraca",
+          "Jam randik"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Termometer digunakan untuk mengukur suhu.",
+        "category": "Pengukuran",
+        "difficulty": "easy"
+      },
+      {
+        "id": "26",
+        "question": "Apakah keadaan jirim bagi ais?",
+        "options": [
+          "Pepejal",
+          "Cecair",
+          "Gas",
+          "Plasma"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Ais ialah air dalam keadaan pepejal.",
+        "category": "Jirim",
+        "difficulty": "easy"
+      },
+      {
+        "id": "27",
+        "question": "Daya yang menarik objek ke arah Bumi dipanggil apa?",
+        "options": [
+          "Geseran",
+          "Graviti",
+          "Magnet",
+          "Tekanan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Graviti menarik objek ke arah pusat Bumi.",
+        "category": "Fizik",
+        "difficulty": "easy"
+      },
+      {
+        "id": "28",
+        "question": "Yang manakah sumber tenaga boleh diperbaharui?",
+        "options": [
+          "Arang batu",
+          "Petroleum",
+          "Cahaya matahari",
+          "Gas asli"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Cahaya matahari boleh diperbaharui secara semula jadi.",
+        "category": "Tenaga",
+        "difficulty": "easy"
+      },
+      {
+        "id": "29",
+        "question": "Mengapakah pakaian basah lebih cepat kering di bawah cahaya matahari?",
+        "options": [
+          "Air membeku",
+          "Air menyejat lebih cepat",
+          "Kain menghasilkan air",
+          "Udara menjadi pepejal"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Haba Matahari mempercepat penyejatan air.",
+        "category": "Haba",
+        "difficulty": "medium"
+      },
+      {
+        "id": "30",
+        "question": "Apakah fungsi utama lapisan ozon?",
+        "options": [
+          "Menghasilkan hujan",
+          "Menyerap sinaran ultraungu",
+          "Menghalang angin",
+          "Menghasilkan karbon dioksida"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Lapisan ozon menyerap sebahagian besar sinaran ultraungu berbahaya.",
+        "category": "Alam Sekitar",
+        "difficulty": "medium"
+      },
+      {
+        "id": "31",
+        "question": "Mengapakah sudu logam dalam sup panas turut menjadi panas?",
+        "options": [
+          "Konduksi haba",
+          "Pantulan cahaya",
+          "Penyejatan",
+          "Pembekuan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Haba bergerak melalui logam secara konduksi.",
+        "category": "Haba",
+        "difficulty": "medium"
+      },
+      {
+        "id": "32",
+        "question": "Apakah yang berlaku kepada mentol jika suis dalam litar lengkap dibuka?",
+        "options": [
+          "Lebih terang",
+          "Terus menyala",
+          "Terpadam",
+          "Meletup"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Suis terbuka memutuskan litar, jadi arus tidak mengalir.",
+        "category": "Elektrik",
+        "difficulty": "medium"
+      },
+      {
+        "id": "33",
+        "question": "Mengapakah akar penting kepada tumbuhan selain menyerap air?",
+        "options": [
+          "Menghasilkan bunga",
+          "Menambat tumbuhan pada tanah",
+          "Menghasilkan cahaya",
+          "Menukar daun menjadi buah"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Akar menambat dan menyokong tumbuhan pada tanah.",
+        "category": "Biologi",
+        "difficulty": "medium"
+      },
+      {
+        "id": "34",
+        "question": "Dalam rantai makanan rumput → belalang → katak → ular, apakah pengguna primer?",
+        "options": [
+          "Rumput",
+          "Belalang",
+          "Katak",
+          "Ular"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Belalang memakan pengeluar, maka belalang ialah pengguna primer.",
+        "category": "Ekologi",
+        "difficulty": "medium"
+      },
+      {
+        "id": "35",
+        "question": "Mengapakah kita dapat melihat Bulan walaupun Bulan tidak menghasilkan cahaya sendiri?",
+        "options": [
+          "Bulan memantulkan cahaya Matahari",
+          "Bulan menghasilkan elektrik",
+          "Bumi menyala",
+          "Awan menerangi Bulan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Bulan kelihatan kerana memantulkan cahaya Matahari.",
+        "category": "Astronomi",
+        "difficulty": "medium"
+      },
+      {
+        "id": "36",
+        "question": "Apakah perubahan tenaga utama pada kipas elektrik?",
+        "options": [
+          "Kimia kepada cahaya",
+          "Elektrik kepada kinetik",
+          "Haba kepada kimia",
+          "Bunyi kepada elektrik"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kipas menukar tenaga elektrik kepada tenaga pergerakan atau kinetik.",
+        "category": "Tenaga",
+        "difficulty": "medium"
+      },
+      {
+        "id": "37",
+        "question": "Organ manakah menapis darah dan menghasilkan air kencing?",
+        "options": [
+          "Jantung",
+          "Buah pinggang",
+          "Paru-paru",
+          "Usus kecil"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Buah pinggang menapis darah dan menyingkirkan bahan kumuh melalui air kencing.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "38",
+        "question": "Apakah kesan utama penebangan hutan secara berlebihan?",
+        "options": [
+          "Habitat bertambah",
+          "Hakisan tanah meningkat",
+          "Udara menghasilkan lebih oksigen",
+          "Suhu sentiasa menurun"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kehilangan akar pokok menyebabkan tanah lebih mudah terhakis.",
+        "category": "Alam Sekitar",
+        "difficulty": "medium"
+      },
+      {
+        "id": "39",
+        "question": "Bahan manakah pengalir elektrik yang baik?",
+        "options": [
+          "Getah",
+          "Plastik",
+          "Tembaga",
+          "Kayu kering"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Tembaga ialah logam dan pengalir elektrik yang baik.",
+        "category": "Elektrik",
+        "difficulty": "medium"
+      },
+      {
+        "id": "40",
+        "question": "Mengapakah objek kelihatan bengkok apabila sebahagiannya dimasukkan ke dalam air?",
+        "options": [
+          "Pembiasan cahaya",
+          "Pantulan bunyi",
+          "Tarikan graviti",
+          "Pengembangan haba"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Cahaya berubah arah apabila bergerak antara udara dan air.",
+        "category": "Cahaya",
+        "difficulty": "medium"
+      },
+      {
+        "id": "61",
+        "question": "Apakah hubungan antara senaman dan kadar denyutan jantung?",
+        "options": [
+          "Senaman biasanya meningkatkan kadar denyutan",
+          "Senaman menghentikan denyutan",
+          "Tiada perubahan langsung",
+          "Denyutan sentiasa berkurang kepada sifar"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Otot memerlukan lebih oksigen ketika bersenam, lalu jantung berdenyut lebih cepat.",
+        "category": "Kesihatan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "62",
+        "question": "Campuran pasir dan air paling sesuai dipisahkan menggunakan kaedah apa?",
+        "options": [
+          "Penurasan",
+          "Peleburan",
+          "Pembekuan",
+          "Pengaratan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Penurasan menahan pasir dan membenarkan air melaluinya.",
+        "category": "Jirim",
+        "difficulty": "medium"
+      },
+      {
+        "id": "63",
+        "question": "Apakah yang berlaku kepada bayang-bayang apabila objek digerakkan lebih dekat kepada sumber cahaya?",
+        "options": [
+          "Biasanya menjadi lebih besar",
+          "Sentiasa hilang",
+          "Menjadi sumber cahaya",
+          "Bertukar warna biru"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Objek yang lebih dekat dengan sumber cahaya biasanya menghasilkan bayang-bayang lebih besar.",
+        "category": "Cahaya",
+        "difficulty": "medium"
+      },
+      {
+        "id": "64",
+        "question": "Mengapakah pemegang periuk biasanya dibuat daripada plastik atau kayu?",
+        "options": [
+          "Bahan itu pengalir haba baik",
+          "Bahan itu penebat haba",
+          "Bahan itu menghasilkan haba",
+          "Bahan itu mencairkan periuk"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Plastik dan kayu ialah penebat yang mengurangkan pemindahan haba ke tangan.",
+        "category": "Haba",
+        "difficulty": "medium"
+      },
+      {
+        "id": "65",
+        "question": "Apakah peranan pengurai dalam ekosistem?",
+        "options": [
+          "Menghasilkan cahaya",
+          "Menguraikan organisma mati dan mengitar nutrien",
+          "Menghentikan hujan",
+          "Memakan semua pengeluar"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pengurai mengembalikan nutrien daripada bahan mati ke persekitaran.",
+        "category": "Ekologi",
+        "difficulty": "medium"
+      },
+      {
+        "id": "66",
+        "question": "Mengapakah vaksin membantu melindungi badan?",
+        "options": [
+          "Melatih sistem imun mengenali patogen",
+          "Menggantikan semua sel darah",
+          "Menghentikan pernafasan",
+          "Membunuh semua bakteria baik"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Vaksin merangsang memori imun terhadap patogen tertentu.",
+        "category": "Kesihatan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "67",
+        "question": "Sebuah objek berjisim 200 g mempunyai isipadu 100 cm³. Berapakah ketumpatannya?",
+        "options": [
+          "0.5 g/cm³",
+          "1 g/cm³",
+          "2 g/cm³",
+          "20 g/cm³"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Ketumpatan = jisim ÷ isipadu = 200 ÷ 100 = 2 g/cm³.",
+        "category": "Fizik",
+        "difficulty": "medium"
+      },
+      {
+        "id": "68",
+        "question": "Mengapakah garam lebih cepat larut dalam air suam berbanding air sejuk?",
+        "options": [
+          "Zarah air suam bergerak lebih cepat",
+          "Air suam tiada zarah",
+          "Garam bertukar menjadi logam",
+          "Air sejuk sentiasa mendidih"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Zarah yang bergerak lebih cepat meningkatkan kadar pelarutan.",
+        "category": "Jirim",
+        "difficulty": "medium"
+      },
+      {
+        "id": "69",
+        "question": "Dua tumbuhan sama disiram dengan jumlah air yang sama. Satu diletakkan dalam cahaya dan satu dalam gelap. Apakah pemboleh ubah dimanipulasikan?",
+        "options": [
+          "Jenis tumbuhan",
+          "Jumlah air",
+          "Pendedahan kepada cahaya",
+          "Saiz pasu"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Faktor yang sengaja diubah ialah pendedahan kepada cahaya.",
+        "category": "Kaedah Saintifik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "70",
+        "question": "Jika bilangan ular dalam satu ekosistem menurun dengan banyak, apakah kesan awal yang paling mungkin pada populasi katak yang dimakannya?",
+        "options": [
+          "Katak berkurang serta-merta",
+          "Katak meningkat",
+          "Rumput pupus serta-merta",
+          "Tiada organisma berubah"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kurang pemangsa membolehkan lebih banyak katak hidup dan membiak.",
+        "category": "Ekologi",
+        "difficulty": "hard"
+      },
+      {
+        "id": "71",
+        "question": "Mentol A dan B disusun secara bersiri. Jika Mentol A terbakar dan memutuskan filamennya, apakah yang berlaku kepada Mentol B?",
+        "options": [
+          "Menjadi lebih terang",
+          "Turut terpadam",
+          "Kekal sama",
+          "Bertukar menjadi bateri"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Litar bersiri mempunyai satu laluan; filamen terputus menghentikan arus seluruh litar.",
+        "category": "Elektrik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "72",
+        "question": "Mengapakah kapal keluli boleh terapung walaupun keluli lebih tumpat daripada air?",
+        "options": [
+          "Bentuk berongga mengurangkan ketumpatan purata kapal",
+          "Laut tiada graviti",
+          "Keluli bertukar menjadi gas",
+          "Enjin sentiasa menolak kapal ke atas"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Ruang udara dalam badan kapal menjadikan ketumpatan purata kapal lebih rendah dan daya apungan mencukupi.",
+        "category": "Fizik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "73",
+        "question": "Seorang murid mahu menguji kesan suhu air terhadap masa gula melarut. Apakah faktor yang perlu dikekalkan sama?",
+        "options": [
+          "Suhu air",
+          "Masa melarut",
+          "Jumlah gula",
+          "Keputusan eksperimen"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Jumlah gula perlu sama supaya hanya suhu air mempengaruhi keputusan.",
+        "category": "Kaedah Saintifik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "74",
+        "question": "Mengapakah kadar pernafasan meningkat selepas berlari?",
+        "options": [
+          "Sel memerlukan lebih oksigen dan menghasilkan lebih karbon dioksida",
+          "Badan berhenti menggunakan tenaga",
+          "Paru-paru menghasilkan makanan",
+          "Darah berhenti mengalir"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Respirasi sel meningkat untuk membekalkan tenaga kepada otot.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "75",
+        "question": "Larutan X menukarkan kertas litmus biru kepada merah. Apakah sifat Larutan X?",
+        "options": [
+          "Neutral",
+          "Beralkali",
+          "Berasid",
+          "Tidak mempunyai zarah"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Asid menukarkan litmus biru kepada merah.",
+        "category": "Kimia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "76",
+        "question": "Mengapakah suhu air mendidih kekal hampir sama walaupun pemanasan diteruskan?",
+        "options": [
+          "Tenaga digunakan untuk perubahan keadaan",
+          "Air tidak menerima tenaga",
+          "Termometer berhenti berfungsi",
+          "Semua haba bertukar menjadi cahaya"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Ketika mendidih, tenaga digunakan untuk mengatasi daya antara zarah dan menukar cecair kepada gas.",
+        "category": "Haba",
+        "difficulty": "hard"
+      },
+      {
+        "id": "77",
+        "question": "Dalam bekas tertutup, 10 g bahan A bertindak balas sepenuhnya dengan 15 g bahan B. Berapakah jumlah jisim produk?",
+        "options": [
+          "5 g",
+          "15 g",
+          "25 g",
+          "150 g"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Hukum keabadian jisim memberikan 10 g + 15 g = 25 g.",
+        "category": "Kimia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "78",
+        "question": "Mengapakah gerhana Bulan berlaku?",
+        "options": [
+          "Bulan berada antara Matahari dan Bumi",
+          "Bumi berada antara Matahari dan Bulan",
+          "Matahari berada antara Bumi dan Bulan",
+          "Awan menutup seluruh Bulan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bayang-bayang Bumi jatuh pada Bulan apabila Bumi berada di antaranya dan Matahari.",
+        "category": "Astronomi",
+        "difficulty": "hard"
+      },
+      {
+        "id": "79",
+        "question": "Dalam eksperimen, bacaan diulang tiga kali dan purata dikira. Apakah tujuan utama langkah ini?",
+        "options": [
+          "Mengubah hipotesis",
+          "Meningkatkan kebolehpercayaan keputusan",
+          "Menghapuskan semua pemboleh ubah",
+          "Memastikan keputusan sentiasa sama dengan ramalan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pengulangan dan purata mengurangkan kesan ralat rawak.",
+        "category": "Kaedah Saintifik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "80",
+        "question": "Panel suria mengecas bateri yang kemudian menyalakan lampu. Apakah urutan perubahan tenaga yang paling tepat?",
+        "options": [
+          "Cahaya → elektrik → kimia → elektrik → cahaya",
+          "Kimia → bunyi → cahaya",
+          "Elektrik → graviti → haba",
+          "Haba → nuklear → cahaya"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Panel menukar cahaya kepada elektrik, bateri menyimpan tenaga kimia, lalu membekalkan elektrik kepada lampu.",
+        "category": "Tenaga",
+        "difficulty": "hard"
+      }
+    ],
+    "kemahiran_hidup": [
+      {
+        "id": "181",
+        "question": "Apakah tindakan pertama sebelum menggunakan peralatan elektrik?",
+        "options": [
+          "Periksa keadaan wayar dan palam",
+          "Basahkan tangan",
+          "Tarik wayar dengan kuat",
+          "Buka penutup alat"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Wayar dan palam perlu diperiksa untuk mengelakkan renjatan atau litar pintas.",
+        "category": "Keselamatan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "182",
+        "question": "Alat manakah sesuai untuk mengetatkan skru?",
+        "options": [
+          "Tukul",
+          "Pemutar skru",
+          "Gunting",
+          "Pembaris"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pemutar skru digunakan untuk mengetatkan atau melonggarkan skru.",
+        "category": "Alatan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "183",
+        "question": "Apakah yang perlu dilakukan sebelum menyediakan makanan?",
+        "options": [
+          "Basuh tangan",
+          "Sentuh tong sampah",
+          "Biarkan meja kotor",
+          "Gunakan bahan tamat tempoh"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Membasuh tangan mengurangkan risiko pencemaran makanan.",
+        "category": "Penyediaan Makanan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "184",
+        "question": "Di manakah ubat-ubatan rumah patut disimpan?",
+        "options": [
+          "Dalam jangkauan kanak-kanak",
+          "Di tempat selamat dan berlabel",
+          "Bersebelahan makanan",
+          "Di bawah cahaya matahari"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Ubat perlu disimpan dengan selamat, berlabel dan jauh daripada kanak-kanak.",
+        "category": "Pengurusan Rumah",
+        "difficulty": "easy"
+      },
+      {
+        "id": "185",
+        "question": "Warna tong kitar semula biru biasanya digunakan untuk bahan apa?",
+        "options": [
+          "Kertas",
+          "Sisa makanan",
+          "Minyak masak",
+          "Bateri kereta"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tong biru lazimnya digunakan untuk kertas.",
+        "category": "Kelestarian",
+        "difficulty": "easy"
+      },
+      {
+        "id": "186",
+        "question": "Apakah alat perlindungan sesuai ketika memotong kayu?",
+        "options": [
+          "Cermin mata keselamatan",
+          "Selipar",
+          "Topi kain sahaja",
+          "Jam tangan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Cermin mata keselamatan melindungi mata daripada habuk dan serpihan.",
+        "category": "Bengkel",
+        "difficulty": "easy"
+      },
+      {
+        "id": "187",
+        "question": "Apakah tujuan membuat senarai perbelanjaan sebelum membeli-belah?",
+        "options": [
+          "Mengawal pembelian dan bajet",
+          "Menaikkan harga barang",
+          "Melambatkan pembayaran",
+          "Menghapuskan resit"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Senarai membantu membeli keperluan dan mengawal perbelanjaan.",
+        "category": "Kewangan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "188",
+        "question": "Jika lantai basah, apakah tindakan paling selamat?",
+        "options": [
+          "Biarkan sahaja",
+          "Letakkan tanda amaran dan keringkan",
+          "Berlari di atasnya",
+          "Tutup lampu"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tanda amaran dan pengeringan mencegah kemalangan tergelincir.",
+        "category": "Keselamatan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "189",
+        "question": "Pendapatan bulanan ialah RM1,500 dan perbelanjaan wajib RM1,100. Jika mahu menyimpan RM200, berapakah baki untuk perbelanjaan lain?",
+        "options": [
+          "RM100",
+          "RM200",
+          "RM300",
+          "RM400"
+        ],
+        "correctAnswer": 1,
+        "explanation": "RM1,500 - RM1,100 - RM200 = RM200.",
+        "category": "Kewangan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "190",
+        "question": "Mengapakah daging mentah perlu dipisahkan daripada makanan yang telah dimasak?",
+        "options": [
+          "Mengelakkan pencemaran silang",
+          "Menjadikan peti sejuk panas",
+          "Mengurangkan berat makanan",
+          "Menambah rasa manis"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Pemisahan menghalang mikroorganisma daripada daging mentah mencemari makanan siap dimakan.",
+        "category": "Penyediaan Makanan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "191",
+        "question": "Sebuah resipi untuk 4 orang memerlukan 2 cawan beras. Berapa cawan diperlukan untuk 6 orang?",
+        "options": [
+          "2 cawan",
+          "2.5 cawan",
+          "3 cawan",
+          "4 cawan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "6 orang ialah 1.5 kali 4 orang, jadi 2 × 1.5 = 3 cawan.",
+        "category": "Penyediaan Makanan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "192",
+        "question": "Apakah jahitan tangan paling sesuai untuk menyambung dua keping fabrik dengan kukuh?",
+        "options": [
+          "Jahitan kia",
+          "Jahitan jelujur kasar",
+          "Simpulan tunggal sahaja",
+          "Tiada jahitan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Jahitan kia menghasilkan sambungan tangan yang lebih kukuh.",
+        "category": "Jahitan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "193",
+        "question": "Pokok dalam pasu mempunyai daun kekuningan dan tanah sentiasa bertakung. Apakah tindakan sesuai?",
+        "options": [
+          "Tambah air setiap jam",
+          "Perbaiki saliran dan kurangkan siraman",
+          "Tutup semua lubang pasu",
+          "Letakkan dalam baldi air"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Air bertakung boleh merosakkan akar; saliran dan jadual siraman perlu diperbaiki.",
+        "category": "Perkebunan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "194",
+        "question": "Apakah kegunaan fius dalam palam elektrik?",
+        "options": [
+          "Menghentikan arus berlebihan",
+          "Menambah voltan",
+          "Menghasilkan cahaya",
+          "Menyimpan air"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Fius terputus apabila arus terlalu tinggi untuk melindungi pengguna dan peralatan.",
+        "category": "Elektrik",
+        "difficulty": "medium"
+      },
+      {
+        "id": "195",
+        "question": "Kayu hendak dipotong tepat sepanjang 45 cm. Apakah urutan kerja terbaik?",
+        "options": [
+          "Potong, ukur, tanda",
+          "Ukur, tanda, potong",
+          "Tanda, potong, ukur",
+          "Potong tanpa mengukur"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Ukur dahulu, tandakan garisan, kemudian potong dengan selamat.",
+        "category": "Bengkel",
+        "difficulty": "medium"
+      },
+      {
+        "id": "196",
+        "question": "Harga tunai sebuah alat ialah RM240. Pelan ansuran berjumlah RM22 sebulan selama 12 bulan. Berapakah lebihan kos ansuran?",
+        "options": [
+          "RM12",
+          "RM24",
+          "RM26",
+          "RM44"
+        ],
+        "correctAnswer": 1,
+        "explanation": "RM22 × 12 = RM264; lebihan berbanding RM240 ialah RM24.",
+        "category": "Kewangan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "197",
+        "question": "Apakah cara terbaik memadam api kecil yang berpunca daripada minyak masak?",
+        "options": [
+          "Siram dengan air",
+          "Tutup api dan selubungi dengan penutup sesuai",
+          "Alihkan kuali sambil berlari",
+          "Tambah minyak"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Menutup kuali memutuskan bekalan oksigen; air boleh menyebabkan minyak terbakar merebak.",
+        "category": "Keselamatan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "198",
+        "question": "Mengapakah pakaian berwarna gelap dan cerah elok diasingkan semasa mencuci?",
+        "options": [
+          "Mengelakkan pemindahan warna",
+          "Menambah berat mesin",
+          "Menghasilkan lebih sabun",
+          "Memendekkan kain"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Warna daripada pakaian gelap boleh luntur dan mencemari pakaian cerah.",
+        "category": "Pengurusan Rumah",
+        "difficulty": "medium"
+      },
+      {
+        "id": "199",
+        "question": "Sebuah bilik menggunakan lampu 10 W menggantikan lampu 60 W untuk tempoh yang sama. Apakah manfaat utama?",
+        "options": [
+          "Penggunaan tenaga lebih rendah",
+          "Bilik tiada cahaya",
+          "Voltan rumah meningkat",
+          "Wayar menjadi lebih panjang"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Kuasa lebih rendah menggunakan kurang tenaga bagi tempoh penggunaan yang sama.",
+        "category": "Kelestarian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "200",
+        "question": "Apakah maklumat paling penting diperiksa sebelum membeli makanan berbungkus?",
+        "options": [
+          "Warna rak",
+          "Tarikh luput dan keadaan bungkusan",
+          "Saiz troli",
+          "Muzik kedai"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tarikh luput dan bungkusan yang tidak rosak membantu memastikan keselamatan makanan.",
+        "category": "Pengguna Bijak",
+        "difficulty": "medium"
+      },
+      {
+        "id": "201",
+        "question": "Apakah tindakan awal bagi luka kecil yang berdarah?",
+        "options": [
+          "Bersihkan tangan dan tekan dengan kain bersih",
+          "Letak tanah pada luka",
+          "Biarkan terkena kotoran",
+          "Gosok luka dengan kuat"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tekanan lembut dengan bahan bersih membantu menghentikan pendarahan selepas kebersihan dijaga.",
+        "category": "Pertolongan Cemas",
+        "difficulty": "medium"
+      },
+      {
+        "id": "202",
+        "question": "Mengapakah kata laluan akaun tidak patut menggunakan tarikh lahir sahaja?",
+        "options": [
+          "Mudah diteka",
+          "Terlalu panjang",
+          "Tidak boleh ditaip",
+          "Menggunakan terlalu banyak simbol"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Maklumat peribadi seperti tarikh lahir mudah diketahui dan diteka.",
+        "category": "Kemahiran Digital",
+        "difficulty": "medium"
+      },
+      {
+        "id": "203",
+        "question": "Apakah kaedah sesuai untuk mengurangkan sisa makanan di rumah?",
+        "options": [
+          "Rancang menu dan gunakan bahan mengikut tarikh",
+          "Beli tanpa senarai",
+          "Buang lebihan terus",
+          "Masak semua bahan setiap hari"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Perancangan menu dan penggunaan mengikut tarikh mengurangkan makanan rosak atau berlebihan.",
+        "category": "Kelestarian",
+        "difficulty": "medium"
+      },
+      {
+        "id": "204",
+        "question": "Sebuah rak condong selepas dipasang. Pemeriksaan pertama yang wajar ialah apa?",
+        "options": [
+          "Tahap kerataan dan kedudukan skru",
+          "Warna cat",
+          "Harga kayu",
+          "Bilangan buku"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Alat aras dan sambungan skru membantu mengenal pasti punca rak condong.",
+        "category": "Bengkel",
+        "difficulty": "medium"
+      },
+      {
+        "id": "205",
+        "question": "Apakah kelebihan membeli barangan yang mempunyai jaminan?",
+        "options": [
+          "Perlindungan bagi kerosakan dalam syarat tertentu",
+          "Barang pasti tidak rosak",
+          "Tidak perlu menyimpan resit",
+          "Harga sentiasa percuma"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Jaminan memberi hak pembaikan atau penggantian tertakluk pada syarat.",
+        "category": "Pengguna Bijak",
+        "difficulty": "medium"
+      },
+      {
+        "id": "206",
+        "question": "Mengapakah baja tidak boleh digunakan melebihi sukatan yang disyorkan?",
+        "options": [
+          "Boleh merosakkan akar dan mencemarkan air",
+          "Menjadikan semua daun biru",
+          "Menghentikan cahaya matahari",
+          "Membekukan tanah"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Baja berlebihan boleh membakar akar dan mengalir ke sumber air.",
+        "category": "Perkebunan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "207",
+        "question": "Apakah cara paling selamat mencabut palam daripada soket?",
+        "options": [
+          "Pegang kepala palam",
+          "Tarik kabel",
+          "Gunakan tangan basah",
+          "Goncang soket"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Memegang kepala palam mengelakkan kerosakan kabel dan mengurangkan risiko renjatan.",
+        "category": "Elektrik",
+        "difficulty": "medium"
+      },
+      {
+        "id": "208",
+        "question": "Dalam tugasan berkumpulan, apakah cara terbaik mengelakkan kerja bertindih?",
+        "options": [
+          "Bahagikan peranan dan rekod kemajuan",
+          "Semua orang buat perkara sama",
+          "Jangan berkomunikasi",
+          "Tunggu sehingga tarikh akhir"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Pembahagian peranan dan kemas kini kemajuan menjelaskan tanggungjawab setiap ahli.",
+        "category": "Pengurusan Kerja",
+        "difficulty": "medium"
+      },
+      {
+        "id": "209",
+        "question": "Pendapatan ialah RM2,400. Komitmen tetap RM1,250, makanan RM450 dan pengangkutan RM300. Jika sasaran dana kecemasan RM500 sebulan, apakah keadaan bajet?",
+        "options": [
+          "Lebihan RM100",
+          "Cukup tepat",
+          "Kurang RM100",
+          "Kurang RM500"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Jumlah termasuk simpanan ialah RM2,500, iaitu RM100 melebihi pendapatan.",
+        "category": "Kewangan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "210",
+        "question": "Peti sejuk tidak sejuk tetapi lampu dalamnya menyala. Apakah tindakan awal paling selamat?",
+        "options": [
+          "Buka komponen elektrik sendiri",
+          "Periksa tetapan dan pengudaraan, kemudian hubungi juruteknik jika perlu",
+          "Siram air pada motor",
+          "Potong kabel kuasa"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pemeriksaan luaran yang selamat dibuat dahulu; pembaikan dalaman perlu dilakukan orang berkelayakan.",
+        "category": "Pengurusan Rumah",
+        "difficulty": "hard"
+      },
+      {
+        "id": "211",
+        "question": "Anda menerima mesej bank dengan pautan yang meminta kata laluan dan kod TAC segera. Apakah tindakan terbaik?",
+        "options": [
+          "Klik dan isi segera",
+          "Balas dengan kod TAC",
+          "Jangan klik; sahkan melalui aplikasi atau nombor rasmi bank",
+          "Hantar kepada semua rakan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Permintaan maklumat rahsia melalui pautan mungkin pancingan data dan perlu disahkan melalui saluran rasmi.",
+        "category": "Kemahiran Digital",
+        "difficulty": "hard"
+      },
+      {
+        "id": "212",
+        "question": "Ayam masak dibiarkan pada suhu bilik selama beberapa jam. Apakah keputusan paling selamat?",
+        "options": [
+          "Hidang tanpa diperiksa",
+          "Panaskan sedikit sahaja",
+          "Elakkan memakannya jika tempoh keselamatan telah dilepasi",
+          "Campur dengan makanan baharu"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Makanan mudah rosak yang lama pada suhu bahaya mungkin mengandungi mikroorganisma atau toksin.",
+        "category": "Penyediaan Makanan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "213",
+        "question": "Sebuah meja bergoyang walaupun semua skru ketat. Apakah punca paling munasabah dan penyelesaian sesuai?",
+        "options": [
+          "Kaki tidak sama panjang; ukur dan laraskan",
+          "Warna meja salah; cat semula",
+          "Meja terlalu bersih; kotorkan",
+          "Skru perlu dibuang semua"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Perbezaan panjang atau aras kaki menyebabkan meja tidak stabil.",
+        "category": "Bengkel",
+        "difficulty": "hard"
+      },
+      {
+        "id": "214",
+        "question": "Sebuah produk RM80 diberi diskaun 15%, kemudian dikenakan caj penghantaran RM8. Berapakah jumlah akhir?",
+        "options": [
+          "RM68",
+          "RM72",
+          "RM76",
+          "RM80"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Diskaun ialah RM12, jadi harga RM68. Tambah penghantaran RM8 menjadi RM76.",
+        "category": "Kewangan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "215",
+        "question": "Daun pokok layu pada tengah hari tetapi pulih pada petang, sedangkan tanah masih lembap. Apakah tindakan terbaik sebelum menambah air?",
+        "options": [
+          "Nilai haba, cahaya dan saliran terlebih dahulu",
+          "Tambah air tanpa had",
+          "Potong semua akar",
+          "Tutup tanah dengan plastik kedap"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Layu sementara boleh disebabkan kehilangan air ketika panas; penyiraman berlebihan pula boleh merosakkan akar.",
+        "category": "Perkebunan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "216",
+        "question": "Soket mengeluarkan bau hangit ketika digunakan. Apakah tindakan paling selamat?",
+        "options": [
+          "Terus gunakan sehingga alat berhenti",
+          "Matikan bekalan jika selamat, hentikan penggunaan dan panggil orang berkelayakan",
+          "Sentuh soket untuk menguji haba",
+          "Siram dengan air"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bau hangit menandakan bahaya pemanasan atau litar; bekalan perlu dihentikan dengan selamat dan diperiksa pakar.",
+        "category": "Elektrik",
+        "difficulty": "hard"
+      },
+      {
+        "id": "217",
+        "question": "Sebuah baju bertanda 'cuci tangan, jangan guna peluntur'. Apakah kaedah penjagaan paling sesuai?",
+        "options": [
+          "Mesin kitaran kuat dengan peluntur",
+          "Cuci tangan menggunakan bahan pencuci lembut",
+          "Rendam dalam peluntur semalaman",
+          "Seterika ketika sangat basah tanpa melihat suhu"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Arahan label perlu diikuti untuk mengelakkan fabrik rosak atau berubah warna.",
+        "category": "Jahitan dan Pakaian",
+        "difficulty": "hard"
+      },
+      {
+        "id": "218",
+        "question": "Anda perlu memilih antara alat murah tanpa jaminan dan alat lebih mahal dengan kecekapan tenaga serta jaminan baik. Apakah penilaian terbaik?",
+        "options": [
+          "Lihat harga awal sahaja",
+          "Bandingkan jumlah kos pemilikan, penggunaan tenaga dan risiko pembaikan",
+          "Pilih berdasarkan warna",
+          "Anggap semua alat sama"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Keputusan baik mempertimbangkan kos sepanjang penggunaan, bukan harga pembelian sahaja.",
+        "category": "Pengguna Bijak",
+        "difficulty": "hard"
+      },
+      {
+        "id": "219",
+        "question": "Dalam kecemasan, seseorang tidak sedarkan diri tetapi masih bernafas. Apakah tindakan umum yang paling sesuai sementara menunggu bantuan?",
+        "options": [
+          "Beri makanan",
+          "Hubungi bantuan kecemasan dan pantau pernafasan dalam kedudukan selamat",
+          "Biarkan bersendirian",
+          "Paksa berdiri"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bantuan kecemasan perlu dipanggil dan pernafasan dipantau tanpa memberi makanan atau minuman.",
+        "category": "Pertolongan Cemas",
+        "difficulty": "hard"
+      },
+      {
+        "id": "220",
+        "question": "Projek perlu siap dalam 4 hari dengan tiga tugas: ukur 1 hari, bina 2 hari selepas mengukur, dan cat 1 hari selepas membina. Apakah jadual yang memenuhi kebergantungan tugas?",
+        "options": [
+          "Cat, bina, ukur",
+          "Ukur hari 1, bina hari 2–3, cat hari 4",
+          "Bina dan cat sebelum mengukur",
+          "Semua tugas pada hari 4"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kerja mesti mengikut urutan ukur, bina, kemudian cat dalam tempoh empat hari.",
+        "category": "Pengurusan Kerja",
+        "difficulty": "hard"
+      }
+    ]
+  },
+  "general": {
+    "Haiwan": [
+      {
+        "id": "general-Haiwan-1",
+        "question": "Haiwan manakah yang hidup di dalam air?",
+        "options": [
+          "Kucing",
+          "Ikan",
+          "Ayam",
+          "Arnab"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Ikan hidup di dalam air.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-2",
+        "question": "Apakah makanan utama panda?",
+        "options": [
+          "Buluh",
+          "Daging",
+          "Ikan",
+          "Rumput laut"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Panda banyak memakan buluh.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-3",
+        "question": "Haiwan manakah mempunyai belalai?",
+        "options": [
+          "Harimau",
+          "Gajah",
+          "Kuda",
+          "Zirafah"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Gajah mempunyai belalai.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-4",
+        "question": "Haiwan manakah bertelur?",
+        "options": [
+          "Kucing",
+          "Lembu",
+          "Ayam",
+          "Kambing"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Ayam membiak dengan bertelur.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-5",
+        "question": "Apakah bunyi yang dibuat oleh kucing?",
+        "options": [
+          "Mengaum",
+          "Mengiau",
+          "Mengembek",
+          "Menyalak"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kucing mengiau.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-6",
+        "question": "Haiwan manakah dikenali sebagai raja rimba?",
+        "options": [
+          "Singa",
+          "Gajah",
+          "Rusa",
+          "Kuda"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Singa sering dikenali sebagai raja rimba.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-7",
+        "question": "Haiwan manakah mempunyai sayap dan boleh terbang?",
+        "options": [
+          "Ikan",
+          "Burung",
+          "Kura-kura",
+          "Arnab"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Burung menggunakan sayap untuk terbang.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-8",
+        "question": "Apakah anak bagi seekor lembu?",
+        "options": [
+          "Anak ayam",
+          "Anak kucing",
+          "Anak lembu",
+          "Anak kambing"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Anak lembu ialah anak bagi lembu.",
+        "category": "Haiwan",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Haiwan-9",
+        "question": "Haiwan manakah merupakan mamalia?",
+        "options": [
+          "Katak",
+          "Ikan",
+          "Kelawar",
+          "Kupu-kupu"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Kelawar ialah mamalia walaupun boleh terbang.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-10",
+        "question": "Apakah fungsi sisik pada ikan?",
+        "options": [
+          "Membantu ikan terbang",
+          "Melindungi badan ikan",
+          "Membantu ikan bernafas",
+          "Membantu ikan berjalan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Sisik membantu melindungi badan ikan.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-11",
+        "question": "Haiwan manakah berubah daripada berudu kepada dewasa?",
+        "options": [
+          "Katak",
+          "Kucing",
+          "Burung",
+          "Kambing"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Katak melalui peringkat berudu sebelum dewasa.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-12",
+        "question": "Haiwan manakah makan tumbuhan?",
+        "options": [
+          "Harimau",
+          "Singa",
+          "Arnab",
+          "Buaya"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Arnab ialah haiwan herbivor.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-13",
+        "question": "Haiwan manakah aktif pada waktu malam?",
+        "options": [
+          "Ayam",
+          "Burung hantu",
+          "Rama-rama",
+          "Lembu"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Burung hantu lazimnya aktif pada waktu malam.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-14",
+        "question": "Haiwan manakah mempunyai cangkerang keras?",
+        "options": [
+          "Kura-kura",
+          "Kucing",
+          "Monyet",
+          "Rusa"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Kura-kura dilindungi oleh cangkerangnya.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-15",
+        "question": "Apakah kegunaan ekor bagi ikan?",
+        "options": [
+          "Menghidu makanan",
+          "Bergerak di dalam air",
+          "Mendengar bunyi",
+          "Bernafas di darat"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Ekor membantu ikan berenang dan bergerak.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-16",
+        "question": "Haiwan manakah tergolong dalam kumpulan serangga?",
+        "options": [
+          "Labah-labah",
+          "Cacing",
+          "Kupu-kupu",
+          "Siput"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Kupu-kupu ialah serangga.",
+        "category": "Haiwan",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Haiwan-17",
+        "question": "Haiwan manakah bernafas menggunakan insang?",
+        "options": [
+          "Ikan",
+          "Kucing",
+          "Burung",
+          "Cicak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Ikan menggunakan insang untuk mengambil oksigen daripada air.",
+        "category": "Haiwan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Haiwan-18",
+        "question": "Apakah maksud haiwan omnivor?",
+        "options": [
+          "Makan daging sahaja",
+          "Makan tumbuhan sahaja",
+          "Makan tumbuhan dan haiwan",
+          "Tidak makan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Omnivor memakan tumbuhan dan haiwan.",
+        "category": "Haiwan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Haiwan-19",
+        "question": "Antara berikut, yang manakah haiwan terancam di Malaysia?",
+        "options": [
+          "Harimau Malaya",
+          "Ayam kampung",
+          "Kucing rumah",
+          "Lembu"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Harimau Malaya ialah spesies terancam.",
+        "category": "Haiwan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Haiwan-20",
+        "question": "Mengapakah hutan penting kepada haiwan liar?",
+        "options": [
+          "Tempat tinggal dan sumber makanan",
+          "Menjadikan haiwan lebih kecil",
+          "Menghalang haiwan minum air",
+          "Menukar warna haiwan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Hutan membekalkan habitat, perlindungan dan makanan.",
+        "category": "Haiwan",
+        "difficulty": "hard"
+      }
+    ],
+    "Planet": [
+      {
+        "id": "general-Planet-1",
+        "question": "Apakah planet tempat manusia tinggal?",
+        "options": [
+          "Marikh",
+          "Bumi",
+          "Zuhrah",
+          "Musytari"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Manusia tinggal di planet Bumi.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-2",
+        "question": "Apakah pusat Sistem Suria?",
+        "options": [
+          "Bulan",
+          "Bumi",
+          "Matahari",
+          "Marikh"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Matahari ialah pusat Sistem Suria.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-3",
+        "question": "Planet manakah paling hampir dengan Matahari?",
+        "options": [
+          "Utarid",
+          "Bumi",
+          "Marikh",
+          "Neptun"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Utarid ialah planet paling hampir dengan Matahari.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-4",
+        "question": "Planet manakah dikenali sebagai Planet Merah?",
+        "options": [
+          "Zuhrah",
+          "Marikh",
+          "Musytari",
+          "Zuhal"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Marikh kelihatan merah kerana besi oksida di permukaannya.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-5",
+        "question": "Apakah satelit semula jadi Bumi?",
+        "options": [
+          "Matahari",
+          "Bulan",
+          "Marikh",
+          "Komet"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bulan ialah satelit semula jadi Bumi.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-6",
+        "question": "Planet manakah mempunyai cincin yang jelas kelihatan?",
+        "options": [
+          "Bumi",
+          "Marikh",
+          "Zuhal",
+          "Utarid"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Zuhal terkenal dengan sistem cincinnya.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-7",
+        "question": "Apakah yang memberi cahaya dan haba kepada Bumi?",
+        "options": [
+          "Bulan",
+          "Matahari",
+          "Bintang laut",
+          "Komet"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Matahari membekalkan cahaya dan haba kepada Bumi.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-8",
+        "question": "Berapakah jumlah planet dalam Sistem Suria?",
+        "options": [
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Terdapat lapan planet dalam Sistem Suria.",
+        "category": "Planet",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Planet-9",
+        "question": "Planet manakah paling besar dalam Sistem Suria?",
+        "options": [
+          "Bumi",
+          "Marikh",
+          "Musytari",
+          "Zuhrah"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Musytari ialah planet terbesar.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-10",
+        "question": "Apakah yang berlaku apabila Bumi berputar pada paksinya?",
+        "options": [
+          "Siang dan malam",
+          "Hujan dan panas",
+          "Gempa bumi",
+          "Pelangi"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Putaran Bumi menyebabkan siang dan malam.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-11",
+        "question": "Apakah yang berlaku apabila Bumi mengelilingi Matahari?",
+        "options": [
+          "Terjadinya satu tahun",
+          "Terjadinya satu hari",
+          "Bulan menghilang",
+          "Bintang jatuh"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Satu edaran Bumi mengelilingi Matahari mengambil kira-kira setahun.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-12",
+        "question": "Planet manakah paling panas dalam Sistem Suria?",
+        "options": [
+          "Utarid",
+          "Zuhrah",
+          "Bumi",
+          "Marikh"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Zuhrah paling panas kerana kesan rumah hijau yang kuat.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-13",
+        "question": "Antara berikut, yang manakah bukan planet?",
+        "options": [
+          "Bumi",
+          "Bulan",
+          "Neptun",
+          "Zuhal"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bulan ialah satelit semula jadi, bukan planet.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-14",
+        "question": "Apakah nama kumpulan objek batu yang mengelilingi Matahari?",
+        "options": [
+          "Asteroid",
+          "Awan",
+          "Gunung",
+          "Ombak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Asteroid ialah objek berbatu yang mengelilingi Matahari.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-15",
+        "question": "Planet manakah terletak selepas Bumi dari Matahari?",
+        "options": [
+          "Zuhrah",
+          "Marikh",
+          "Utarid",
+          "Musytari"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Marikh ialah planet selepas Bumi dari Matahari.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-16",
+        "question": "Apakah nama galaksi yang mengandungi Sistem Suria?",
+        "options": [
+          "Bima Sakti",
+          "Andromeda",
+          "Orion",
+          "Saturnus"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Sistem Suria berada dalam galaksi Bima Sakti.",
+        "category": "Planet",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Planet-17",
+        "question": "Mengapakah manusia memerlukan pakaian angkasa di angkasa lepas?",
+        "options": [
+          "Angkasa mempunyai udara cukup",
+          "Angkasa tidak mempunyai udara untuk bernafas",
+          "Angkasa sentiasa hujan",
+          "Angkasa mempunyai banyak pokok"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pakaian angkasa membekalkan oksigen dan perlindungan.",
+        "category": "Planet",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Planet-18",
+        "question": "Planet manakah paling jauh daripada Matahari?",
+        "options": [
+          "Uranus",
+          "Neptun",
+          "Zuhal",
+          "Musytari"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Neptun ialah planet kelapan dan paling jauh daripada Matahari.",
+        "category": "Planet",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Planet-19",
+        "question": "Apakah maksud orbit?",
+        "options": [
+          "Laluan objek mengelilingi objek lain",
+          "Cahaya daripada Matahari",
+          "Batu di atas Bumi",
+          "Bunyi dari angkasa"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Orbit ialah laluan sesuatu objek mengelilingi objek lain.",
+        "category": "Planet",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Planet-20",
+        "question": "Mengapakah Bulan kelihatan bercahaya pada waktu malam?",
+        "options": [
+          "Bulan menghasilkan cahaya sendiri",
+          "Bulan memantulkan cahaya Matahari",
+          "Bulan menyimpan cahaya lampu",
+          "Bulan sentiasa terbakar"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bulan memantulkan cahaya daripada Matahari.",
+        "category": "Planet",
+        "difficulty": "hard"
+      }
+    ],
+    "Tokoh Malaysia": [
+      {
+        "id": "general-Tokoh Malaysia-1",
+        "question": "Siapakah yang dikenali sebagai Bapa Kemerdekaan?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tunku Abdul Rahman",
+          "Tun Hussein Onn",
+          "Tun Dr. Mahathir Mohamad"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tunku Abdul Rahman dikenali sebagai Bapa Kemerdekaan.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-2",
+        "question": "Siapakah yang mengasaskan perjuangan kemerdekaan melalui UMNO?",
+        "options": [
+          "Dato' Onn Jaafar",
+          "P. Ramlee",
+          "Datuk Lee Chong Wei",
+          "Nicol David"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Onn Jaafar ialah pengasas UMNO.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-3",
+        "question": "Siapakah tokoh sukan negara dalam bidang badminton?",
+        "options": [
+          "Azizulhasni Awang",
+          "Datuk Lee Chong Wei",
+          "Mokhtar Dahari",
+          "Pandelela Rinong"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Datuk Lee Chong Wei ialah tokoh badminton negara.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-4",
+        "question": "Siapakah tokoh seni terkenal sebagai pelakon, penyanyi dan pengarah?",
+        "options": [
+          "P. Ramlee",
+          "Sudirman",
+          "Siti Nurhaliza",
+          "M. Nasir"
+        ],
+        "correctAnswer": 0,
+        "explanation": "P. Ramlee ialah tokoh seni Malaysia yang terkenal.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-5",
+        "question": "Siapakah yang dikenali sebagai Bapa Pembangunan?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tunku Abdul Rahman",
+          "Tun Abdullah Ahmad Badawi",
+          "Tan Sri Muhyiddin Yassin"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Abdul Razak dikenali sebagai Bapa Pembangunan.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-6",
+        "question": "Siapakah tokoh wanita Malaysia dalam sukan skuasy?",
+        "options": [
+          "Pandelela Rinong",
+          "Nicol David",
+          "Farah Ann Hadi",
+          "Siti Nurhaliza"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Nicol David ialah tokoh skuasy negara.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-7",
+        "question": "Apakah bidang utama Datuk Nicol David?",
+        "options": [
+          "Badminton",
+          "Skuasy",
+          "Bola sepak",
+          "Berbasikal"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Nicol David ialah pemain skuasy.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-8",
+        "question": "Siapakah tokoh pelumba basikal negara?",
+        "options": [
+          "Azizulhasni Awang",
+          "Lee Chong Wei",
+          "Mokhtar Dahari",
+          "P. Ramlee"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Azizulhasni Awang ialah pelumba basikal negara.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tokoh Malaysia-9",
+        "question": "Apakah sumbangan utama Tunku Abdul Rahman kepada negara?",
+        "options": [
+          "Membawa kemerdekaan Persekutuan Tanah Melayu",
+          "Menjadi pelumba basikal",
+          "Mengasaskan sukan skuasy",
+          "Mencipta bendera Malaysia"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tunku Abdul Rahman memimpin usaha mencapai kemerdekaan pada 1957.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-10",
+        "question": "Dato' Onn Jaafar terkenal kerana menubuhkan organisasi yang mana?",
+        "options": [
+          "UMNO",
+          "ASEAN",
+          "FELDA",
+          "KOMSAS"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Onn Jaafar mengasaskan UMNO.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-11",
+        "question": "Siapakah tokoh bola sepak Malaysia yang dikenali sebagai Supermokh?",
+        "options": [
+          "Safee Sali",
+          "Mokhtar Dahari",
+          "Soh Chin Aun",
+          "Datuk Lee Chong Wei"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Mokhtar Dahari digelar Supermokh.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-12",
+        "question": "Apakah bidang kejayaan Pandelela Rinong?",
+        "options": [
+          "Terjun",
+          "Memanah",
+          "Skuasy",
+          "Badminton"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Pandelela Rinong ialah atlet terjun.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-13",
+        "question": "Siapakah tokoh yang dikaitkan dengan pembangunan luar bandar melalui FELDA?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tun Hussein Onn",
+          "Tunku Abdul Rahman",
+          "Tun Dr. Ismail Abdul Rahman"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Abdul Razak banyak menyumbang kepada pembangunan luar bandar dan FELDA.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-14",
+        "question": "P. Ramlee terkenal dalam bidang yang mana?",
+        "options": [
+          "Seni dan hiburan",
+          "Sains angkasa",
+          "Perubatan",
+          "Pertanian"
+        ],
+        "correctAnswer": 0,
+        "explanation": "P. Ramlee terkenal dalam muzik, lakonan dan filem.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-15",
+        "question": "Apakah nilai yang boleh dicontohi daripada tokoh sukan negara?",
+        "options": [
+          "Mudah berputus asa",
+          "Disiplin dan kegigihan",
+          "Tidak menghormati orang lain",
+          "Tidak mahu berlatih"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tokoh sukan menunjukkan disiplin dan kegigihan.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-16",
+        "question": "Siapakah tokoh negara yang dikenali sebagai Bapa Pemodenan?",
+        "options": [
+          "Tun Dr. Mahathir Mohamad",
+          "Tun Hussein Onn",
+          "Tunku Abdul Rahman",
+          "Dato' Onn Jaafar"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Dr. Mahathir Mohamad dikenali sebagai Bapa Pemodenan.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tokoh Malaysia-17",
+        "question": "Bilakah Persekutuan Tanah Melayu mencapai kemerdekaan?",
+        "options": [
+          "31 Ogos 1957",
+          "16 September 1963",
+          "31 Ogos 1963",
+          "31 Ogos 1969"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Persekutuan Tanah Melayu merdeka pada 31 Ogos 1957.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tokoh Malaysia-18",
+        "question": "Apakah maksud tokoh negara?",
+        "options": [
+          "Individu yang memberi sumbangan besar kepada negara",
+          "Individu yang tinggal di luar negara sahaja",
+          "Individu yang tidak dikenali masyarakat",
+          "Individu yang tidak mempunyai pekerjaan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tokoh negara ialah individu yang berjasa kepada negara.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tokoh Malaysia-19",
+        "question": "Mengapakah kita perlu menghargai tokoh negara?",
+        "options": [
+          "Mengenang jasa dan mencontohi sumbangan mereka",
+          "Melupakan sejarah negara",
+          "Membandingkan kekayaan mereka",
+          "Mengabaikan usaha mereka"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Kita menghargai tokoh untuk mengenang jasa dan mencontohi nilai baik.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tokoh Malaysia-20",
+        "question": "Antara berikut, yang manakah contoh sumbangan tokoh kepada negara?",
+        "options": [
+          "Meningkatkan nama Malaysia dalam pertandingan dunia",
+          "Merosakkan harta awam",
+          "Tidak mematuhi undang-undang",
+          "Mengabaikan pelajaran"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Kejayaan di peringkat dunia dapat mengharumkan nama negara.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
+      }
+    ],
+    "Perdana Menteri Malaysia": [
+      {
+        "id": "general-Perdana Menteri Malaysia-1",
+        "question": "Siapakah Perdana Menteri Malaysia yang pertama?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tunku Abdul Rahman",
+          "Tun Hussein Onn",
+          "Tun Dr. Mahathir Mohamad"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Tunku Abdul Rahman ialah Perdana Menteri pertama Malaysia.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-2",
+        "question": "Siapakah Perdana Menteri Malaysia yang kedua?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tun Hussein Onn",
+          "Tun Abdullah Ahmad Badawi",
+          "Dato' Sri Ismail Sabri Yaakob"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Abdul Razak ialah Perdana Menteri kedua.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-3",
+        "question": "Siapakah Perdana Menteri yang dikenali sebagai Bapa Pembangunan?",
+        "options": [
+          "Tun Abdul Razak",
+          "Tun Hussein Onn",
+          "Tan Sri Muhyiddin Yassin",
+          "Dato' Seri Anwar Ibrahim"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Abdul Razak dikenali sebagai Bapa Pembangunan.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-4",
+        "question": "Siapakah Perdana Menteri yang dikenali sebagai Bapa Perpaduan?",
+        "options": [
+          "Tun Hussein Onn",
+          "Tunku Abdul Rahman",
+          "Tun Abdullah Ahmad Badawi",
+          "Tun Dr. Mahathir Mohamad"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Hussein Onn dikenali sebagai Bapa Perpaduan.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-5",
+        "question": "Siapakah Perdana Menteri Malaysia yang kelima?",
+        "options": [
+          "Tun Abdullah Ahmad Badawi",
+          "Tun Dr. Mahathir Mohamad",
+          "Tan Sri Muhyiddin Yassin",
+          "Dato' Sri Najib Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Abdullah Ahmad Badawi ialah Perdana Menteri kelima.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-6",
+        "question": "Siapakah Perdana Menteri Malaysia yang keenam?",
+        "options": [
+          "Dato' Sri Najib Razak",
+          "Tun Abdullah Ahmad Badawi",
+          "Tun Hussein Onn",
+          "Tan Sri Muhyiddin Yassin"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Sri Najib Razak ialah Perdana Menteri keenam.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-7",
+        "question": "Siapakah Perdana Menteri Malaysia yang kesepuluh?",
+        "options": [
+          "Dato' Seri Anwar Ibrahim",
+          "Dato' Sri Ismail Sabri Yaakob",
+          "Tun Dr. Mahathir Mohamad",
+          "Tan Sri Muhyiddin Yassin"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Seri Anwar Ibrahim ialah Perdana Menteri kesepuluh.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-8",
+        "question": "Apakah jawatan utama Perdana Menteri?",
+        "options": [
+          "Ketua pentadbiran kerajaan Persekutuan",
+          "Ketua semua sekolah",
+          "Ketua semua negeri",
+          "Ketua pasukan sukan negara"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Perdana Menteri mengetuai pentadbiran kerajaan Persekutuan.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-9",
+        "question": "Siapakah Perdana Menteri Malaysia yang ketiga?",
+        "options": [
+          "Tun Hussein Onn",
+          "Tun Abdul Razak",
+          "Tun Abdullah Ahmad Badawi",
+          "Dato' Sri Najib Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Hussein Onn ialah Perdana Menteri ketiga.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-10",
+        "question": "Siapakah Perdana Menteri Malaysia yang keempat?",
+        "options": [
+          "Tun Dr. Mahathir Mohamad",
+          "Tunku Abdul Rahman",
+          "Tan Sri Muhyiddin Yassin",
+          "Tun Hussein Onn"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Dr. Mahathir Mohamad ialah Perdana Menteri keempat.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-11",
+        "question": "Siapakah Perdana Menteri Malaysia yang ketujuh?",
+        "options": [
+          "Tun Dr. Mahathir Mohamad",
+          "Dato' Sri Najib Razak",
+          "Tun Abdullah Ahmad Badawi",
+          "Dato' Seri Anwar Ibrahim"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Dr. Mahathir Mohamad kembali sebagai Perdana Menteri ketujuh.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-12",
+        "question": "Siapakah Perdana Menteri Malaysia yang kelapan?",
+        "options": [
+          "Tan Sri Muhyiddin Yassin",
+          "Dato' Sri Ismail Sabri Yaakob",
+          "Tun Hussein Onn",
+          "Tun Abdul Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tan Sri Muhyiddin Yassin ialah Perdana Menteri kelapan.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-13",
+        "question": "Siapakah Perdana Menteri Malaysia yang kesembilan?",
+        "options": [
+          "Dato' Sri Ismail Sabri Yaakob",
+          "Tan Sri Muhyiddin Yassin",
+          "Dato' Seri Anwar Ibrahim",
+          "Dato' Sri Najib Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Sri Ismail Sabri Yaakob ialah Perdana Menteri kesembilan.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-14",
+        "question": "Siapakah Perdana Menteri ketika Malaysia dibentuk pada tahun 1963?",
+        "options": [
+          "Tunku Abdul Rahman",
+          "Tun Abdul Razak",
+          "Tun Hussein Onn",
+          "Tun Dr. Mahathir Mohamad"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tunku Abdul Rahman memimpin negara ketika Malaysia dibentuk.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-15",
+        "question": "Siapakah Perdana Menteri yang berkhidmat paling lama dalam sejarah Malaysia?",
+        "options": [
+          "Tun Dr. Mahathir Mohamad",
+          "Tun Abdul Razak",
+          "Tun Hussein Onn",
+          "Tan Sri Muhyiddin Yassin"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Dr. Mahathir Mohamad mempunyai tempoh khidmat paling lama.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-16",
+        "question": "Apakah antara tugas Perdana Menteri?",
+        "options": [
+          "Mengetuai Jemaah Menteri",
+          "Menggantikan semua guru",
+          "Menjadi ketua semua keluarga",
+          "Mengendalikan semua kedai"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Perdana Menteri mengetuai Jemaah Menteri.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-17",
+        "question": "Susunan manakah betul bagi tiga Perdana Menteri pertama Malaysia?",
+        "options": [
+          "Tunku Abdul Rahman, Tun Abdul Razak, Tun Hussein Onn",
+          "Tun Abdul Razak, Tunku Abdul Rahman, Tun Hussein Onn",
+          "Tun Hussein Onn, Tun Abdul Razak, Tunku Abdul Rahman",
+          "Tunku Abdul Rahman, Tun Hussein Onn, Tun Abdul Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Urutannya ialah Tunku Abdul Rahman, Tun Abdul Razak dan Tun Hussein Onn.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-18",
+        "question": "Siapakah yang kembali menjadi Perdana Menteri ketujuh selepas menjadi Perdana Menteri keempat?",
+        "options": [
+          "Tun Dr. Mahathir Mohamad",
+          "Tun Abdullah Ahmad Badawi",
+          "Dato' Sri Najib Razak",
+          "Dato' Seri Anwar Ibrahim"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tun Dr. Mahathir Mohamad ialah Perdana Menteri keempat dan ketujuh.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-19",
+        "question": "Apakah kepentingan mengetahui senarai Perdana Menteri Malaysia?",
+        "options": [
+          "Memahami sejarah kepimpinan negara",
+          "Menghafal nama tanpa tujuan",
+          "Menggantikan tugas Perdana Menteri",
+          "Mengabaikan sejarah negara"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Senarai ini membantu kita memahami sejarah kepimpinan negara.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-20",
+        "question": "Siapakah Perdana Menteri Malaysia selepas Dato' Sri Ismail Sabri Yaakob?",
+        "options": [
+          "Dato' Seri Anwar Ibrahim",
+          "Tun Dr. Mahathir Mohamad",
+          "Tan Sri Muhyiddin Yassin",
+          "Dato' Sri Najib Razak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dato' Seri Anwar Ibrahim dilantik sebagai Perdana Menteri kesepuluh.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
+      }
+    ],
+    "Tubuh Manusia": [
+      {
+        "id": "general-Tubuh Manusia-1",
+        "question": "Apakah anggota badan yang digunakan untuk melihat?",
+        "options": [
+          "Telinga",
+          "Mata",
+          "Hidung",
+          "Tangan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Mata digunakan untuk melihat.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-2",
+        "question": "Apakah anggota badan yang digunakan untuk mendengar?",
+        "options": [
+          "Mulut",
+          "Mata",
+          "Telinga",
+          "Kaki"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Telinga digunakan untuk mendengar.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-3",
+        "question": "Apakah anggota badan yang digunakan untuk menghidu?",
+        "options": [
+          "Hidung",
+          "Lidah",
+          "Tangan",
+          "Mata"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Hidung digunakan untuk menghidu.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-4",
+        "question": "Apakah anggota badan yang digunakan untuk berjalan?",
+        "options": [
+          "Tangan",
+          "Kaki",
+          "Telinga",
+          "Leher"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kaki membantu kita berjalan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-5",
+        "question": "Apakah anggota badan yang digunakan untuk merasa makanan?",
+        "options": [
+          "Lidah",
+          "Mata",
+          "Hidung",
+          "Rambut"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Lidah mempunyai deria rasa.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-6",
+        "question": "Organ manakah mengepam darah ke seluruh badan?",
+        "options": [
+          "Paru-paru",
+          "Jantung",
+          "Perut",
+          "Otak"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Jantung mengepam darah ke seluruh badan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-7",
+        "question": "Apakah organ yang digunakan untuk bernafas?",
+        "options": [
+          "Paru-paru",
+          "Jantung",
+          "Hati",
+          "Kulit"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Paru-paru membantu proses pernafasan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-8",
+        "question": "Apakah yang melindungi otak?",
+        "options": [
+          "Tengkorak",
+          "Lutut",
+          "Jari",
+          "Bahu"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tengkorak melindungi otak.",
+        "category": "Tubuh Manusia",
+        "difficulty": "easy"
+      },
+      {
+        "id": "general-Tubuh Manusia-9",
+        "question": "Apakah fungsi otak?",
+        "options": [
+          "Mengepam darah",
+          "Mengawal aktiviti badan",
+          "Menghadam makanan",
+          "Menapis air kencing"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Otak mengawal dan menyelaras aktiviti badan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-10",
+        "question": "Apakah fungsi tulang dalam tubuh manusia?",
+        "options": [
+          "Memberi bentuk dan menyokong badan",
+          "Menghasilkan air mata",
+          "Menghadam makanan",
+          "Menghidu bau"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Tulang menyokong badan dan memberi bentuk badan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-11",
+        "question": "Di manakah makanan mula dihancurkan?",
+        "options": [
+          "Mulut",
+          "Paru-paru",
+          "Jantung",
+          "Buah pinggang"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Makanan mula dikunyah dan dihancurkan di dalam mulut.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-12",
+        "question": "Apakah fungsi gigi?",
+        "options": [
+          "Mengunyah makanan",
+          "Mengepam darah",
+          "Menapis darah",
+          "Menghidu bau"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Gigi mengunyah makanan kepada bahagian kecil.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-13",
+        "question": "Apakah fungsi kulit?",
+        "options": [
+          "Melindungi bahagian dalam badan",
+          "Menghadam makanan",
+          "Mengepam darah",
+          "Menghasilkan suara"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Kulit melindungi bahagian dalam tubuh.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-14",
+        "question": "Organ manakah membantu menapis bahan buangan daripada darah?",
+        "options": [
+          "Buah pinggang",
+          "Perut",
+          "Otak",
+          "Mata"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Buah pinggang menapis bahan buangan daripada darah.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-15",
+        "question": "Apakah yang berlaku kepada dada semasa kita menarik nafas?",
+        "options": [
+          "Dada mengembang",
+          "Dada mengecil",
+          "Dada tidak bergerak",
+          "Dada menjadi sejuk"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Dada mengembang apabila udara masuk ke paru-paru.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-16",
+        "question": "Antara berikut, yang manakah amalan baik untuk kesihatan tubuh?",
+        "options": [
+          "Tidak mandi",
+          "Makan makanan berkhasiat",
+          "Tidur terlalu lewat setiap hari",
+          "Tidak minum air"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Pemakanan berkhasiat membantu mengekalkan kesihatan badan.",
+        "category": "Tubuh Manusia",
+        "difficulty": "medium"
+      },
+      {
+        "id": "general-Tubuh Manusia-17",
+        "question": "Sistem manakah membawa darah, oksigen dan nutrien ke seluruh tubuh?",
+        "options": [
+          "Sistem peredaran darah",
+          "Sistem pencernaan",
+          "Sistem pembiakan",
+          "Sistem rangka"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Sistem peredaran darah mengangkut darah, oksigen dan nutrien.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tubuh Manusia-18",
+        "question": "Apakah laluan makanan selepas ditelan?",
+        "options": [
+          "Mulut → esofagus → perut",
+          "Mulut → paru-paru → perut",
+          "Mulut → jantung → perut",
+          "Mulut → buah pinggang → perut"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Makanan bergerak dari mulut melalui esofagus ke perut.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tubuh Manusia-19",
+        "question": "Mengapakah kita perlu minum air secukupnya?",
+        "options": [
+          "Membantu badan kekal sihat dan mengelakkan dehidrasi",
+          "Menjadikan tulang hilang",
+          "Menggantikan keperluan tidur",
+          "Menghilangkan keperluan makan"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Air penting untuk fungsi badan dan mencegah dehidrasi.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tubuh Manusia-20",
+        "question": "Apakah tindakan yang baik untuk menjaga kesihatan jantung?",
+        "options": [
+          "Kerap bersenam dan makan seimbang",
+          "Makan makanan segera setiap hari",
+          "Tidak tidur langsung",
+          "Tidak bergerak"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Senaman dan pemakanan seimbang membantu menjaga jantung.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

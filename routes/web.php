@@ -76,10 +76,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('games/TekaKataPage');
     })->name('tekakata-page');
     Route::get('/quiz-page', [GamesController::class, 'index'])->name('quiz-page');
-    Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
-    Route::get('/question-section', function () {
-        return Inertia::render('games/QuizInterface');
-    })->name('question-section');
+    Route::middleware('throttle:60,1')->group(function () {
+        Route::post('/quiz/start', [GamesController::class, 'startQuiz'])->name('quiz.start');
+        Route::post('/quiz/answer', [GamesController::class, 'answerQuestion'])->name('quiz.answer');
+        Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
+    });
 
 
     Route::get('/chat', [ChatController::class, 'lobby'])->name('chat.lobby');

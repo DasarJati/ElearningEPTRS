@@ -22,6 +22,9 @@ class QuizSession extends Model
         'updated_at'
     ];
 
+    // Never send participants' IC numbers to the browser
+    protected $hidden = ['ic_number'];
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

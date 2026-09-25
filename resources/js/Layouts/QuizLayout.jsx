@@ -93,6 +93,12 @@ const QuizLayout = ({
     };
   }, [isDragging, calculatorVisible]);
 
+  const calculatorIcon = (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    </svg>
+  );
+
   const toggleCalculator = () => {
     setCalculatorVisible(!calculatorVisible);
   };
@@ -140,27 +146,23 @@ const QuizLayout = ({
       {/* Pass navbarVisible prop to QuestionNavbar */}
       {/* <QuestionNavbar title={title} visible={navbarVisible} /> */}
       
-      {/* Floating Calculator Icon */}
-      <div 
-        className={`fixed z-50 transition-all duration-300 ${
-          calculatorVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
-        style={{ 
-          top: '80px', 
-          right: '20px',
-          cursor: 'pointer'
-        }}
-      >
-        <button
-          onClick={toggleCalculator}
-          className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
-          title="Open Calculator"
+      {/* Floating Calculator Icon (only when there is no footer to hold it) */}
+      {!footer && (
+        <div
+          className={`fixed z-50 transition-all duration-300 ${
+            calculatorVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+          style={{ top: '80px', right: '20px' }}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-        </button>
-      </div>
+          <button
+            onClick={toggleCalculator}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
+            title="Open Calculator"
+          >
+            {calculatorIcon}
+          </button>
+        </div>
+      )}
 
       {/* Draggable Calculator */}
       {calculatorVisible && (
@@ -214,7 +216,10 @@ const QuizLayout = ({
         {children}
       </main>
       
-      {footer}
+      {/* The footer places the calculator button next to its action buttons */}
+      {footer && React.isValidElement(footer)
+        ? React.cloneElement(footer, { onToggleCalculator: toggleCalculator, calculatorOpen: calculatorVisible })
+        : footer}
       <StandardFooter />
     </div>
   );

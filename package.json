@@ -3,9 +3,11 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "npm run quiz:export && vite build",
+        "quiz:export": "node scripts/export-quiz-bank.mjs",
         "serve": "php artisan serve",
-        "start": "concurrently \"npm run dev\" \"npm run serve\""
+        "start": "concurrently \"npm run dev\" \"npm run serve\"",
+        "prepare": "git config core.hooksPath .githooks || true"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",

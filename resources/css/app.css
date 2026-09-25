@@ -65,3 +65,31 @@ body {
   background-color: #cbd5e1;
   border-radius: 10px;
 }
+
+/* ===== Soft shade & shadow (system-wide) =====
+   Wrapped in :where() so specificity is zero — any explicit Tailwind
+   shadow/background utility on an element still wins. */
+@layer base {
+  /* White bordered cards/panels that don't declare their own shadow */
+  :where(div, section, article, aside, li, form)[class*="bg-white"][class*="rounded-"][class*="border"]:where(:not([class*="shadow"])) {
+    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 2px 6px -1px rgb(15 23 42 / 0.05);
+  }
+
+  /* Smooth shadow changes on hover (hover:shadow-* utilities) */
+  :where([class*="hover:shadow"]) {
+    transition-property: box-shadow, transform, background-color, border-color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Form fields: subtle inner shade so they read as inputs */
+  :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea):where(:not([class*="shadow"])) {
+    box-shadow: inset 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  }
+
+  /* Images inside question/explanation content */
+  :where(.question-content, .smart-question-renderer, .prose) img {
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05), 0 4px 10px -2px rgb(15 23 42 / 0.06);
+  }
+}

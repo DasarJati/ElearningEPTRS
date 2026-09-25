@@ -4,18 +4,14 @@ import { motion } from 'framer-motion';
 
 export default function QuizFooter({
   showExplanation,
-  answeredQuestions,
   currentQuestion,
   selectedOption,
-  isCorrect,
-  firstAnswers,
+  checking = false,
   onCheckAnswer,
   onNextQuestion,
-  onTryAgain,
-  onSkipQuestion,
-  showRetryOption,
   questions,
-  onQuestionSelect
+  onToggleCalculator,
+  calculatorOpen = false
 }) {
   const progress = questions.length > 0
     ? Math.round(((currentQuestion + 1) / questions.length) * 100)
@@ -42,16 +38,31 @@ export default function QuizFooter({
         </div>
         
         {/* Action buttons - SIMPLIFIED VERSION */}
-        <div className="ml-auto flex space-x-2">
+        <div className="ml-auto flex items-center space-x-2">
+          {onToggleCalculator && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onToggleCalculator}
+              aria-pressed={calculatorOpen}
+              title="Calculator"
+              className={`rounded-xl border p-2.5 text-white shadow-lg ${calculatorOpen ? 'border-yellow-300 bg-white/25' : 'border-white/30 bg-white/10 hover:bg-white/20'}`}
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              <span className="sr-only">Calculator</span>
+            </motion.button>
+          )}
           {!showExplanation ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onCheckAnswer}
-              disabled={selectedOption === null}
-              className={`rounded-xl border px-4 py-2.5 font-bold text-white shadow-lg sm:px-6 ${selectedOption === null ? 'cursor-not-allowed border-white/10 bg-slate-500/80' : 'border-emerald-300 bg-emerald-500 hover:bg-emerald-600'}`}
+              disabled={selectedOption === null || checking}
+              className={`rounded-xl border px-4 py-2.5 font-bold text-white shadow-lg sm:px-6 ${selectedOption === null || checking ? 'cursor-not-allowed border-white/10 bg-slate-500/80' : 'border-emerald-300 bg-emerald-500 hover:bg-emerald-600'}`}
             >
-              Check Answer
+              {checking ? 'Checking...' : 'Check Answer'}
             </motion.button>
           ) : (
             // TAMPILKAN LANGSUNG NEXT BUTTON TANPA TRY AGAIN

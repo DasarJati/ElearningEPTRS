@@ -1,0 +1,34 @@
+#!/bin/sh
+# Runs before every `git commit`. When frontend files are part of the commit it
+# runs `npm run build` and adds the output (public/build and the Quiz Arena bank)
+# to the same commit, so the server only needs `git pull` - no build there.
+# Skip once with: git commit --no-verify
+
+FRONTEND_PATHS='^(resources/js/|resources/css/|vite\.config\.js|tailwind\.config\.js|postcss\.config\.js|package\.json|package-lock\.json|scripts/export-quiz-bank\.mjs)'
+
+needs_build=0
+if git diff --cached --name-only | grep -Eq "$FRONTEND_PATHS"; then
+    needs_build=1
+fi
+# First commit after enabling this hook: build output is not tracked yet.
+if [ -z "$(git ls-files public/build/manifest.json)" ]; then
+    needs_build=1
+fi
+
+if [ "$needs_build" -eq 0 ]; then
+    exit 0
+fi
+
+echo "pre-commit: frontend changes found, running npm run build..."
+
+if ! npm run build; then
+    echo ""
+    echo "pre-commit: npm run build FAILED - commit cancelled. Fix the errors above and try again."
+    exit 1
+fi
+
+# -A so assets removed by the build (old hashed files) are deleted in git too.
+git add -A public/build resources/data/quiz_bank.json
+
+echo "pre-commit: build added to this commit."
+exit 0
