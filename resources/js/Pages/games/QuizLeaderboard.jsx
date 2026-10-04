@@ -4,7 +4,7 @@ import { router, Link } from '@inertiajs/react';
 import QuizInterface from './QuizInterface';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
-const LEADERBOARD_TITLE = 'festival sastera kanak-kanak selangor 2026';
+const LEADERBOARD_TITLE = 'k-semanis 2026';
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
