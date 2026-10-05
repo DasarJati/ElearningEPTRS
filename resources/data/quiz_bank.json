@@ -560,6 +560,48 @@
         "explanation": "Kilogram ialah unit yang sesuai untuk mengukur berat beg beras.",
         "category": "Pengetahuan Pengukuran",
         "difficulty": "easy"
+      },
+      {
+        "id": "61",
+        "question": "Kedai A menjual baju RM60 dengan diskaun 25%. Kedai B menjual baju yang sama pada RM52 dengan diskaun 10%. Kedai manakah lebih murah?",
+        "options": [
+          "Kedai B, lebih murah RM1.80",
+          "Kedai A, lebih murah RM1.80",
+          "Kedai A, lebih murah RM9.80",
+          "Harga sama, iaitu RM45"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Kedai A: RM60 − RM15 = RM45. Kedai B: RM52 − RM5.20 = RM46.80. Kedai A lebih murah RM1.80.",
+        "category": "Kewangan Harian",
+        "difficulty": "hard"
+      },
+      {
+        "id": "62",
+        "question": "Paip A memenuhkan sebuah tangki dalam 6 jam. Paip B memenuhkannya dalam 3 jam. Jika kedua-dua paip dibuka serentak, berapa lama tangki itu penuh?",
+        "options": [
+          "1 jam 30 minit",
+          "2 jam",
+          "2 jam 30 minit",
+          "4 jam 30 minit"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Dalam 1 jam, paip A mengisi 1/6 dan paip B mengisi 1/3 tangki, iaitu 1/2 tangki. Jadi tangki penuh dalam 2 jam.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "hard"
+      },
+      {
+        "id": "63",
+        "question": "Ali ada RM50. Dia mesti membeli 2 buah buku berharga RM8 sebuah, dan mahu membeli seberapa banyak pen berharga RM3 sebatang. Berapakah bilangan pen paling banyak yang boleh dibelinya?",
+        "options": [
+          "10",
+          "12",
+          "11",
+          "14"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Buku: 2 × RM8 = RM16. Baki RM34 ÷ RM3 = 11 batang pen, dengan baki RM1.",
+        "category": "Penyelesaian Masalah",
+        "difficulty": "hard"
       }
     ],
     "science": [
@@ -1121,6 +1163,48 @@
         "correctAnswer": 0,
         "explanation": "Panel menukar cahaya kepada elektrik, bateri menyimpan tenaga kimia, lalu membekalkan elektrik kepada lampu.",
         "category": "Tenaga",
+        "difficulty": "hard"
+      },
+      {
+        "id": "81",
+        "question": "Dalam rantai makanan padi → belalang → katak → ular, racun serangga membunuh kebanyakan belalang. Apakah kesan awal yang paling mungkin?",
+        "options": [
+          "Ular menurun dahulu, kemudian barulah katak",
+          "Katak meningkat kerana kurang persaingan dengan belalang",
+          "Padi berkurang kerana tiada belalang",
+          "Katak menurun kerana kekurangan makanan"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Katak memakan belalang, jadi katak terjejas dahulu apabila sumber makanannya berkurang.",
+        "category": "Ekologi",
+        "difficulty": "hard"
+      },
+      {
+        "id": "82",
+        "question": "Air panas yang sama banyak dituang ke dalam cawan logam dan cawan polistirena. Cawan manakah menyejukkan air lebih cepat, dan mengapa?",
+        "options": [
+          "Cawan logam, kerana logam konduktor haba yang baik",
+          "Cawan logam, kerana logam menyerap kesejukan daripada udara",
+          "Cawan logam, kerana logam penebat haba yang baik",
+          "Cawan polistirena, kerana penebat membebaskan haba dengan cepat"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Logam mengalirkan haba dari air ke persekitaran dengan cepat. Haba yang berpindah, bukan kesejukan.",
+        "category": "Haba",
+        "difficulty": "hard"
+      },
+      {
+        "id": "83",
+        "question": "Seorang murid meletakkan baja X pada pokok di tempat cerah dan tidak meletakkan baja pada pokok di tempat teduh. Pokok pertama tumbuh lebih cepat, lalu dia membuat kesimpulan baja X berkesan. Mengapakah kesimpulan ini tidak boleh dipercayai?",
+        "options": [
+          "Kedua-dua pokok sepatutnya diberi baja X",
+          "Cahaya ialah pemboleh ubah bergerak balas dalam eksperimen ini",
+          "Baja dan cahaya berubah serentak, jadi tidak pasti faktor mana puncanya",
+          "Baja X ialah pemboleh ubah yang dimalarkan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Ujian yang adil hanya mengubah satu faktor. Di sini baja dan cahaya berbeza, jadi punca pertumbuhan tidak dapat dipastikan.",
+        "category": "Kaedah Saintifik",
         "difficulty": "hard"
       }
     ],
@@ -1684,6 +1768,48 @@
         "explanation": "Kerja mesti mengikut urutan ukur, bina, kemudian cat dalam tempoh empat hari.",
         "category": "Pengurusan Kerja",
         "difficulty": "hard"
+      },
+      {
+        "id": "221",
+        "question": "Sebuah telefon berharga RM1,200 jika dibayar tunai, atau RM110 sebulan selama 12 bulan secara ansuran. Jika simpanan anda mencukupi, apakah keputusan paling bijak?",
+        "options": [
+          "Tunai, kerana ansuran menelan kos tambahan RM110",
+          "Tunai, kerana ansuran menelan kos tambahan RM120",
+          "Tunai, kerana ansuran menelan kos tambahan RM100",
+          "Ansuran, kerana jumlahnya sama tetapi lebih ringan setiap bulan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Ansuran: RM110 × 12 = RM1,320, iaitu RM120 lebih mahal daripada harga tunai.",
+        "category": "Kewangan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "222",
+        "question": "Mentol LED berharga RM15 dan menggunakan elektrik RM2 sebulan. Mentol biasa berharga RM5 dan menggunakan elektrik RM6 sebulan. Mulai bulan ke berapakah jumlah kos mentol LED menjadi lebih rendah?",
+        "options": [
+          "Bulan ke-2",
+          "Bulan ke-4",
+          "Bulan ke-5",
+          "Bulan ke-3"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Bulan ke-2: LED RM19, mentol biasa RM17. Bulan ke-3: LED RM21, mentol biasa RM23.",
+        "category": "Kelestarian",
+        "difficulty": "hard"
+      },
+      {
+        "id": "223",
+        "question": "Minyak di dalam kuali tiba-tiba terbakar. Apakah tindakan paling selamat?",
+        "options": [
+          "Matikan api dapur dan tutup kuali dengan penutup",
+          "Renjis sedikit air sahaja supaya api beransur padam",
+          "Tabur tepung gandum ke atas api",
+          "Angkat kuali ke luar rumah dengan segera"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Penutup menyekat udara lalu api padam. Air memercikkan minyak terbakar, tepung boleh menyala, dan mengangkat kuali boleh menumpahkan minyak.",
+        "category": "Keselamatan",
+        "difficulty": "hard"
       }
     ]
   },
@@ -1968,6 +2094,34 @@
         "explanation": "Hutan membekalkan habitat, perlindungan dan makanan.",
         "category": "Haiwan",
         "difficulty": "hard"
+      },
+      {
+        "id": "general-Haiwan-21",
+        "question": "Jika semua lebah pupus, apakah kesan paling besar kepada manusia?",
+        "options": [
+          "Hanya bekalan madu yang terjejas",
+          "Banyak tanaman sukar berbuah kerana kurang pendebungaan",
+          "Tanaman tetap berbuah seperti biasa kerana angin mendebungakan semua bunga",
+          "Bunga bertambah kerana nektarnya tidak lagi dihisap"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Lebah mendebungakan banyak tanaman makanan, jadi hasil buah dan sayur akan merosot.",
+        "category": "Haiwan",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Haiwan-22",
+        "question": "Seekor haiwan mempunyai bulu tebal, lapisan lemak yang tebal dan telinga yang kecil. Habitat manakah paling sesuai untuknya?",
+        "options": [
+          "Gurun, kerana lemak tebal menyimpan air seperti bonggol unta",
+          "Gurun, kerana telinga kecil mengurangkan penyerapan haba",
+          "Kawasan kutub, kerana ciri itu mengurangkan kehilangan haba",
+          "Hutan tropika, kerana bulu tebal melindungi daripada hujan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Bulu tebal, lemak tebal dan telinga kecil membantu haiwan mengekalkan haba badan di tempat sejuk.",
+        "category": "Haiwan",
+        "difficulty": "hard"
       }
     ],
     "Planet": [
@@ -2248,6 +2402,34 @@
         ],
         "correctAnswer": 1,
         "explanation": "Bulan memantulkan cahaya daripada Matahari.",
+        "category": "Planet",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Planet-21",
+        "question": "Utarid paling dekat dengan Matahari, tetapi Zuhrah lebih panas. Mengapa?",
+        "options": [
+          "Atmosfera Zuhrah yang tebal memerangkap haba",
+          "Zuhrah berputar sangat perlahan, jadi siangnya lebih lama",
+          "Zuhrah lebih besar, jadi menerima lebih banyak cahaya Matahari",
+          "Utarid memantulkan semua haba kerana tiada atmosfera"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Atmosfera Zuhrah yang tebal dan kaya karbon dioksida memerangkap haba melalui kesan rumah hijau.",
+        "category": "Planet",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Planet-22",
+        "question": "Jika Bumi berhenti berputar pada paksinya tetapi masih mengelilingi Matahari, apakah yang paling mungkin berlaku?",
+        "options": [
+          "Satu bahagian Bumi mengalami siang selama-lamanya",
+          "Siang dan malam kekal 24 jam kerana Bumi masih mengorbit",
+          "Bumi tidak lagi mempunyai graviti",
+          "Siang dan malam masing-masing berlangsung kira-kira enam bulan"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Tanpa putaran, bahagian Bumi yang menghadap Matahari hanya berubah apabila Bumi mengorbit, iaitu sekali setahun.",
         "category": "Planet",
         "difficulty": "hard"
       }
@@ -2532,6 +2714,34 @@
         "explanation": "Kejayaan di peringkat dunia dapat mengharumkan nama negara.",
         "category": "Tokoh Malaysia",
         "difficulty": "hard"
+      },
+      {
+        "id": "general-Tokoh Malaysia-21",
+        "question": "Tunku Abdul Rahman memilih jalan rundingan dengan British untuk mendapatkan kemerdekaan. Apakah kelebihan utama cara ini?",
+        "options": [
+          "British menyerahkan kuasa tanpa sebarang syarat",
+          "Kemerdekaan dicapai secara aman tanpa pertumpahan darah",
+          "Kemerdekaan dicapai tanpa memerlukan kerjasama antara kaum",
+          "Rakyat tidak perlu terlibat dalam usaha kemerdekaan"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Rundingan membolehkan kemerdekaan dicapai secara aman, dengan sokongan rakyat dan kerjasama antara kaum.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tokoh Malaysia-22",
+        "question": "Datuk Nicol David menjadi juara skuasy dunia sebanyak lapan kali. Apakah pengajaran paling penting daripada pencapaian ini?",
+        "options": [
+          "Bakat semula jadi lebih penting daripada latihan",
+          "Kemenangan pertama memudahkan kemenangan seterusnya",
+          "Kejayaan berulang memerlukan disiplin dan latihan berterusan",
+          "Kejayaan lebih mudah dalam sukan yang kurang pesaing"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Mengekalkan kejuaraan dunia berkali-kali memerlukan disiplin, kegigihan dan latihan yang konsisten.",
+        "category": "Tokoh Malaysia",
+        "difficulty": "hard"
       }
     ],
     "Perdana Menteri Malaysia": [
@@ -2814,6 +3024,34 @@
         "explanation": "Dato' Seri Anwar Ibrahim dilantik sebagai Perdana Menteri kesepuluh.",
         "category": "Perdana Menteri Malaysia",
         "difficulty": "hard"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-21",
+        "question": "Tun Abdul Razak digelar Bapa Pembangunan. Sumbangan manakah paling menyokong gelaran ini?",
+        "options": [
+          "Membangunkan industri berat dan kereta nasional",
+          "Memperkenalkan Dasar Pandang ke Timur",
+          "Mengetuai pengisytiharan kemerdekaan pada 1957",
+          "Memajukan kawasan luar bandar dan ekonomi rakyat"
+        ],
+        "correctAnswer": 3,
+        "explanation": "Tun Abdul Razak terkenal dengan usaha pembangunan luar bandar dan peningkatan taraf ekonomi rakyat.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Perdana Menteri Malaysia-22",
+        "question": "Mengapakah seorang Perdana Menteri perlu mendapat sokongan majoriti ahli Dewan Rakyat?",
+        "options": [
+          "Kerana kerajaan mesti mendapat kepercayaan majoriti wakil yang dipilih rakyat",
+          "Kerana Perdana Menteri dipilih terus oleh rakyat dalam pilihan raya",
+          "Kerana Perdana Menteri dilantik oleh ahli Dewan Negara",
+          "Kerana majoriti Dewan Rakyat melantik Yang di-Pertuan Agong"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Rakyat memilih ahli Dewan Rakyat, dan Perdana Menteri ialah ahli yang mendapat kepercayaan majoriti mereka.",
+        "category": "Perdana Menteri Malaysia",
+        "difficulty": "hard"
       }
     ],
     "Tubuh Manusia": [
@@ -3094,6 +3332,34 @@
         ],
         "correctAnswer": 0,
         "explanation": "Senaman dan pemakanan seimbang membantu menjaga jantung.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tubuh Manusia-21",
+        "question": "Seorang murid kerap makan makanan manis dan jarang memberus gigi. Mengapakah giginya mudah berlubang?",
+        "options": [
+          "Gula itu sendiri menghakis enamel gigi secara langsung",
+          "Bakteria menukar gula kepada asid yang menghakis gigi",
+          "Gula melembutkan gusi sehingga gigi menjadi longgar",
+          "Makanan manis mengeringkan air liur lalu gigi merekah"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Bakteria dalam mulut menggunakan gula dan menghasilkan asid, dan asid inilah yang menghakis gigi.",
+        "category": "Tubuh Manusia",
+        "difficulty": "hard"
+      },
+      {
+        "id": "general-Tubuh Manusia-22",
+        "question": "Mengapakah berpeluh membantu menyejukkan badan ketika cuaca panas?",
+        "options": [
+          "Peluh lebih sejuk daripada kulit",
+          "Liang peluh terbuka untuk membenarkan udara sejuk masuk",
+          "Penyejatan peluh menyerap haba daripada kulit",
+          "Peluh membuang garam yang memanaskan badan"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Apabila peluh menyejat, ia mengambil haba daripada kulit lalu badan menjadi lebih sejuk.",
         "category": "Tubuh Manusia",
         "difficulty": "hard"
       }

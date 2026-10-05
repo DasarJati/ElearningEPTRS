@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use RuntimeException;
@@ -19,6 +20,9 @@ class QuizArenaService
 
     private const SESSION_KEY = 'quiz_arena';
     private const TOPIC_ROTATION_CACHE_KEY = 'quiz_arena.general_topic_index';
+    private const RECENT_QUESTIONS_CACHE_KEY = 'quiz_arena.recent_questions';
+    // A question is not reused until this many games have been started.
+    private const NO_REPEAT_GAMES = 5;
     private const SESSION_DIFFICULTIES = ['easy', 'easy', 'medium', 'medium', 'hard'];
 
     // Every game has Matematik, Sains and Kemahiran Hidup; the other two slots
@@ -145,25 +149,55 @@ class QuizArenaService
         [$firstTopic, $secondTopic] = $this->nextGeneralTopics();
 
         $pools = [
-            $bank['pools']['mathematic'],
-            $bank['pools']['science'],
-            $bank['pools']['kemahiran_hidup'],
-            $bank['general'][$firstTopic],
-            $bank['general'][$secondTopic],
+            'mathematic' => $bank['pools']['mathematic'],
+            'science' => $bank['pools']['science'],
+            'kemahiran_hidup' => $bank['pools']['kemahiran_hidup'],
+            $firstTopic => $bank['general'][$firstTopic],
+            $secondTopic => $bank['general'][$secondTopic],
         ];
 
-        $difficulties = self::SESSION_DIFFICULTIES;
-        shuffle($difficulties);
+        try {
+            $questions = Cache::lock('quiz_arena.pick_questions', 10)->block(5, function () use ($pools) {
+                $recentGames = Cache::get(self::RECENT_QUESTIONS_CACHE_KEY, []);
+                [$questions, $picked] = $this->pickFromPools($pools, array_merge([], ...$recentGames));
 
-        $questions = [];
-        foreach ($pools as $i => $pool) {
-            $candidates = array_values(array_filter($pool, fn ($q) => $q['difficulty'] === $difficulties[$i])) ?: $pool;
-            $questions[] = $this->shuffleOptions($candidates[array_rand($candidates)]);
+                $recentGames[] = $picked;
+                Cache::forever(self::RECENT_QUESTIONS_CACHE_KEY, array_slice($recentGames, 1 - self::NO_REPEAT_GAMES));
+
+                return $questions;
+            });
+        } catch (LockTimeoutException) {
+            [$questions] = $this->pickFromPools($pools, []);
         }
 
         shuffle($questions);
 
         return $questions;
+    }
+
+    /**
+     * Pick one question per pool, skipping the recently used ones.
+     *
+     * @return array{0: array, 1: string[]} the questions and their "pool:id" keys
+     */
+    private function pickFromPools(array $pools, array $recent): array
+    {
+        $difficulties = self::SESSION_DIFFICULTIES;
+        shuffle($difficulties);
+
+        $questions = [];
+        $picked = [];
+        foreach ($pools as $name => $pool) {
+            $difficulty = array_shift($difficulties);
+            $fresh = array_values(array_filter($pool, fn ($q) => !in_array("{$name}:{$q['id']}", $recent, true)));
+            $candidates = array_values(array_filter($fresh, fn ($q) => $q['difficulty'] === $difficulty)) ?: $fresh ?: $pool;
+            $question = $candidates[array_rand($candidates)];
+
+            $questions[] = $this->shuffleOptions($question);
+            $picked[] = "{$name}:{$question['id']}";
+        }
+
+        return [$questions, $picked];
     }
 
     private function shuffleOptions(array $question): array
@@ -180,6 +214,8 @@ class QuizArenaService
 
     private function nextGeneralTopics(): array
     {
+        // The database cache store cannot increment a key that does not exist yet.
+        Cache::add(self::TOPIC_ROTATION_CACHE_KEY, 0);
         $counter = (int) Cache::increment(self::TOPIC_ROTATION_CACHE_KEY);
 
         return self::GENERAL_TOPIC_ROTATION[max(0, $counter - 1) % count(self::GENERAL_TOPIC_ROTATION)];
