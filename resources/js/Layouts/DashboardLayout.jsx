@@ -74,9 +74,9 @@ export default function DashboardLayout({ header, children }) {
                   </div>
                 )}
               </div>
-              <Link href={route('quiz-page')} className="flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+              {/* <Link href={route('quiz-page')} className="flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
                 <Squares2X2Icon className="h-4 w-4" /> {t('quiz_arena')}
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -98,7 +98,7 @@ export default function DashboardLayout({ header, children }) {
           <div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg lg:hidden">
             <div className="mx-auto grid max-w-[1440px] gap-1">
               <Link href={route('dashboard')} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700"><HomeIcon className="h-5 w-5" /> {t('dashboard')}</Link>
-              <Link href={route('quiz-page')} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"><Squares2X2Icon className="h-5 w-5" /> {t('quiz_arena')}</Link>
+              {/* <Link href={route('quiz-page')} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"><Squares2X2Icon className="h-5 w-5" /> {t('quiz_arena')}</Link> */}
               <div className="mt-2 border-t border-slate-100 pt-2">
                 <p className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('courses')}</p>
                 {schoolSubjects.slice(0, 6).map((subject) => <Link key={subject.id} href={subjectUrl(subject)} onClick={() => setMobileOpen(false)} className="block rounded-xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50">{subject.name}</Link>)}
