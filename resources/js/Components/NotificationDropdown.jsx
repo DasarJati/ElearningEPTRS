@@ -14,8 +14,10 @@ export default function NotificationDropdown() {
   const [items, setItems] = useState([]);
   const [badgeCount, setBadgeCount] = useState(notificationCount);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [panelPosition, setPanelPosition] = useState(null);
   const rootRef = useRef(null);
   const bellRef = useRef(null);
+  const panelRef = useRef(null);
   const closeRef = useRef(null);
 
   useEffect(() => {
@@ -25,16 +27,35 @@ export default function NotificationDropdown() {
   useEffect(() => {
     if (!open) return undefined;
     const closeOnOutsideClick = (event) => {
-      if (!rootRef.current?.contains(event.target)) setOpen(false);
+      if (!rootRef.current?.contains(event.target) && !panelRef.current?.contains(event.target)) setOpen(false);
     };
     const closeOnEscape = (event) => {
       if (event.key === 'Escape') setOpen(false);
     };
-    document.addEventListener('mousedown', closeOnOutsideClick);
+    const updatePosition = () => {
+      const bell = bellRef.current?.getBoundingClientRect();
+      if (!bell) return;
+
+      const margin = 16;
+      const width = Math.min(320, window.innerWidth - margin * 2);
+      const top = bell.bottom + 12;
+      setPanelPosition({
+        left: Math.min(Math.max(margin, bell.right - width), window.innerWidth - width - margin),
+        top,
+        width,
+        maxHeight: Math.max(120, window.innerHeight - top - margin),
+      });
+    };
+    updatePosition();
+    document.addEventListener('pointerdown', closeOnOutsideClick);
     document.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
     return () => {
-      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
       document.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
     };
   }, [open]);
 
@@ -127,17 +148,19 @@ export default function NotificationDropdown() {
         )}
       </button>
 
-      {open && (
+      {open && panelPosition && createPortal(
         <section
+          ref={panelRef}
           id="notification-panel"
           aria-label={t('notifications')}
-          className="absolute right-0 top-full z-[70] mt-3 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-300/50"
+          style={panelPosition}
+          className="fixed z-[100] flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-300/50"
         >
-          <div className="border-b border-slate-100 px-4 py-3">
+          <div className="shrink-0 border-b border-slate-100 px-4 py-3">
             <h2 className="font-semibold text-slate-900">{t('notifications')}</h2>
             <p className="text-xs text-slate-500">{t('recent_notifications')}</p>
           </div>
-          <div className="max-h-80 overflow-y-auto p-2" aria-live="polite">
+          <div className="min-h-0 flex-1 overflow-y-auto p-2" aria-live="polite">
             {loading ? (
               <p className="px-3 py-8 text-center text-sm text-slate-500">{t('loading_notifications')}</p>
             ) : error ? (
@@ -161,7 +184,8 @@ export default function NotificationDropdown() {
               </button>
             ))}
           </div>
-        </section>
+        </section>,
+        document.body
       )}
       {selectedMessage && createPortal(
         <div
