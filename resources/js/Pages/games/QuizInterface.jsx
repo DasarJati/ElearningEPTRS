@@ -4,6 +4,7 @@ import axios from 'axios';
 import QuizLayout from '@/Layouts/QuizLayout';
 import QuizFooter from '@/Components/QuizFooter';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 const formatTime = (totalSeconds) => {
   const minutes = Math.floor(totalSeconds / 60);
@@ -94,7 +95,9 @@ const Confetti = memo(() => (
   </div>
 ));
 
-const SubmittingScreen = ({ correct, total, timeElapsed }) => (
+const SubmittingScreen = ({ correct, total, timeElapsed }) => {
+  const { t } = useLanguage();
+  return (
   <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
@@ -109,7 +112,7 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => (
         🏆
       </motion.div>
       <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-        Calculating Your Victory!
+        {t('calculating_victory')}
       </h2>
       <div className="bg-gray-700 rounded-full h-3 mb-6 overflow-hidden">
         <motion.div
@@ -119,30 +122,32 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => (
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
-      <p className="text-blue-300 mb-6 text-lg font-semibold">🎮 Securing your place in the leaderboard...</p>
+      <p className="text-blue-300 mb-6 text-lg font-semibold">🎮 {t('securing_rank')}</p>
       <div className="grid grid-cols-3 gap-4 text-xs">
         <div className="bg-gray-700 p-2 rounded-lg">
-          <div className="text-green-400 font-bold">✓ Correct</div>
+          <div className="text-green-400 font-bold">✓ {t('correct_answers')}</div>
           <div className="text-white">{correct}/{total}</div>
         </div>
         <div className="bg-gray-700 p-2 rounded-lg">
-          <div className="text-blue-400 font-bold">⏱️ Time</div>
+          <div className="text-blue-400 font-bold">⏱️ {t('time')}</div>
           <div className="text-white">{formatTime(timeElapsed)}</div>
         </div>
         <div className="bg-gray-700 p-2 rounded-lg">
-          <div className="text-yellow-400 font-bold">🎯 Score</div>
+          <div className="text-yellow-400 font-bold">🎯 {t('score')}</div>
           <div className="text-white">{Math.round((correct / total) * 100)}%</div>
         </div>
       </div>
     </motion.div>
   </div>
-);
+  );
+};
 
 /**
  * Plays a Quiz Arena game started on the server. The server holds the correct
  * answers and the start time; this component only sends the player's choices.
  */
 export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting = false, submitError = null }) {
+  const { t } = useLanguage();
   const { questions } = quiz;
   const [answers, setAnswers] = useState(quiz.answers);
   const [currentQuestion, setCurrentQuestion] = useState(() => {
@@ -198,7 +203,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
         setTimeout(() => setShowConfetti(false), 1500);
       }
     } catch (error) {
-      setAnswerError(error.response?.data?.message || 'Gagal menyemak jawapan. Sila cuba lagi.');
+      setAnswerError(error.response?.data?.message || t('check_answer_failed'));
     } finally {
       setChecking(false);
     }
@@ -217,8 +222,8 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
 
   if (submitting) {
     return (
-      <QuizLayout title="Submitting Results...">
-        <Head title="Submitting Results" />
+      <QuizLayout title={t('submitting_results')}>
+        <Head title={t('submitting_results')} />
         <SubmittingScreen correct={correctAnswersCount} total={questions.length} timeElapsed={timeElapsed} />
       </QuizLayout>
     );
@@ -228,7 +233,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
 
   return (
     <QuizLayout
-      title="Random Quiz (5 Questions)"
+      title={`${t('random_quiz')} (${questions.length} ${t('questions')})`}
       firstAnswers={firstAnswers}
       footer={
         <QuizFooter
@@ -242,7 +247,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
         />
       }
     >
-      <Head title="Random Quiz" />
+      <Head title={t('random_quiz')} />
 
       <AnimatePresence>
         {showConfetti && <Confetti />}
@@ -259,8 +264,8 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
           {/* Compact Header */}
           <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
             <div className="rounded-xl border border-yellow-300/80 bg-gradient-to-r from-purple-700 to-blue-700 px-3 py-2 text-white shadow-lg sm:px-4">
-              <span className="font-bold">🎯 Quiz Quest</span>
-              <span className="ml-2 hidden text-xs text-blue-100 sm:inline">5 quick questions</span>
+              <span className="font-bold">🎯 {t('quiz_quest')}</span>
+              <span className="ml-2 hidden text-xs text-blue-100 sm:inline">{questions.length} {t('quick_questions')}</span>
             </div>
 
             <TimerDisplay timeElapsed={timeElapsed} />
@@ -284,16 +289,16 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
             <div className="border-b-2 border-yellow-400 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 p-3.5 sm:p-4">
               <div className="flex justify-between items-center">
                 <div className="min-w-0 text-white font-bold">
-                  <span>Question {currentQuestion + 1} of {questions.length}</span>
+                  <span>{t('question')} {currentQuestion + 1} {t('of')} {questions.length}</span>
                   <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-yellow-400 px-2 py-1 align-middle text-xs text-gray-900 sm:max-w-none">
                     {question.category}
                   </span>
                 </div>
                 <div className="shrink-0 text-right text-xs font-bold text-yellow-300">
-                  ⭐ {correctAnswersCount} correct
+                  ⭐ {correctAnswersCount} {t('correct_answers')}
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`Question ${currentQuestion + 1} of ${questions.length}`}>
+              <div className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`${t('question')} ${currentQuestion + 1} ${t('of')} ${questions.length}`}>
                 {questions.map((_, index) => (
                   <div
                     key={index}
@@ -317,7 +322,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                 {question.question}
               </motion.h2>
 
-              <div className="mb-3 text-sm font-bold text-gray-600 sm:mb-4">🎯 Choose your answer</div>
+              <div className="mb-3 text-sm font-bold text-gray-600 sm:mb-4">🎯 {t('choose_answer')}</div>
 
               <QuestionOptions
                 options={question.options}
@@ -337,7 +342,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                     className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow hover:shadow-md transition duration-200 flex items-center gap-2"
                   >
                     <span>📖</span>
-                    <span>{explanationVisible ? "Hide" : "Reveal"}</span>
+                    <span>{t(explanationVisible ? 'hide' : 'reveal')}</span>
                   </motion.button>
                 </div>
               )}
@@ -358,7 +363,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                     </div>
                     <div>
                       <h3 className={`font-bold ${currentAnswer.correct ? "text-green-800" : "text-red-800"}`}>
-                        {currentAnswer.correct ? "Correct! 🎉" : "Learn: "}
+                        {currentAnswer.correct ? `${t('correct_feedback')} 🎉` : `${t('learn')}: `}
                       </h3>
                       <p className="text-gray-700 mt-1 text-sm">{currentAnswer.explanation}</p>
                     </div>

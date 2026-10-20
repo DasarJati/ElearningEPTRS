@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\UserLoginActivity;
 use App\Models\UserLocation;
+use App\Services\WelcomeNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        app(WelcomeNotificationService::class)->sendForFirstLogin(Auth::user());
 
         UserLoginActivity::create([
             'user_id' => Auth::id(),

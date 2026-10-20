@@ -4,11 +4,11 @@ import ResultQuestion from "@/Pages/courses/training/ResultQuestion";
 import { Head, usePage, router } from '@inertiajs/react'; // Added router import
 import QuestionReportButton from '@/Components/QuestionReportButton';
 import Calculator from '@/Components/ScientificCalculator';
-import PageDrawingTool from '@/Components/PageDrawingTool';
-import AutoNotes from '@/Components/AutoNotes';
 import axios from 'axios';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
+  const { t } = useLanguage();
   const pageProps = usePage().props;
 
   const {
@@ -155,9 +155,6 @@ export default function SubjectiveQuestion({ title = "Subjective Quiz" }) {
   // Tools state (shared behavior with Objective questions)
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
-  const [showPageDrawing, setShowPageDrawing] = useState(false);
-  const [showAutoNotes, setShowAutoNotes] = useState(false);
-  const [noteClickCount, setNoteClickCount] = useState(0);
   const [calculatorPosition, setCalculatorPosition] = useState(() => ({
     x: typeof window === 'undefined' ? 12 : Math.max(12, window.innerWidth - 322),
     y: 72,
@@ -341,7 +338,7 @@ const processHtmlContent = (html) => {
 
   const handleCheckAnswer = () => {
     if (!answers[currentIndex].trim()) {
-      setError("⚠️ Please enter your answer first.");
+      setError(t('enter_answer_first'));
       return;
     }
 
@@ -550,7 +547,7 @@ const processHtmlContent = (html) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span>Tools</span>
+          <span>{t('tools')}</span>
         </button>
 
         {showToolsDropdown && (
@@ -568,38 +565,7 @@ const processHtmlContent = (html) => {
                 <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
-                <span>Calculator</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPageDrawing(true);
-                  setShowToolsDropdown(false);
-                }}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
-                role="menuitem"
-              >
-                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                <span>Draw on Page</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAutoNotes(true);
-                  setNoteClickCount((count) => count + 1);
-                  setShowToolsDropdown(false);
-                }}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition-colors duration-150 hover:bg-gray-100"
-                role="menuitem"
-              >
-                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                <span>Add Note</span>
+                <span>{t('calculator')}</span>
               </button>
 
               <div className="my-1 border-t border-gray-200" />
@@ -612,7 +578,7 @@ const processHtmlContent = (html) => {
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                Close Menu
+                {t('close_menu')}
               </button>
             </div>
           </div>
@@ -630,7 +596,7 @@ const processHtmlContent = (html) => {
               : 'bg-green-600 text-white hover:bg-green-700 '
               }`}
           >
-            Check Answer
+            {t('check_answer')}
           </button>
         )}
 
@@ -642,12 +608,12 @@ const processHtmlContent = (html) => {
           >
             {currentIndex < questions.length - 1 ? (
               <>
-                <span className="hidden sm:inline">Next Question</span>
-                <span className="sm:hidden">Next</span>
+                <span className="hidden sm:inline">{t('next_question')}</span>
+                <span className="sm:hidden">{t('next')}</span>
                 
               </>
             ) : (
-              'Finish Quiz 🎉'
+              `${t('finish_quiz')} 🎉`
             )}
           </button>
         )}
@@ -668,7 +634,7 @@ const processHtmlContent = (html) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-green-800 font-medium text-sm">
-                  Answer submitted! ✓
+                  {t('answer_submitted')} ✓
                 </span>
               </div>
             </div>
@@ -683,7 +649,7 @@ const processHtmlContent = (html) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-green-800 font-medium text-sm">
-                Answer submitted! ✓
+                {t('answer_submitted')} ✓
               </span>
             </div>
           </div>
@@ -695,7 +661,7 @@ const processHtmlContent = (html) => {
   {/* Mobile Question Counter */}
   <div className="lg:hidden mb-4 pb-3 border-b border-gray-200">
     <h2 className="text-lg font-semibold text-gray-800 text-center">
-      Question {currentIndex + 1} of {questions.length}
+      {t('question')} {currentIndex + 1} {t('of')} {questions.length}
     </h2>
   </div>
 
@@ -734,7 +700,7 @@ const processHtmlContent = (html) => {
     <div className="flex justify-center">
       <img
         src={questions[currentIndex].question_file}
-        alt={`Question ${currentIndex + 1}`}
+        alt={`${t('question')} ${currentIndex + 1}`}
         className="question-image max-h-[min(58vh,640px)] cursor-zoom-in rounded-lg object-contain shadow-sm"
         loading="eager"
         onError={(event) => {
@@ -743,11 +709,11 @@ const processHtmlContent = (html) => {
         }}
       />
       <div className="hidden rounded-lg border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700" role="alert">
-        The question image could not be loaded. Please report this question.
+        {t('question_image_failed_report')}
       </div>
     </div>
   ) : (
-    <p className="text-red-500">No question content available</p>
+    <p className="text-red-500">{t('no_question_content')}</p>
   )}
   </div>
 
@@ -762,7 +728,7 @@ const processHtmlContent = (html) => {
     />
   </div>
 
-  <span className="text-gray-600 text-sm md:text-md mb-3 md:mb-4 block">Type your answer below:</span>
+  <span className="text-gray-600 text-sm md:text-md mb-3 md:mb-4 block">{t('type_answer_below')}</span>
 
   {/* Answer input */}
   <textarea
@@ -770,7 +736,7 @@ const processHtmlContent = (html) => {
     onChange={(e) => handleAnswerChange(e.target.value)}
     rows={4}
     className="w-full resize-none border-2 border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base md:text-lg font-medium mb-4 md:mb-6 p-3 md:p-4 bg-white transition-all duration-200"
-    placeholder="Type your detailed answer with explanations and working here..."
+    placeholder={t('answer_placeholder')}
     disabled={checked[currentIndex]}
   />
 
@@ -792,7 +758,7 @@ const processHtmlContent = (html) => {
         onClick={toggleSchema}
         className="max-w-xs sm:w-auto px-2 py-2 md:px-2 md:py-3 rounded-lg md:rounded-xl shadow bg-yellow-500 hover:bg-yellow-600 text-white font-medium transition-all duration-300 hover:scale-105 text-xs md:text-sm"
       >
-        {showSchema[currentIndex] ? "Hide Schema Answer" : "Show Schema Answer"}
+        {t(showSchema[currentIndex] ? 'hide_schema_answer' : 'show_schema_answer')}
       </button>
     )}
 
@@ -806,7 +772,7 @@ const processHtmlContent = (html) => {
         <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Schema Answer:
+        {t('schema_answer')}:
       </h3>
       
       {questions[currentIndex]?.schema ? (
@@ -840,7 +806,7 @@ const processHtmlContent = (html) => {
               <div className="flex flex-col items-center">
                 <img
                   src={schema}
-                  alt="Schema Answer"
+                  alt={t('schema_answer')}
                   className="max-w-full h-auto rounded-lg shadow-md max-h-96 object-contain border border-gray-200"
                   onError={(e) => {
                     console.error('❌ Failed to load schema image:', schema);
@@ -848,7 +814,7 @@ const processHtmlContent = (html) => {
                     if (!e.target.parentNode.querySelector('.image-fallback')) {
                       const fallback = document.createElement('div');
                       fallback.className = 'image-fallback text-red-500 text-center p-4 bg-red-50 rounded-lg mt-2';
-                      fallback.textContent = `Failed to load schema image`;
+                      fallback.textContent = t('schema_image_failed');
                       e.target.parentNode.appendChild(fallback);
                     }
                   }}
@@ -864,7 +830,7 @@ const processHtmlContent = (html) => {
           else if (schema.startsWith('http://') || schema.startsWith('https://')) {
             return (
               <div className="text-green-700">
-                <p className="mb-2">Schema answer is available at:</p>
+                <p className="mb-2">{t('schema_answer_at')}</p>
                 <a
                   href={schema}
                   target="_blank"
@@ -888,7 +854,7 @@ const processHtmlContent = (html) => {
         })()
       ) : (
         <div className="text-red-500 bg-red-50 p-3 rounded-lg">
-          <p>No schema answer available for this question.</p>
+          <p>{t('no_schema_for_question')}</p>
         </div>
       )}
     </div>
@@ -905,7 +871,7 @@ const processHtmlContent = (html) => {
         >
           <img
             src={zoomedImage}
-            alt="Zoomed question image"
+            alt={t('enlarged_question_image')}
             className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-lg cursor-zoom-out"
           />
         </div>
@@ -942,16 +908,7 @@ const processHtmlContent = (html) => {
       <audio ref={wrongSoundRef} src="/sounds/wrong.mp3" preload="auto" />
       <audio ref={successSoundRef} src="/sounds/success.mp3" preload="auto" />
 
-      <Head title={`${subject} - Subjective Quiz`} />
-
-      {showPageDrawing && (
-        <PageDrawingTool
-          isActive={showPageDrawing}
-          onClose={() => setShowPageDrawing(false)}
-        />
-      )}
-
-      {showAutoNotes && <AutoNotes isActive={showAutoNotes} addNoteTrigger={noteClickCount} />}
+      <Head title={`${subject} - ${t('subjective_quiz')}`} />
 
       {showCalculator && (
         <div
@@ -977,13 +934,13 @@ const processHtmlContent = (html) => {
                 <svg className="h-4 w-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                 </svg>
-                <h3 className="text-sm font-semibold">Scientific Calculator</h3>
+                <h3 className="text-sm font-semibold">{t('scientific_calculator')}</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCalculator(false)}
                 className="rounded-full p-1 text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
-                title="Close Calculator"
+                title={t('close_calculator')}
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1003,16 +960,16 @@ const processHtmlContent = (html) => {
                   if (display) navigator.clipboard.writeText(display.textContent || '0');
                 }}
                 className="rounded px-2 py-1 text-xs text-gray-300 hover:bg-slate-800 hover:text-white"
-                title="Copy Result"
+                title={t('copy_result')}
               >
-                Copy
+                {t('copy_result')}
               </button>
               <button
                 type="button"
                 onClick={() => setShowCalculator(false)}
                 className="rounded bg-gray-600 px-3 py-1 text-xs text-white transition-colors hover:bg-gray-700"
               >
-                Close
+                {t('close')}
               </button>
             </div>
           </div>

@@ -96,8 +96,8 @@ class SubjectController extends Controller
     public function challenge(Request $request, $subject)
     {
         return response()->json([
-            'title' => 'Mastery Challenge',
-            'description' => "Strengthen skills you've already practiced",
+            'title' => __('common.mastery_challenge'),
+            'description' => __('common.mastery_challenge_description'),
             'question_count' => 10
         ]);
     }

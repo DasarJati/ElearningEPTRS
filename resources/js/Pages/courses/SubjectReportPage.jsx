@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import SubjectLayout from '@/Layouts/SubjectLayout';
 import DonutChart from '@/Components/ChartJsDonut';
@@ -16,6 +16,7 @@ export default function SubjectReportPage() {
     subject_id,
     level_id,
     question_type = 'Objective',
+    time_range = 'Last 7 Days',
     objective_topics = [],  
     subjective_topics = [], 
   } = props;
@@ -23,7 +24,7 @@ export default function SubjectReportPage() {
   const [currentStandard, setCurrentStandard] = useState(form || 'Form 4');
   const [expandedTopics, setExpandedTopics] = useState({});
   const [activeTab, setActiveTab] = useState(question_type);
-  const [timeRange, setTimeRange] = useState('Last 7 Days');
+  const [timeRange, setTimeRange] = useState(time_range);
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,11 +42,10 @@ export default function SubjectReportPage() {
       level_id: level_id,
       subject_id: subject_id,
       question_type: activeTab,
-      preload_both: 'true'
-    }), {
+      time_range: timeRange,
+    }), {}, {
       preserveState: true,
       preserveScroll: true,
-       onStart: () => setIsLoading(true),
       onFinish: () => setIsLoading(false),
       onError: () => setIsLoading(false),
     });
@@ -63,8 +63,9 @@ export default function SubjectReportPage() {
       form: currentStandard,
       level_id: level_id,
       subject_id: subject_id,
-      question_type: tab
-    }), {
+      question_type: tab,
+      time_range: timeRange,
+    }), {}, {
       preserveState: true,
       preserveScroll: true,
       onFinish: () => setIsLoading(false),
@@ -73,6 +74,19 @@ export default function SubjectReportPage() {
 
   const handleTimeRangeChange = (range) => {
     setTimeRange(range);
+    setIsLoading(true);
+    router.get(route('subject-report-page', {
+      subject: subject_abbr || subject,
+      form: currentStandard,
+      level_id,
+      subject_id,
+      question_type: activeTab,
+      time_range: range,
+    }), {}, {
+      preserveState: true,
+      preserveScroll: true,
+      onFinish: () => setIsLoading(false),
+    });
   };
 
   const toggleTopic = (topicId) => {
@@ -131,24 +145,21 @@ export default function SubjectReportPage() {
       selectedStandard={currentStandard}
       onStandardChange={handleStandardChange}
     >
-      <div className="py-0 mx-6 mt-0">
-        <div className="px-6 py-0 min-w-full mx-auto">
+      <div className="mx-auto w-full max-w-[1440px] px-3 py-0 sm:px-6 lg:px-8">
+        <div className="min-w-0">
 
           {/* Header */}
-          <div className="flex justify-between items-center mb-2">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                {activeTab} Analysis
+              <h2 className="text-xl font-bold leading-tight text-gray-800 sm:text-2xl">
+                {t(activeTab === 'Objective' ? 'objective_analysis' : 'subjective_analysis')}
               </h2>
-              <p className="text-gray-600">
-                This report analyses the {activeTab.toLowerCase()} practice that you have done earlier and helps to evaluate your progress.
-              </p>
             </div>
 
             {/* Tabs with loading indicator */}
-            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit relative">
+            <div className="relative flex w-full gap-1 rounded-lg bg-gray-100 p-1 sm:w-fit">
               <button
-                className={`px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center min-w-[80px] ${activeTab === 'Objective'
+                className={`flex min-w-0 flex-1 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 sm:min-w-[100px] sm:flex-none sm:px-6 ${activeTab === 'Objective'
                     ? 'bg-white text-gray-800 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                   } ${isLoading && activeTab === 'Objective' ? 'opacity-75' : ''}`}
@@ -158,7 +169,7 @@ export default function SubjectReportPage() {
                 {isLoading && activeTab === 'Objective' ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    Loading...
+                    {t('loading_data')}
                   </div>
                 ) : (
                   t('objective_type')
@@ -166,7 +177,7 @@ export default function SubjectReportPage() {
               </button>
 
               <button
-                className={`px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center min-w-[80px] ${activeTab === 'Subjective'
+                className={`flex min-w-0 flex-1 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 sm:min-w-[100px] sm:flex-none sm:px-6 ${activeTab === 'Subjective'
                     ? 'bg-white text-gray-800 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                   } ${isLoading && activeTab === 'Subjective' ? 'opacity-75' : ''}`}
@@ -176,7 +187,7 @@ export default function SubjectReportPage() {
                 {isLoading && activeTab === 'Subjective' ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    Loading...
+                    {t('loading_data')}
                   </div>
                 ) : (
                   t('subjective_type')
@@ -196,17 +207,18 @@ export default function SubjectReportPage() {
           )}
 
           {/* Progress Details */}
-          <div className="mb-8 border border-gray-300 rounded-lg bg-gray-50 shadow-sm transition-opacity duration-300">
-            <div className="flex items-center justify-between mb-2 bg-slate-100 p-6">
+          <div className="mb-8 min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-opacity duration-300">
+            <div className="mb-2 flex flex-col gap-3 bg-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <h3 className="text-lg font-semibold text-gray-800">{t('progress_details')}</h3>
 
               {/* Time range */}
-              <div className="gap-2 flex">
-                <span className="text-sm text-gray-600">{t('activity_from')}</span>
+              <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                <label htmlFor="report-time-range" className="text-sm text-gray-600">{t('activity_from')}</label>
                 <select
+                  id="report-time-range"
                   value={timeRange}
                   onChange={(e) => handleTimeRangeChange(e.target.value)}
-                  className="border border-gray-300 rounded-md px-3 py-0 text-sm bg-white"
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm sm:w-auto"
                   disabled={isLoading}
                 >
                   <option value="Last 7 Days">{t('last_7_days')}</option>
@@ -261,7 +273,7 @@ export default function SubjectReportPage() {
                       <div className="bg-gray-200">
 
                         {/* Table header */}
-                        <div className="px-6 py-3">
+                        <div className="hidden px-6 py-3 sm:block">
                           <div className="grid grid-cols-5 gap-4 text-sm font-medium text-gray-700">
                             <div className="border-b-2 border-gray-50">{t('subtopics')}</div>
                             <div className="text-center border-b-2 border-gray-50">{t('total_sessions')}</div>
@@ -289,39 +301,43 @@ export default function SubjectReportPage() {
                               {topic.subtopics.map((subtopic) => (
                                 <div
                                   key={subtopic.id}
-                                  className="grid grid-cols-5 gap-4 items-center py-3 px-4 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+                                  className="grid grid-cols-2 gap-2 rounded-lg bg-white p-3 transition-colors hover:bg-indigo-50 sm:grid-cols-5 sm:items-center sm:gap-4 sm:rounded-none sm:bg-gray-200 sm:px-4 sm:py-3 sm:hover:bg-gray-300 cursor-pointer"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleSubtopicClick(subtopic);
                                   }}
                                 >
                                   {/* Subtopic name */}
-                                  <div className="text-sm font-medium text-gray-900">
+                                  <div className="col-span-2 text-sm font-medium text-gray-900 sm:col-span-1">
                                     {subtopic.name}
                                   </div>
 
                                   {/* Total sessions */}
-                                  <div className="text-sm text-gray-600 text-center">
+                                  <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                    <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('total_sessions')}</span>
                                     {subtopic.progress?.total_sessions || 0}
                                   </div>
 
                                   {/* Objective mode */}
                                   {activeTab === 'Objective' && (
                                     <>
-                                      <div className="text-sm text-gray-600 text-center">
+                                      <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                        <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('score_statistic')}</span>
                                         {subtopic.progress?.score_statistic || '—'}
                                       </div>
 
-                                      <div className="text-center" onClick={(e) => e.stopPropagation()}>
+                                      <div className="flex flex-col items-center rounded-md bg-slate-50 p-2 text-center sm:bg-transparent sm:p-0" onClick={(e) => e.stopPropagation()}>
+                                        <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('average_score')}</span>
                                         <DonutChart
                                           percentage={subtopic.progress?.average_score || 0}
                                           size={40}
                                           strokeWidth={4}
-                                          label="Accuracy"
+                                          label={t('accuracy_rate')}
                                         />
                                       </div>
 
-                                      <div className="text-sm text-gray-600 text-center">
+                                      <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                        <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('last_session')}</span>
                                         {subtopic.progress?.last_session || '-'}
                                       </div>
                                     </>
@@ -330,7 +346,8 @@ export default function SubjectReportPage() {
                                   {/* Subjective mode */}
                                   {activeTab === 'Subjective' && (
                                     <>
-                                      <div className="text-sm text-gray-600 text-center">
+                                      <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                        <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('last_session')}</span>
                                         {subtopic.progress?.last_session || '-'}
                                       </div>
                                     </>
@@ -341,37 +358,41 @@ export default function SubjectReportPage() {
                           ) : (
                             // No subtopics - show topic directly
                             <div
-                              className="grid grid-cols-5 gap-4 items-center py-3 px-4 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+                              className="grid grid-cols-2 gap-2 rounded-lg bg-white p-3 transition-colors hover:bg-indigo-50 sm:grid-cols-5 sm:items-center sm:gap-4 sm:rounded-none sm:bg-gray-200 sm:px-4 sm:py-3 sm:hover:bg-gray-300 cursor-pointer"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSubtopicClick(topic);
                               }}
                             >
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="col-span-2 text-sm font-medium text-gray-900 sm:col-span-1">
                                 {topic.name}
                               </div>
 
-                              <div className="text-sm text-gray-600 text-center">
+                              <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('total_sessions')}</span>
                                 {topic.total_sessions || '0'}
                               </div>
 
                               {/* Objective mode */}
                               {activeTab === 'Objective' && (
                                 <>
-                                  <div className="text-sm text-gray-600 text-center">
+                                  <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                    <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('score_statistic')}</span>
                                     {topic.score_statistic || '—'}
                                   </div>
 
-                                  <div className="text-center">
+                                  <div className="flex flex-col items-center rounded-md bg-slate-50 p-2 text-center sm:bg-transparent sm:p-0">
+                                    <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('average_score')}</span>
                                     <DonutChart
                                       percentage={topic.average_score || 0}
                                       size={40}
                                       strokeWidth={4}
-                                      label="Accuracy"
+                                      label={t('accuracy_rate')}
                                     />
                                   </div>
 
-                                  <div className="text-sm text-gray-600 text-center">
+                                  <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                    <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('last_session')}</span>
                                     {topic.last_session || '-'}
                                   </div>
                                 </>
@@ -380,7 +401,8 @@ export default function SubjectReportPage() {
                               {/* Subjective mode */}
                               {activeTab === 'Subjective' && (
                                 <>
-                                  <div className="text-sm text-gray-600 text-center">
+                                  <div className="rounded-md bg-slate-50 p-2 text-center text-sm text-gray-600 sm:bg-transparent sm:p-0">
+                                    <span className="block text-xs font-medium text-slate-500 sm:hidden">{t('last_session')}</span>
                                     {topic.last_session || '-'}
                                   </div>
                                 </>
@@ -404,6 +426,7 @@ export default function SubjectReportPage() {
         onClose={closeModal}
         subtopicData={selectedSubtopic}
         questionType={activeTab}
+        timeRange={timeRange}
       />
     </SubjectLayout>
   );

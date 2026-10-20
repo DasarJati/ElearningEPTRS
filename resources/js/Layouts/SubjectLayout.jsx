@@ -88,7 +88,7 @@ export default function SubjectLayout({
             </div>
             <div className="relative">
               <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex min-w-[150px] items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/15">
-                <span>{selectedStandard}</span><ChevronDownIcon className={`h-4 w-4 transition ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <span>{selectedStandard === 'Form 4' ? t('form_4') : selectedStandard === 'Form 5' ? t('form_5') : selectedStandard}</span><ChevronDownIcon className={`h-4 w-4 transition ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 bottom-10 z-40 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-slate-700 shadow-2xl">

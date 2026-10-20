@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StandardFooter from '@/Components/StandardFooter';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { confirmAlert } from '@/Components/sweetAlert';
 
 const ObjectiveQuestionLayout = ({
   children,
@@ -18,21 +20,24 @@ const ObjectiveQuestionLayout = ({
   handleBackNavigation,
   onExitWithResults
 }) => {
+  const { t } = useLanguage();
   const [showNavbar, setShowNavbar] = useState(true);
   const [showColoredHeader, setShowColoredHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
    // Handle back/exit logic
-  const handleBackButtonClick = () => {
+  const handleBackButtonClick = async () => {
     if (answeredQuestions && answeredQuestions.size > 0) {
       if (onExitWithResults) {
         // Use custom exit handler that shows results
         onExitWithResults();
-      } else if (window.confirm('Exit quiz? Answered questions will be saved. Unanswered questions will be marked as skipped.')) {
+      } else if (await confirmAlert(t, { title: t('exit_practice_title'), text: t('exit_quiz_confirmation'), confirmText: t('exit_practice_action') })) {
         handleExitQuiz && handleExitQuiz();
       }
     } else {
-      handleBackNavigation ? handleBackNavigation() : window.history.back();
+      if (await confirmAlert(t, { title: t('exit_practice_title'), text: t('exit_practice_no_answers'), confirmText: t('exit_practice_action') })) {
+        handleBackNavigation ? handleBackNavigation() : window.history.back();
+      }
     }
   };
 
@@ -76,7 +81,7 @@ const ObjectiveQuestionLayout = ({
               <button
                 onClick={handleBackButtonClick}
                 className="w-8 h-8 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group relative"
-                title="Back / Exit Quiz"
+                title={t('back_exit_quiz')}
               >
                 <svg
                   className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-[#202020]"
@@ -93,13 +98,13 @@ const ObjectiveQuestionLayout = ({
                 </svg>
                 {/* Tooltip for desktop */}
                 <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {answeredQuestions && answeredQuestions.size > 0 ? 'Exit & Save' : 'Back'}
+                  {answeredQuestions && answeredQuestions.size > 0 ? t('view_results_and_exit') : t('back')}
                 </span>
               </button>
               <span className="line-clamp-1">{sectionTitle}</span>
             </h1>
             <p className="text-gray-600 text-sm px-12 md:text-base">
-              Topic: {currentTopic}
+              {t('topic')}: {currentTopic}
             </p>
           </div>
           <div className="relative w-full md:w-auto">
@@ -120,7 +125,7 @@ const ObjectiveQuestionLayout = ({
              <button
                 onClick={handleBackButtonClick}
                 className="w-8 h-8 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group relative"
-                title="Back / Exit Quiz"
+                title={t('back_exit_quiz')}
               >
                 <svg
                   className="w-4 h-4 md:w-5 md:h-5 text-gray-600 group-hover:text-[#202020]"
@@ -137,13 +142,13 @@ const ObjectiveQuestionLayout = ({
                 </svg>
                 {/* Tooltip for desktop */}
                 <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {answeredQuestions && answeredQuestions.size > 0 ? 'Exit & Save' : 'Back'}
+                  {answeredQuestions && answeredQuestions.size > 0 ? t('view_results_and_exit') : t('back')}
                 </span>
               </button>
               <span className="line-clamp-1">{sectionTitle}</span>
             </h1>
             <p className="text-gray-50 text-sm px-12 md:text-base">
-              Topic: {currentTopic}
+              {t('topic')}: {currentTopic}
             </p>
           </div>
           <div className="relative w-full md:w-auto">
@@ -178,7 +183,7 @@ const ObjectiveQuestionLayout = ({
               </span>
             </div>
             <div className="text-[10px] flex gap-1 text-blue-600 font-medium tracking-wide">
-              <span>TIME ELAPSED</span>
+              <span>{t('time_elapsed')}</span>
             </div>
           </div>
         </div>

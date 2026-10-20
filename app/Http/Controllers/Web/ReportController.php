@@ -16,7 +16,6 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 
 class ReportController extends Controller
@@ -27,6 +26,10 @@ class ReportController extends Controller
         $levelId = $request->get('level_id');
         $form = $request->get('form', 'Form 4');
         $questionType = $request->get('question_type', 'Objective');
+        $timeRange = $request->get('time_range', 'Last 7 Days');
+        if (!in_array($timeRange, ['Last 7 Days', 'Last 30 Days', 'Last 3 Months', 'All Time'], true)) {
+            $timeRange = 'Last 7 Days';
+        }
 
         $userId = Auth::id();
         Auth::user()->load('student');
@@ -104,31 +107,11 @@ class ReportController extends Controller
         // Map question type to ID
         $questionTypeId = $this->getQuestionTypeId($questionType);
 
-        // OPTIMASI PENTING: Hanya load data yang diperlukan
-        $shouldPreloadBoth = $request->has('preload_both') && $request->get('preload_both') === 'true';
-
-        if ($shouldPreloadBoth) {
-            // Load both types menggunakan CACHE untuk performa
-            $cacheKey = "report_data_{$subjectId}_{$levelId}";
-            $cacheDuration = 5; // 5 menit
-
-            $allData = Cache::remember($cacheKey, $cacheDuration * 60, function () use ($subjectId, $levelId) {
-                return [
-                    'objective' => $this->getOptimizedReportData($subjectId, $levelId, 1),
-                    'subjective' => $this->getOptimizedReportData($subjectId, $levelId, 2)
-                ];
-            });
-
-            $objectiveData = $allData['objective'];
-            $subjectiveData = $allData['subjective'];
-            $currentData = $questionType === 'Objective' ? $objectiveData : $subjectiveData;
-        }
-         else {
-            // Load only current type (default untuk initial load)
-            $currentData = $this->getOptimizedReportData($subjectId, $levelId, $questionTypeId);
-            $objectiveData = $questionType === 'Objective' ? $currentData : [];
-            $subjectiveData = $questionType === 'Subjective' ? $currentData : [];
-        }
+        // Progress changes immediately after a practice session and belongs to one user.
+        // Do not cache it under a subject-only key.
+        $currentData = $this->getOptimizedReportData($subjectId, $levelId, $questionTypeId, $timeRange);
+        $objectiveData = $questionType === 'Objective' ? $currentData : [];
+        $subjectiveData = $questionType === 'Subjective' ? $currentData : [];
 
         return Inertia::render('courses/SubjectReportPage', [
             'subject' => $subjectData->name,
@@ -137,6 +120,7 @@ class ReportController extends Controller
             'level_id' => $levelId,
             'form' => $form,
             'question_type' => $questionType,
+            'time_range' => $timeRange,
             'objective_topics' => $objectiveData,
             'subjective_topics' => $subjectiveData,
             'topics' => $currentData,
@@ -281,7 +265,7 @@ class ReportController extends Controller
     /**
      * Batch calculate progress for multiple topics
      */
-    private function batchCalculateTopicProgress(array $topicIds, $questionTypeId)
+    private function batchCalculateTopicProgress(array $topicIds, $questionTypeId, $timeRange = 'All Time')
     {
         if (empty($topicIds)) {
             return [];
@@ -290,9 +274,10 @@ class ReportController extends Controller
         $userId = Auth::id();
 
         // Get all session data for these topics in one query
-        $progressData = DB::table('practice_session')
+        $topicExpression = 'CASE WHEN subtopic_id IS NOT NULL AND subtopic_id <> 0 THEN subtopic_id ELSE topic_id END';
+        $progressQuery = DB::table('practice_session')
             ->select(
-                DB::raw('CASE WHEN topic_id IN (' . implode(',', $topicIds) . ') THEN topic_id ELSE subtopic_id END as topic_id'),
+                DB::raw($topicExpression . ' as topic_id'),
                 DB::raw('COUNT(DISTINCT id) as total_sessions'),
                 DB::raw('AVG(score) as average_score'),
                 DB::raw('MAX(score) as max_score'),
@@ -302,13 +287,21 @@ class ReportController extends Controller
                 DB::raw('SUM(total_correct + total_skipped) as total_questions'),
                 DB::raw('AVG(total_correct) as avg_answered')
             )
-            ->where(function ($query) use ($topicIds) {
-                $query->whereIn('topic_id', $topicIds)
-                    ->orWhereIn('subtopic_id', $topicIds);
-            })
+            ->whereIn(DB::raw($topicExpression), $topicIds)
             ->where('question_type_id', $questionTypeId)
             ->where('user_id', $userId)
-            ->groupBy(DB::raw('CASE WHEN topic_id IN (' . implode(',', $topicIds) . ') THEN topic_id ELSE subtopic_id END'))
+            ->groupBy(DB::raw($topicExpression));
+
+        if ($timeRange !== 'All Time') {
+            $start = match ($timeRange) {
+                'Last 30 Days' => now()->subDays(30),
+                'Last 3 Months' => now()->subMonths(3),
+                default => now()->subDays(7),
+            };
+            $progressQuery->where('created_at', '>=', $start);
+        }
+
+        $progressData = $progressQuery
             ->get()
             ->keyBy('topic_id');
 
@@ -508,17 +501,10 @@ class ReportController extends Controller
     /**
      * Get report data yang OPTIMIZED
      */
-    private function getOptimizedReportData($subjectId, $levelId, $questionTypeId)
+    private function getOptimizedReportData($subjectId, $levelId, $questionTypeId, $timeRange)
     {
-        // Cache key untuk data report
-        // $cacheKey = "optimized_report_{$subjectId}_{$levelId}_{$questionTypeId}_" . Auth::id();
-
-        // Cache shared data (tanpa user_id)
-        $cacheKey = "report_structure_{$subjectId}_{$levelId}_{$questionTypeId}";
-
-        $cacheDuration = 5; // 
-
-        return Cache::remember($cacheKey, $cacheDuration * 60, function () use ($subjectId, $levelId, $questionTypeId) {
+        // Topic structure and user progress are assembled together, so the result must
+        // be calculated for the current user on every request.
             // 1. Get parent topics sekaligus dengan sub-topics menggunakan JOIN
             $topics = DB::table('topics as parent')
                 ->leftJoin('topics as child', function ($join) {
@@ -584,7 +570,7 @@ class ReportController extends Controller
             $topicsWithQuestions = $this->optimizedBatchCheckTopicsWithQuestions($allTopicIds, $questionTypeId);
 
             // 5. Batch calculate progress untuk semua topics
-            $progressData = $this->batchCalculateTopicProgress($allTopicIds, $questionTypeId);
+            $progressData = $this->batchCalculateTopicProgress($allTopicIds, $questionTypeId, $timeRange);
 
             // 6. Filter dan build final data
             $reportData = [];
@@ -643,7 +629,6 @@ class ReportController extends Controller
             ]);
 
             return $reportData;
-        });
     }
 
     /**
@@ -818,6 +803,7 @@ class ReportController extends Controller
         try {
             $questionType = $request->get('questionType', 'Objective');
             $questionTypeId = $this->getQuestionTypeId($questionType);
+            $timeRange = $request->get('time_range', 'Last 7 Days');
 
             Log::info('Fetching subtopic details:', [
                 'subtopic_id' => $subtopicId,
@@ -832,27 +818,45 @@ class ReportController extends Controller
             }
 
             // Get detailed session data with all sessions
-            $sessions = DB::table('practice_session')
+            $sessionsQuery = DB::table('practice_session')
                 ->where(function ($query) use ($subtopicId) {
                     $query->where('topic_id', $subtopicId)
                         ->orWhere('subtopic_id', $subtopicId);
                 })
                 ->where('question_type_id', $questionTypeId)
-                ->where('user_id', Auth::id())
+                ->where('user_id', Auth::id());
+
+            if ($timeRange !== 'All Time') {
+                $start = match ($timeRange) {
+                    'Last 30 Days' => now()->subDays(30),
+                    'Last 3 Months' => now()->subMonths(3),
+                    default => now()->subDays(7),
+                };
+                $sessionsQuery->where('created_at', '>=', $start);
+            }
+
+            $sessions = $sessionsQuery
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $attemptCounts = $sessions->isEmpty() ? collect() : DB::table('quiz_attempts')
+                ->whereIn('session_id', $sessions->pluck('id'))
+                ->select('session_id')
+                ->selectRaw('COUNT(DISTINCT question_id) as question_count')
+                ->groupBy('session_id')
+                ->pluck('question_count', 'session_id');
 
             $sessionData = [];
 
             foreach ($sessions as $index => $session) {
+                $totalQuestions = max(
+                    (int) ($attemptCounts[$session->id] ?? 0),
+                    (int) ($session->total_correct ?? 0) + (int) ($session->total_skipped ?? 0)
+                );
                 if ($questionTypeId == 1) { // Objective
-                    // Objective calculations
-                    $totalQuestions = ($session->total_correct ?? 0) + ($session->total_skipped ?? 0);
-
-                    // For objective, calculate wrong answers
-                    $totalWrong = 5 - ($session->total_correct ?? 0) - ($session->total_skipped ?? 0);
+                    // Derive wrong answers from the actual questions in this session.
+                    $totalWrong = $totalQuestions - ($session->total_correct ?? 0) - ($session->total_skipped ?? 0);
                     $totalWrong = max($totalWrong, 0);
-                    $totalQuestions = ($session->total_correct ?? 0) + $totalWrong + ($session->total_skipped ?? 0);
 
                     // Calculate score percentage
                     $scorePercentage = $totalQuestions > 0 ? (($session->total_correct ?? 0) / $totalQuestions) * 100 : 0;
@@ -863,9 +867,6 @@ class ReportController extends Controller
                     // Subjective calculations
                     $totalAnswered = $session->total_correct ?? 0;
                     $totalSkipped = $session->total_skipped ?? 0;
-
-                    // For subjective, total questions = 5 (as per your requirement)
-                    $totalQuestions = 5;
 
                     // Recalculate skipped
                     $totalSkipped = $totalQuestions - $totalAnswered;
@@ -886,7 +887,7 @@ class ReportController extends Controller
                 // Calculate average time per question
                 $averageTime = $totalQuestions > 0
                     ? $this->formatTime(($session->total_time_seconds ?? 0) / $totalQuestions)
-                    : '0 min 0 secs';
+                    : $this->formatTime(0);
 
                 // Format session date - IMPORTANT FIX
                 $sessionDate = $session->created_at
@@ -939,12 +940,12 @@ class ReportController extends Controller
     // Helper method to format time
     private function formatTime($seconds)
     {
-        if (!$seconds) return "0 min 0 secs";
-
-        $minutes = floor($seconds / 60);
+        $seconds = max(0, (int) round($seconds));
+        $minutes = intdiv($seconds, 60);
         $remainingSeconds = $seconds % 60;
+        $secondLabel = app()->getLocale() === 'ms' ? 'saat' : 'sec';
 
-        return "{$minutes} min {$remainingSeconds} secs";
+        return "{$minutes} min {$remainingSeconds} {$secondLabel}";
     }
 
 
@@ -1099,6 +1100,7 @@ class ReportController extends Controller
                 ->leftJoin('topics', 'practice_session.topic_id', '=', 'topics.id')
                 ->select('practice_session.*', 'topics.name as topic_name')
                 ->where('practice_session.id', $sessionId)
+                ->where('practice_session.user_id', Auth::id())
                 ->first();
 
             if (!$session) {

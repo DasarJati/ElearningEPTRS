@@ -21,6 +21,7 @@ use App\Http\Controllers\Web\SubjectiveController;
 use App\Http\Controllers\Web\MissionController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\QuestionReportController;
+use App\Http\Controllers\Web\NotificationController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -34,6 +35,8 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/question-reports', [QuestionReportController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('question-reports.store');
@@ -41,7 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
 
 
@@ -131,7 +133,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::post('/change-language', [LanguageController::class, 'change'])->middleware(['web', 'auth'])->name('language.change');
+Route::post('/change-language', [LanguageController::class, 'change'])->middleware('web')->name('language.change');
 
 
 

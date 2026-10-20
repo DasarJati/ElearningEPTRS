@@ -55,7 +55,7 @@ export default function ResultQuestion({
       form: form || standard,
       level_id,
       subject_id,
-      question_type: quizType === 'objective' ? 'Objective' : 'Subjective',
+      question_type: quizType,
     }));
   };
 
@@ -75,7 +75,7 @@ export default function ResultQuestion({
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h1 className="text-2xl font-bold text-gray-800">Loading Results...</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t('loading_results')}</h1>
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ export default function ResultQuestion({
   const formatTime = (totalSeconds) => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${minutes} minutes ${seconds} seconds`;
+    return `${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`;
   };
 
   // Calculate average time per question
@@ -93,7 +93,7 @@ export default function ResultQuestion({
   const averageTime = totalQuestions > 0
     ? Math.round(Number(results.timeElapsed || 0) / totalQuestions)
     : 0;
-  const averageTimeFormatted = `${Math.floor(averageTime / 60)} minutes ${averageTime % 60} seconds`;
+  const averageTimeFormatted = formatTime(averageTime);
 
   // For objective quizzes: use correctAnswers, for subjective: all answered are correct
   const correctAnswers = quizType === "objective" ? results.correctAnswers : results.answered;
@@ -130,15 +130,15 @@ export default function ResultQuestion({
                   <h1 className="text-lg font-bold text-gray-50">
                     {topic}
                   </h1>
-                  <p className="text-xs text-gray-50">Quiz Results</p>
+                  <p className="text-xs text-gray-50">{t('quiz_results')}</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
                 <div className="text-center">
-                  <p className="text-xs font-medium text-gray-100">Completion Status</p>
+                  <p className="text-xs font-medium text-gray-100">{t('completion_status')}</p>
                   <p className="text-xs text-green-600 font-semibold">
-                    {skippedAnswers === 0 ? "Completed" : "In Progress"}
+                    {t(skippedAnswers === 0 ? 'completed' : 'in_progress')}
                   </p>
                 </div>
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -163,15 +163,15 @@ export default function ResultQuestion({
                 <h1 className="text-2xl font-bold text-gray-50">
                   {topic}
                 </h1>
-                <p className="text-sm text-gray-50">Quiz Results</p>
+                <p className="text-sm text-gray-50">{t('quiz_results')}</p>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-100">Completion Status</p>
+                <p className="text-sm font-medium text-gray-100">{t('completion_status')}</p>
                 <p className="text-sm text-green-600 font-semibold">
-                  {skippedAnswers === 0 ? "Completed" : "In Progress"}
+                  {t(skippedAnswers === 0 ? 'completed' : 'in_progress')}
                 </p>
               </div>
               <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -186,11 +186,11 @@ export default function ResultQuestion({
           <div className="flex items-center justify-center space-x-2 lg:space-x-4 mb-4">
             <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
             <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-            <p className="text-xl lg:text-3xl text-gray-100 font-semibold">Nice work!</p>
+            <p className="text-xl lg:text-3xl text-gray-100 font-semibold">{t('nice_work')}</p>
             <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
             <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
           </div>
-          <p className="text-gray-100 italic text-base lg:text-2xl px-4">Learning never exhausts the mind.</p>
+          <p className="text-gray-100 italic text-base lg:text-2xl px-4">{t('learning_quote')}</p>
         </div>
       </header>
 
@@ -205,7 +205,7 @@ export default function ResultQuestion({
               <div className="bg-green-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-green-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">Total Correct</h3>
+                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_correct')}</h3>
                     <p className="text-2xl lg:text-3xl font-bold text-green-600 mt-1 lg:mt-2">
                       {quizType === "objective" ? results.correctAnswers : results.answered}
                     </p>
@@ -219,7 +219,7 @@ export default function ResultQuestion({
               <div className="bg-red-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-red-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">Total Skipped</h3>
+                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_skipped')}</h3>
                     <p className="text-2xl lg:text-3xl font-bold text-red-600 mt-1 lg:mt-2">{skippedAnswers}</p>
                   </div>
                   <div className="w-8 h-8 lg:w-12 lg:h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -232,7 +232,7 @@ export default function ResultQuestion({
               <div className="bg-purple-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-purple-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">Total Time</h3>
+                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_time')}</h3>
                     <p className="text-base lg:text-xl font-bold text-purple-600 mt-1 lg:mt-2">{formatTime(results.timeElapsed)}</p>
                   </div>
                   <div className="w-8 h-8 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
@@ -245,7 +245,7 @@ export default function ResultQuestion({
               <div className="bg-orange-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-orange-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">Average Time</h3>
+                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('average_time')}</h3>
                     <p className="text-base lg:text-xl font-bold text-orange-600 mt-1 lg:mt-2">{averageTimeFormatted}</p>
                   </div>
                   <div className="w-8 h-8 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
@@ -257,22 +257,22 @@ export default function ResultQuestion({
 
             {/* Analysis Section */}
             <div className="bg-gray-50 rounded-lg lg:rounded-xl p-4 lg:p-6 mb-6 lg:mb-8 border-2 border-gray-200">
-              <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-3 lg:mb-4">Analysis</h3>
+              <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-3 lg:mb-4">{t('analysis')}</h3>
               <div className="space-y-3 lg:space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm lg:text-base text-gray-600">Questions Attempted</span>
+                  <span className="text-sm lg:text-base text-gray-600">{t('questions_attempted')}</span>
                   <span className="text-sm lg:text-base font-semibold text-gray-800">{results.totalQuestions - skippedAnswers}/{results.totalQuestions}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm lg:text-base text-gray-600">Accuracy Rate</span>
+                  <span className="text-sm lg:text-base text-gray-600">{t('accuracy_rate')}</span>
                   <span className="text-sm lg:text-base font-semibold text-green-600">
                     {accuracyRate}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm lg:text-base text-gray-600">Completion Status</span>
+                  <span className="text-sm lg:text-base text-gray-600">{t('completion_status')}</span>
                   <span className="text-sm lg:text-base font-semibold text-blue-600">
-                    {skippedAnswers === 0 ? "Fully Completed" : "Partially Completed"}
+                    {t(skippedAnswers === 0 ? 'fully_completed' : 'partially_completed')}
                   </span>
                 </div>
               </div>
@@ -283,8 +283,8 @@ export default function ResultQuestion({
               <div className="inline-flex items-center justify-center w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-full mb-3 lg:mb-4">
                 <span className="text-2xl lg:text-3xl">🎉</span>
               </div>
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-2">All done!</h2>
-              <p className="text-sm lg:text-base text-gray-600 px-4">You've completed this assessment successfully.</p>
+              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-2">{t('all_done')}</h2>
+              <p className="text-sm lg:text-base text-gray-600 px-4">{t('assessment_completed')}</p>
             </div>
 
             {/* Action Buttons */}
@@ -311,12 +311,12 @@ export default function ResultQuestion({
           {/* Review Section */}
           <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg p-4 lg:p-6 border border-gray-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <h3 className="text-lg lg:text-xl font-bold text-gray-800">Review</h3>
+              <h3 className="text-lg lg:text-xl font-bold text-gray-800">{t('review')}</h3>
               <button onClick={handleViewReport} className="px-3 py-2 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium w-full sm:w-auto text-center">
                 {t('view_detailed_report')}
               </button>
             </div>
-            <p className="text-sm lg:text-base text-gray-600 mt-2">Review your answers and see detailed explanations.</p>
+            <p className="text-sm lg:text-base text-gray-600 mt-2">{t('review_answers_intro')}</p>
           </div>
         </div>
       </div>

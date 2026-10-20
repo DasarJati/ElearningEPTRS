@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import QuestionReportButton from '@/Components/QuestionReportButton';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { showAlert, confirmAlert } from '@/Components/sweetAlert';
 
 export default function MasteryChallenge({ isOpen, onClose, subjectId, levelId, subjectKey }) {
+    const { t } = useLanguage();
+    const masteryLabel = (value) => value ? t(value.toLowerCase(), value.replace(/_/g, ' ')) : t('not_started');
     const [sessionId, setSessionId] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -111,7 +115,7 @@ export default function MasteryChallenge({ isOpen, onClose, subjectId, levelId, 
             loadNextQuestion(data.session_id);
         } catch (error) {
             console.error('Error starting challenge:', error);
-            alert('Failed to start challenge. Please try again.');
+            showAlert(t, { text: t('challenge_start_failed'), icon: 'error' });
             setLoading(false);
         }
     };
@@ -201,7 +205,7 @@ export default function MasteryChallenge({ isOpen, onClose, subjectId, levelId, 
             }
         } catch (error) {
             console.error('Error submitting answer:', error);
-            alert('Failed to submit answer. Please try again.');
+            showAlert(t, { text: t('challenge_submit_failed'), icon: 'error' });
         } finally {
             setIsSubmitting(false);
         }
@@ -222,7 +226,12 @@ export default function MasteryChallenge({ isOpen, onClose, subjectId, levelId, 
         loadNextQuestion(sessionId);
     };
 
-    const handleClose = () => {
+    const handleClose = async () => {
+        if (sessionId && !summary && !(await confirmAlert(t, {
+            title: t('exit_practice_title'),
+            text: t('exit_subjective_practice'),
+            confirmText: t('exit_practice_action'),
+        }))) return;
         setSessionId(null);
         setCurrentQuestion(null);
         setSelectedAnswer(null);
@@ -281,7 +290,7 @@ const getCorrectAnswerInfo = () => {
                 {loading && !currentQuestion ? (
                     <div className="p-12 text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading challenge...</p>
+                        <p className="mt-4 text-gray-600">{t('loading_challenge')}</p>
                     </div>
                 ) : summary ? (
                     // Summary View
@@ -299,13 +308,13 @@ const getCorrectAnswerInfo = () => {
                                 ×
                             </button>
                             <div className="text-center relative z-10">
-                                <h2 className="text-3xl font-bold mb-2">You've completed the mastery challenge</h2>
-                                <p className="text-xl text-blue-100">GREAT JOB!</p>
+                                <h2 className="text-3xl font-bold mb-2">{t('mastery_complete')}</h2>
+                                <p className="text-xl text-blue-100">{t('great_practice')}</p>
                             </div>
                         </div>
 
                         <div className="p-8">
-                            <h3 className="text-xl font-bold text-gray-800 mb-6">PROGRESS MADE</h3>
+                            <h3 className="text-xl font-bold text-gray-800 mb-6">{t('progress_made')}</h3>
                             <div className="space-y-4">
                                 {summary.progress && summary.progress.length > 0 ? (
                                     summary.progress.map((item, index) => (
@@ -317,7 +326,7 @@ const getCorrectAnswerInfo = () => {
                                             <div className="flex items-center space-x-3">
                                                 <div className="flex items-center space-x-2">
                                                     <div className="px-3 py-1 bg-gray-200 rounded text-sm capitalize">
-                                                        {item.previous_mastery?.replace('_', ' ') || 'Not started'}
+                                                        {masteryLabel(item.previous_mastery)}
                                                     </div>
                                                     <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -325,27 +334,27 @@ const getCorrectAnswerInfo = () => {
                                                     <div className={`px-3 py-1 rounded text-sm capitalize ${
                                                         item.mastery_changed ? 'bg-sky-500 text-white' : 'bg-gray-200'
                                                     }`}>
-                                                        {item.new_mastery?.replace('_', ' ')}
+                                                        {masteryLabel(item.new_mastery)}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-gray-500">No progress data available</p>
+                                    <p className="text-gray-500">{t('no_progress_data')}</p>
                                 )}
                             </div>
 
                             <div className="mt-8 p-6 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-gray-600">Your Score</p>
+                                        <p className="text-sm text-gray-600">{t('your_score')}</p>
                                         <p className="text-3xl font-bold text-teal-600">
                                             {summary.correct_answers}/{summary.total_questions}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm text-gray-600">Accuracy</p>
+                                        <p className="text-sm text-gray-600">{t('accuracy')}</p>
                                         <p className="text-3xl font-bold text-cyan-600">
                                             {summary.score_percentage}%
                                         </p>
@@ -357,7 +366,7 @@ const getCorrectAnswerInfo = () => {
                                 onClick={handleContinue}
                                 className="mt-6 w-full py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors flex items-center justify-center space-x-2"
                             >
-                                <span>Continue to next challenge</span>
+                                <span>{t('continue_next_challenge')}</span>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                 </svg>
@@ -379,15 +388,15 @@ const getCorrectAnswerInfo = () => {
                             
                             <div className="flex items-start justify-between pr-8">
                                 <div>
-                                    <h3 className="text-lg font-semibold">Mastery Challenge</h3>
+                                    <h3 className="text-lg font-semibold">{t('mastery_challenge')}</h3>
                                     <p className="text-sm text-sky-100 mt-1">
-                                        Question {questionNumber} of {totalQuestions}
+                                        {t('question')} {questionNumber} {t('of')} {totalQuestions}
                                     </p>
                                 </div>
                                 
                                 <div className="text-right">
                                     <p className="text-sm font-medium mb-2">
-                                        Solve {remainingProblems} more problem{remainingProblems !== 1 ? 's' : ''}
+                                        {remainingProblems} {t('solve_more_problems')}
                                     </p>
                                     <div className="flex items-center justify-end space-x-2">
                                         {Array.from({ length: totalQuestions }).map((_, index) => {
@@ -445,7 +454,7 @@ const getCorrectAnswerInfo = () => {
                                     <div className="flex justify-center">
                                         <img 
                                             src={currentQuestion.question_file} 
-                                            alt="Question" 
+                                            alt={t('question')}
                                             className="max-w-full h-auto rounded-lg shadow"
                                         />
                                     </div>
@@ -500,7 +509,7 @@ const getCorrectAnswerInfo = () => {
                                                         ) : answer.answer_option_file ? (
                                                             <img 
                                                                 src={answer.answer_option_file} 
-                                                                alt="Answer option" 
+                                                                alt={t('option')}
                                                                 className="max-w-xs h-auto rounded"
                                                             />
                                                         ) : (
@@ -524,7 +533,7 @@ const getCorrectAnswerInfo = () => {
                                         );
                                     })
                                 ) : (
-                                    <p className="text-gray-500">No answers available</p>
+                                    <p className="text-gray-500">{t('no_answers_available')}</p>
                                 )}
                             </div>
 
@@ -541,8 +550,8 @@ const getCorrectAnswerInfo = () => {
                                                         </svg>
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="font-semibold text-green-800">Good work!</p>
-                                                        <p className="text-sm text-green-700">That's the right answer. Keep doing it!</p>
+                                                        <p className="font-semibold text-green-800">{t('good_work')}</p>
+                                                        <p className="text-sm text-green-700">{t('right_answer_keep_going')}</p>
                                                     </div>
                                                 </>
                                             ) : (
@@ -553,8 +562,8 @@ const getCorrectAnswerInfo = () => {
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-red-800">Incorrect</p>
-                                                        <p className="text-sm text-red-700">Review the correct answer above</p>
+                                                        <p className="font-semibold text-red-800">{t('incorrect')}</p>
+                                                        <p className="text-sm text-red-700">{t('review_correct_answer_above')}</p>
                                                     </div>
                                                 </>
                                             )}
@@ -577,7 +586,7 @@ const getCorrectAnswerInfo = () => {
                                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                                             </svg>
-                                                            <span>Answer Description</span>
+                                                            <span>{t('answer_description')}</span>
                                                         </button>
                                                     )}
                                                     
@@ -590,7 +599,7 @@ const getCorrectAnswerInfo = () => {
                                                                     </svg>
                                                                 </div>
                                                                 <div className="flex-1">
-                                                                    <p className="font-semibold text-blue-900 mb-2">Answer Description</p>
+                                                                    <p className="font-semibold text-blue-900 mb-2">{t('answer_description')}</p>
                                                                     {correctAnswer.reason && (
                                                                         <div className="prose prose-sm max-w-none text-blue-800 mb-2">
                                                                             {renderContent(correctAnswer.reason)}
@@ -605,7 +614,7 @@ const getCorrectAnswerInfo = () => {
                                                                         <div className="mt-2">
                                                                             <img 
                                                                                 src={correctAnswer.reason_file} 
-                                                                                alt="Answer explanation" 
+                                                                                alt={t('explanation')}
                                                                                 className="max-w-full h-auto rounded shadow"
                                                                             />
                                                                         </div>
@@ -625,7 +634,7 @@ const getCorrectAnswerInfo = () => {
                             {/* Action Buttons */}
                             <div className="mt-8 flex justify-between items-center">
                                 <div className="text-sm text-gray-600">
-                                    {questionNumber} of {totalQuestions}
+                                    {questionNumber} {t('of')} {totalQuestions}
                                 </div>
                                 <div className="flex space-x-3">
                                     {!showResult ? (
@@ -634,14 +643,14 @@ const getCorrectAnswerInfo = () => {
                                             disabled={!selectedAnswer || isSubmitting}
                                             className="px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                                         >
-                                            {isSubmitting ? 'Submitting...' : 'Submit Answer'}
+                                            {isSubmitting ? t('submitting') : t('submit_answer')}
                                         </button>
                                     ) : (
                                         <button
                                             onClick={handleNext}
                                             className="px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors flex items-center space-x-2"
                                         >
-                                            <span>Next question</span>
+                                            <span>{t('next_question')}</span>
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                             </svg>
@@ -653,7 +662,7 @@ const getCorrectAnswerInfo = () => {
                     </div>
                 ) : (
                     <div className="p-12 text-center">
-                        <p className="text-gray-500">No question data available</p>
+                        <p className="text-gray-500">{t('no_question_data')}</p>
                     </div>
                 )}
             </div>

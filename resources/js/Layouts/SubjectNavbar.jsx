@@ -1,5 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import NotificationDropdown from '@/Components/NotificationDropdown';
 import ProfileDropdown from '@/Components/ProfileDropdown';
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { Link, usePage } from '@inertiajs/react';
@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 import {
   AcademicCapIcon,
   Bars3Icon,
-  BellIcon,
   ChevronDownIcon,
   HomeIcon,
   Squares2X2Icon,
@@ -80,10 +79,7 @@ export default function SubjectNavbar({ title }) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden sm:block"><LanguageSwitcher type="buttons" /></div>
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100" aria-label={t('notifications')}>
-            <BellIcon className="h-5 w-5" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white" />
-          </button>
+          <NotificationDropdown />
           <div className="h-6 w-px bg-slate-200" />
           <ProfileDropdown user={user} student={user?.student} />
           <button onClick={() => setMobileOpen(!mobileOpen)} className="ml-1 flex h-9 w-9 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 lg:hidden" aria-label={t('toggle_navigation')}>
@@ -99,7 +95,6 @@ export default function SubjectNavbar({ title }) {
             {/* <Link href={route('quiz-page')} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"><Squares2X2Icon className="h-5 w-5" /> {t('quiz_arena')}</Link> */}
             <p className="mt-2 border-t border-slate-100 px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('switch_subject')}</p>
             {schoolSubjects.slice(0, 6).map((subject) => <Link key={subject.id} href={subjectUrl(subject)} className="rounded-xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50">{subject.name}</Link>)}
-            <div className="mt-3 sm:hidden"><LanguageSwitcher type="dropdown" /></div>
           </div>
         </div>
       )}

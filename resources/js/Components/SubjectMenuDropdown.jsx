@@ -96,7 +96,7 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
           <div className="flex items-center gap-2 mb-5 pb-2 border-b border-amber-200">
             <div className="w-1 h-6 bg-amber-400 rounded-full"></div>
             <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
-              Explore Your Quests
+              {t('explore_quests')}
             </span>
             <div className="flex-1"></div>
             <button 
@@ -212,7 +212,7 @@ export default function SubjectMenuDropdown({ isOpen, setIsOpen, title }) {
             </div>
             <div className="flex items-center gap-1">
               <span className="text-amber-400">🏆</span>
-              <span>{schoolSubjects.length} Subjects Available</span>
+              <span>{schoolSubjects.length} {t('subjects_available')}</span>
             </div>
           </div>
         </div>

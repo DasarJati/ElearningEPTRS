@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StandardFooter from '@/Components/StandardFooter';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { confirmAlert } from '@/Components/sweetAlert';
 
 const SubjectiveQuestionLayout = ({
   children,
@@ -12,9 +14,15 @@ const SubjectiveQuestionLayout = ({
   formatTime,
   footerContent
 }) => {
+  const { t } = useLanguage();
   const [showNavbar, setShowNavbar] = useState(true);
   const [showBlueHeader, setShowBlueHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const handleBack = async () => {
+    if (await confirmAlert(t, { title: t('exit_practice_title'), text: t('exit_subjective_practice'), confirmText: t('exit_practice_action') })) {
+      window.history.back();
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,9 +62,9 @@ const SubjectiveQuestionLayout = ({
           <div>
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-3">
               <button
-                onClick={() => window.history.back()}
+                onClick={handleBack}
                 className="w-8 h-8 md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
-                title="Back"
+                title={t('back')}
               >
                 <svg
                   className="w-4 h-4 md:w-5 md:h-5 text-gray-600"
@@ -75,7 +83,7 @@ const SubjectiveQuestionLayout = ({
               {sectionTitle}
             </h1>
             <p className="text-gray-600 text-sm px-12 md:text-base">
-              Topic: {currentTopic}
+              {t('topic')}: {currentTopic}
             </p>
           </div>
           <div className="relative w-full md:w-auto">
@@ -93,9 +101,9 @@ const SubjectiveQuestionLayout = ({
           <div >
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-50 flex items-center gap-3">
               <button
-                onClick={() => window.history.back()}
+                onClick={handleBack}
                 className="w-8 h-8  md:w-10 md:h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
-                title="Back">
+                title={t('back')}>
                 <svg
                   className="w-4 h-4 md:w-5 md:h-5 text-gray-500 hover:text-[#202020]"
                   fill="none"
@@ -113,7 +121,7 @@ const SubjectiveQuestionLayout = ({
               {sectionTitle}
             </h1>
             <p className="text-gray-50 text-sm px-12 md:text-base">
-              Topic: {currentTopic}
+              {t('topic')}: {currentTopic}
             </p>
           </div>
           <div className="relative w-full md:w-auto">
@@ -148,7 +156,7 @@ const SubjectiveQuestionLayout = ({
               </span>
             </div>
             <div className="text-[10px] flex gap-1 text-blue-600 font-medium tracking-wide">
-              <span>TIME ELAPSED</span>
+              <span>{t('time_elapsed')}</span>
             </div>
           </div>
         </div>

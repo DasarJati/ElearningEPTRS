@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { showAlert } from '@/Components/sweetAlert';
 
 export default function Lobby({ conversations: initialConversations, friends, user }) {
+    const { t, locale } = useLanguage();
     const [conversations, setConversations] = useState(initialConversations || []);
     const [activeConversation, setActiveConversation] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -84,12 +87,12 @@ export default function Lobby({ conversations: initialConversations, friends, us
         const formattedMessage = {
             id: messageData.id,
             sender_id: messageData.sender_id,
-            sender_name: messageData.sender?.name || 'Unknown',
-            sender_avatar: getAvatarInitials(messageData.sender?.name || 'Unknown'),
+            sender_name: messageData.sender?.name || t('unknown_user'),
+            sender_avatar: getAvatarInitials(messageData.sender?.name || t('unknown_user')),
             message: messageData.message,
             is_read: messageData.is_read || false,
             created_at: messageData.created_at,
-            time_ago: 'Just now',
+            time_ago: t('just_now'),
             is_own: messageData.sender_id === user.id,
         };
 
@@ -101,7 +104,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                     ? { 
                         ...conv, 
                         lastMessage: messageData.message,
-                        lastMessageTime: 'Just now',
+                        lastMessageTime: t('just_now'),
                         unreadCount: conv.id === activeConversation?.id ? 0 : conv.unreadCount + 1
                       }
                     : conv
@@ -145,13 +148,13 @@ export default function Lobby({ conversations: initialConversations, friends, us
                     setNewMessage('');
                 },
                 onError: (errors) => {
-                    alert('Failed to send message: ' + (errors.message || 'Unknown error'));
+                    showAlert(t, { text: t('send_message_failed'), icon: 'error' });
                 }
             });
 
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
+            showAlert(t, { text: t('send_message_failed'), icon: 'error' });
         } finally {
             setSending(false);
         }
@@ -173,7 +176,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
 
         } catch (error) {
             console.error('Error starting conversation:', error);
-            alert('Failed to start conversation. Please try again.');
+            showAlert(t, { text: t('start_conversation_failed'), icon: 'error' });
         } finally {
             setLoading(false);
         }
@@ -196,7 +199,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
 
         } catch (error) {
             console.error('Error starting quick chat:', error);
-            alert('Failed to start chat. Please try again.');
+            showAlert(t, { text: t('start_chat_failed'), icon: 'error' });
         } finally {
             setLoading(false);
         }
@@ -217,10 +220,10 @@ export default function Lobby({ conversations: initialConversations, friends, us
         const now = new Date();
         const diffInMinutes = (now - date) / (1000 * 60);
         
-        if (diffInMinutes < 1) return 'Just now';
-        if (diffInMinutes < 60) return `${Math.floor(diffInMinutes)}m ago`;
-        if (diffInMinutes < 1440) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        if (diffInMinutes < 1) return t('just_now');
+        if (diffInMinutes < 60) return `${Math.floor(diffInMinutes)} ${t('minutes_short')} ${t('ago')}`;
+        if (diffInMinutes < 1440) return date.toLocaleTimeString(locale === 'ms' ? 'ms-MY' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleDateString(locale === 'ms' ? 'ms-MY' : 'en-US', { month: 'short', day: 'numeric' });
     };
 
     return (
@@ -234,7 +237,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                     <div className="p-6 border-b border-gray-200/60 bg-white/60">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                Messages
+                                {t('messages')}
                             </h2>
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
@@ -253,7 +256,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                         : 'text-gray-600 hover:text-gray-900'
                                 }`}
                             >
-                                Chats
+                                {t('chats')}
                             </button>
                             <button
                                 onClick={() => setActiveTab('friends')}
@@ -263,7 +266,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                         : 'text-gray-600 hover:text-gray-900'
                                 }`}
                             >
-                                Friends ({friends.length})
+                                {t('friends')} ({friends.length})
                             </button>
                         </div>
                     </div>
@@ -328,7 +331,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex justify-between items-start mb-1">
                                                     <h3 className="font-semibold text-gray-900 truncate">{friend.name}</h3>
-                                                    <span className="text-xs text-green-600 font-medium">Online</span>
+                                                    <span className="text-xs text-green-600 font-medium">{t('online')}</span>
                                                 </div>
 
                                                 <div className="flex items-center justify-between">
@@ -337,7 +340,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                                         onClick={() => quickChat(friend.id, friend.name)}
                                                         className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2.5 py-1.5 rounded-lg font-medium"
                                                     >
-                                                        Chat
+                                                        {t('chat_button')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -348,8 +351,8 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                 {friends.length === 0 && (
                                     <div className="text-center py-12">
                                         <div className="text-4xl mb-3 text-gray-300">👥</div>
-                                        <h3 className="text-lg font-semibold text-gray-600 mb-2">No Friends Yet</h3>
-                                        <p className="text-gray-500 text-sm">Add friends to start chatting</p>
+                                        <h3 className="text-lg font-semibold text-gray-600 mb-2">{t('no_friends_yet')}</h3>
+                                        <p className="text-gray-500 text-sm">{t('add_friends_to_chat')}</p>
                                     </div>
                                 )}
                             </div>
@@ -373,7 +376,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                         <h3 className="text-xl font-semibold text-gray-900">{activeConversation.name}</h3>
                                         <p className="text-sm text-green-600 flex items-center gap-1">
                                             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                            Online
+                                            {t('online')}
                                         </p>
                                     </div>
                                     <div className="flex gap-2">
@@ -447,7 +450,7 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                         <textarea
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
-                                            placeholder="Type your message…"
+                                            placeholder={t('type_message')}
                                             rows="1"
                                             className="w-full resize-none border-0 focus:ring-0 text-gray-900 placeholder-gray-400 text-sm max-h-32"
                                             onKeyDown={(e) => {
@@ -487,13 +490,10 @@ export default function Lobby({ conversations: initialConversations, friends, us
                                 </div>
                             </div>
                             <h3 className="text-3xl font-bold text-gray-800 mb-3">
-                                {activeTab === 'chats' ? 'Welcome to Messages' : 'Start a Conversation'}
+                                {t(activeTab === 'chats' ? 'welcome_messages' : 'start_conversation')}
                             </h3>
                             <p className="text-gray-600 text-lg max-w-md mb-8">
-                                {activeTab === 'chats' 
-                                    ? 'Select a conversation from the sidebar to start chatting with your friends and colleagues.'
-                                    : 'Choose a friend from the sidebar to start a new conversation.'
-                                }
+                                {t(activeTab === 'chats' ? 'select_conversation_intro' : 'choose_friend_intro')}
                             </p>
                             <div className="flex gap-3">
                                 <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>

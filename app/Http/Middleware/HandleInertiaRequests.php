@@ -36,6 +36,9 @@ class HandleInertiaRequests extends Middleware
                 },
             ],
             'schoolSubjects' => fn () => (new MenuController())->getSchoolSubjects(),
+            'notificationCount' => fn () => $request->user()
+                ? $request->user()->unreadNotifications()->count()
+                : 0,
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),

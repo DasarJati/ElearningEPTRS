@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { evaluate } from 'mathjs';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 const scientificButtons = [
   { label: 'sin', value: 'sin(', tone: 'function' },
@@ -63,8 +64,8 @@ const formatExpression = (value) => value
   .replaceAll('sqrt', '√')
   .replaceAll('log10', 'log');
 
-const formatResult = (value) => {
-  if (!Number.isFinite(value)) return 'Math error';
+const formatResult = (value, t) => {
+  if (!Number.isFinite(value)) return t('math_error');
   if (Math.abs(value) > 1e12 || (Math.abs(value) > 0 && Math.abs(value) < 1e-9)) {
     return value.toExponential(8).replace(/\.?0+e/, 'e');
   }
@@ -72,6 +73,7 @@ const formatResult = (value) => {
 };
 
 export default function ScientificCalculator() {
+  const { t } = useLanguage();
   const [expression, setExpression] = useState('');
   const [result, setResult] = useState('0');
   const [angleMode, setAngleMode] = useState('DEG');
@@ -101,13 +103,13 @@ export default function ScientificCalculator() {
       const calculated = evaluate(expression, scope);
       if (typeof calculated !== 'number') throw new Error('Result is not numeric');
 
-      const formatted = formatResult(calculated);
+      const formatted = formatResult(calculated, t);
       setResult(formatted);
       setAnswer(calculated);
       setHistory((items) => [{ expression, result: formatted }, ...items].slice(0, 8));
       setJustEvaluated(true);
     } catch {
-      setResult('Syntax error');
+      setResult(t('syntax_error'));
       setJustEvaluated(true);
     }
   };
@@ -194,8 +196,8 @@ export default function ScientificCalculator() {
     <div className="w-full select-none rounded-lg bg-slate-950 p-1.5 text-white shadow-2xl">
       <div className="mb-1.5 flex items-center justify-between px-0.5">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">PTRS Scientific</p>
-          <p className="text-[9px] text-slate-500">Natural display</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-300">{t('scientific_calculator')}</p>
+          <p className="text-[9px] text-slate-500">{t('natural_display')}</p>
         </div>
         <div className="flex items-center gap-2">
           {memory !== 0 && <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-[10px] font-bold text-emerald-300">M</span>}
@@ -204,8 +206,8 @@ export default function ScientificCalculator() {
       </div>
 
       <div className="mb-1.5 overflow-hidden rounded-md border border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 p-1.5 shadow-inner">
-        <div className="h-4 overflow-x-auto whitespace-nowrap text-right font-mono text-[10px] text-slate-400">{expression ? formatExpression(expression) : 'Ready'}</div>
-        <div data-calculator-result className={`overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-semibold leading-tight tracking-tight ${result.includes('error') ? 'text-rose-300' : 'text-white'}`}>{result}</div>
+        <div className="h-4 overflow-x-auto whitespace-nowrap text-right font-mono text-[10px] text-slate-400">{expression ? formatExpression(expression) : t('calculator_ready')}</div>
+        <div data-calculator-result className={`overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-semibold leading-tight tracking-tight ${Number.isNaN(Number(result)) ? 'text-rose-300' : 'text-white'}`}>{result}</div>
       </div>
 
       <div className="mb-1.5 grid grid-cols-5 gap-1">
@@ -217,9 +219,9 @@ export default function ScientificCalculator() {
       </div>
 
       <details className="mt-1.5 border-t border-slate-800 pt-1">
-        <summary className="cursor-pointer text-[10px] font-semibold text-slate-500 transition hover:text-slate-300">History ({history.length})</summary>
+        <summary className="cursor-pointer text-[10px] font-semibold text-slate-500 transition hover:text-slate-300">{t('calculator_history')} ({history.length})</summary>
         <div className="mt-2 max-h-24 space-y-1.5 overflow-y-auto rounded-lg bg-slate-900 p-2">
-          {history.length === 0 ? <p className="text-[10px] text-slate-600">No calculations yet.</p> : history.map((entry, index) => (
+          {history.length === 0 ? <p className="text-[10px] text-slate-600">{t('no_calculations')}</p> : history.map((entry, index) => (
             <button type="button" key={`${entry.expression}-${index}`} onClick={() => { setExpression(entry.expression); setResult(entry.result); }} className="block w-full rounded-md px-2 py-1 text-right font-mono text-[10px] text-slate-400 hover:bg-slate-800">
               <span className="block truncate">{formatExpression(entry.expression)}</span><span className="text-emerald-300">= {entry.result}</span>
             </button>

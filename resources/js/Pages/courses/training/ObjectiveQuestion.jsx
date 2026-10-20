@@ -3,10 +3,10 @@ import { Head, usePage, Link, router } from '@inertiajs/react';
 import ObjectiveQuestionLayout from '@/Layouts/ObjectiveQuestionLayout';
 import ResultQuestion from '@/Pages/courses/training/ResultQuestion';
 import Calculator from '@/Components/ScientificCalculator';
-import PageDrawingTool from '@/Components/PageDrawingTool';
-import AutoNotes from '@/Components/AutoNotes';
 import QuestionReportButton from '@/Components/QuestionReportButton';
 import axios from 'axios';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { showAlert, confirmAlert } from '@/Components/sweetAlert';
 
 const processQuestionHtml = (html) => html
   .replace(/<img\b([^>]*)>/gi, (match, attributes) => {
@@ -35,6 +35,7 @@ const processQuestionHtml = (html) => html
  * @returns {JSX.Element} - Rendered question content
  */
 const QuestionDisplay = ({ question }) => {
+  const { t } = useLanguage();
   if (!question) return null;
 
   /**
@@ -68,7 +69,7 @@ const QuestionDisplay = ({ question }) => {
           <div className="flex justify-center">
             <img
               src={imageUrl}
-              alt="Question"
+              alt={t('question')}
               className="mx-auto block h-auto w-auto max-w-full rounded-lg object-contain shadow-md"
               onError={(e) => {
                 console.error('Failed to load question image:', imageUrl);
@@ -77,7 +78,7 @@ const QuestionDisplay = ({ question }) => {
                 if (!e.target.parentNode.querySelector('.image-fallback')) {
                   const fallback = document.createElement('div');
                   fallback.className = 'image-fallback text-red-500 text-center p-4 bg-red-50 rounded-lg';
-                  fallback.textContent = 'Failed to load question image';
+                  fallback.textContent = t('question_image_failed');
                   e.target.parentNode.appendChild(fallback);
                 }
               }}
@@ -95,9 +96,9 @@ const QuestionDisplay = ({ question }) => {
     // Fallback when no question content is available
     return (
       <div className="text-center p-4 bg-gray-50 rounded-lg">
-        <p className="text-gray-500">No question content available</p>
+        <p className="text-gray-500">{t('no_question_content')}</p>
         {question.question_text && (
-          <p className="mt-2 text-sm text-gray-600">Question text: {question.question_text}</p>
+          <p className="mt-2 text-sm text-gray-600">{t('question_text')}: {question.question_text}</p>
         )}
       </div>
     );
@@ -251,6 +252,7 @@ const OptionDisplay = ({ option, index, isSelected, isCorrect, isIncorrect, isDi
  * @returns {JSX.Element} - The complete quiz interface
  */
 export default function ObjectiveQuestion() {
+  const { t } = useLanguage();
   // Extract props from Inertia page
   const {
     subject,
@@ -287,6 +289,7 @@ export default function ObjectiveQuestion() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isCheckAgainDisabled, setIsCheckAgainDisabled] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
 
   // Timer State
@@ -309,10 +312,6 @@ export default function ObjectiveQuestion() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const calculatorRef = useRef(null);
 
-  // Drawing and Notes State
-  const [showPageDrawing, setShowPageDrawing] = useState(false);
-  const [noteClickCount, setNoteClickCount] = useState(0);
-  const [showAutoNotes, setShowAutoNotes] = useState(false);
 
   const handleObjectiveImageClick = (event) => {
     const image = event.target.closest?.('img');
@@ -322,7 +321,7 @@ export default function ObjectiveQuestion() {
     event.stopPropagation();
     setZoomedImage({
       src: image.currentSrc || image.src,
-      alt: image.alt || 'Question image',
+      alt: image.alt || t('question_image'),
     });
   };
 
@@ -461,17 +460,12 @@ export default function ObjectiveQuestion() {
   /**
    * Handle exit confirmation from layout
    */
-  const handleExitConfirmation = () => {
-    // Show custom confirmation
-    const shouldShowResults = window.confirm(
-      `You have answered ${answeredQuestions.size} out of ${questions.length} questions.\n\n` +
-      'Do you want to:\n' +
-      '• "OK" - See your results and exit\n' +
-      '• "Cancel" - Return to quiz'
-    );
-
-    if (shouldShowResults) {
-      handleExitWithResults();
+  const handleExitConfirmation = async () => {
+    const message = t('answered_count_message')
+      .replace('{answered}', answeredQuestions.size)
+      .replace('{total}', questions.length);
+    if (await confirmAlert(t, { title: t('exit_practice_title'), text: message, confirmText: t('view_results_and_exit') })) {
+      await handleExitWithResults();
     }
   };
 
@@ -544,7 +538,7 @@ export default function ObjectiveQuestion() {
 
     } catch (error) {
       console.error('❌ Failed to save session:', error);
-      alert('Failed to save your progress. Please try again.');
+      showAlert(t, { text: t('save_progress_failed'), icon: 'error' });
     }
   };
 
@@ -812,14 +806,14 @@ export default function ObjectiveQuestion() {
   };
 
   // Get current topic name (fallback to 'General')
-  const currentTopic = topic || 'General';
+  const currentTopic = topic || t('general_topic');
 
   /**
    * Gets the section title for display
    * Falls back to topic name or section ID
    */
   const getSectionTitle = () => {
-    return sectionTitle || topic || `Section ${sectionId}`;
+    return sectionTitle || topic || `${t('section')} ${sectionId}`;
   };
 
   /**
@@ -870,7 +864,7 @@ export default function ObjectiveQuestion() {
    */
   const handleAnswerSelect = (answerIndex) => {
     // Prevent selection if question already answered
-    if (answeredQuestions.has(currentQuestionIndex)) {
+    if (answeredQuestions.has(currentQuestionIndex) || (isAnswerCorrect === false && !isRetrying)) {
       return;
     }
 
@@ -993,14 +987,8 @@ export default function ObjectiveQuestion() {
 
       // DISABLE THE CHECK AGAIN BUTTON when answer is wrong
       setIsCheckAgainDisabled(true);
-
-      // Reset selection for first-try incorrect (allow retry)
-      if (isFirstAttempt) {
-        setSelectedAnswer({
-          index: null,
-          id: null
-        });
-      }
+      setIsRetrying(false);
+      setSelectedAnswer({ index: null, id: null });
     }
   };
   /**
@@ -1029,6 +1017,7 @@ export default function ObjectiveQuestion() {
       setIncorrectAnswers(new Set());
       setHasCheckedFirstTry(false);
       setIsCheckAgainDisabled(false);
+      setIsRetrying(false);
       setQuestionStartTime(Date.now());
     } else {
       // If last question, complete quiz
@@ -1080,6 +1069,7 @@ export default function ObjectiveQuestion() {
       setIsAnswerCorrect(null);
       setFirstTryResults(Array(newQuestions.length).fill(null));
       setHasCheckedFirstTry(false);
+      setIsRetrying(false);
       setShowCelebration(false);
       setTimeElapsed(0);
       completedTimeRef.current = null;
@@ -1243,7 +1233,7 @@ export default function ObjectiveQuestion() {
    * 
    * @returns {JSX.Element} - Footer toolbar
    */
-  const FooterContent = () => (
+  const renderFooterContent = () => (
     <div className="max-w-full mx-auto flex flex-wrap justify-between items-center gap-3">
       {/* Left side: Tools button with dropdown */}
       <div className="relative z-[9998] hidden shrink-0 lg:block">
@@ -1273,7 +1263,7 @@ export default function ObjectiveQuestion() {
               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          <span>Tools</span>
+          <span>{t('tools')}</span>
         </button>
 
         {/* Tools Dropdown Menu */}
@@ -1300,43 +1290,7 @@ export default function ObjectiveQuestion() {
                     d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                   />
                 </svg>
-                <span>Calculator</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowPageDrawing(true);
-                  setShowToolsDropdown(false);
-                }}
-                className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors duration-150"
-              >
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
-                <span>Draw on Page</span>
-              </button>
-              <button
-                onClick={() => {
-                  setShowAutoNotes(true);
-                  setNoteClickCount(prev => prev + 1);
-                  setShowToolsDropdown(false);
-                }}
-                className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 flex items-center gap-3 transition-colors duration-150"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                <span>Add Note </span>
+                <span>{t('calculator')}</span>
               </button>
 
               {/* Add more tools here in the future */}
@@ -1359,7 +1313,7 @@ export default function ObjectiveQuestion() {
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-                Close Menu
+                {t('close_menu')}
               </button>
             </div>
           </div>
@@ -1379,28 +1333,44 @@ export default function ObjectiveQuestion() {
               : "bg-green-600 text-white hover:bg-green-700"
               }`}
           >
-            Check Answer / Periksa Jawapan
+            {t('check_answer')}
           </button>
         )}
 
-        {/* Check Again button (after incorrect first attempt) */}
-        {/* Check Again button (after incorrect first attempt) */}
+        {/* Choose what to do after an incorrect answer. */}
         {hasCheckedFirstTry &&
           firstTryResults[currentQuestionIndex]?.isCorrect === false &&
           !answeredQuestions.has(currentQuestionIndex) && (
             <div className="flex items-center flex-wrap gap-3">
-              <span className="text-red-600 font-medium text-sm md:text-base">
-                Select another answer
-              </span>
+              {isRetrying ? (
+                <>
+                  <span className="text-red-600 font-medium text-sm md:text-base">
+                    {t('select_another_answer')}
+                  </span>
+                  <button
+                    onClick={handleCheckAnswer}
+                    disabled={selectedAnswer.index === null || isCheckAgainDisabled}
+                    className={`px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-md text-base sm:text-sm md:text-base hover:shadow-lg ${selectedAnswer.index === null || isCheckAgainDisabled
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-orange-600 text-white hover:bg-orange-700"
+                      }`}
+                  >
+                    {t('check_again')}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsRetrying(true)}
+                  className="bg-orange-600 text-white px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-md text-base sm:text-sm md:text-base hover:bg-orange-700"
+                >
+                  {t('try_again')}
+                </button>
+              )}
               <button
-                onClick={handleCheckAnswer}
-                disabled={selectedAnswer.index === null || isCheckAgainDisabled}
-                className={`px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-md  text-base sm:text-sm md:text-base hover:shadow-lg ${selectedAnswer.index === null || isCheckAgainDisabled
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : "bg-orange-600 text-white hover:bg-orange-700"
-                  }`}
+                onClick={handleNextQuestion}
+                className="bg-white text-gray-700 border border-gray-300 px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-sm text-base sm:text-sm md:text-base hover:bg-gray-100"
               >
-                {isCheckAgainDisabled ? "Checking..." : "Check Again / Periksa Semula"}
+                {t('skip_question')}
               </button>
             </div>
           )}
@@ -1412,9 +1382,7 @@ export default function ObjectiveQuestion() {
           onClick={handleNextQuestion}
           className="bg-blue-600 text-white px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg  font-medium shadow-md text-base sm:text-sm md:text-base hover:scale-[1.03] hover:shadow-lg"
         >
-          {currentQuestionIndex < questions.length - 1
-            ? "Next Question"
-            : "Finish Quiz"}
+          {t(currentQuestionIndex < questions.length - 1 ? 'next_question' : 'finish_quiz')}
         </button>
       )}
       </div>
@@ -1559,8 +1527,8 @@ export default function ObjectiveQuestion() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Loading New Questions...</h1>
-            <p className="text-gray-600">Preparing your quiz...</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">{t('loading_new_questions')}</h1>
+            <p className="text-gray-600">{t('preparing_quiz')}</p>
           </div>
         </div>
       </div>
@@ -1573,13 +1541,13 @@ export default function ObjectiveQuestion() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">No Questions Available</h1>
-            <p className="text-gray-600 mb-6">No questions found for this topic.</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">{t('no_questions_available')}</h1>
+            <p className="text-gray-600 mb-6">{t('no_questions_topic')}</p>
             <button
               onClick={handleRestartQuiz}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Try Again
+              {t('try_again')}
             </button>
           </div>
         </div>
@@ -1599,17 +1567,6 @@ export default function ObjectiveQuestion() {
 
       {/* Celebration animation for first-time correct answers */}
       {showCelebration && <Confetti />}
-
-      {/* Drawing Tool Modal */}
-      {showPageDrawing && (
-        <PageDrawingTool
-          isActive={showPageDrawing}
-          onClose={() => setShowPageDrawing(false)}
-        />
-      )}
-
-      {/* Auto Notes Modal */}
-      {showAutoNotes && <AutoNotes isActive={showAutoNotes} addNoteTrigger={noteClickCount} />}
 
       {/* Calculator Modal - Draggable */}
       {showCalculator && (
@@ -1642,13 +1599,13 @@ export default function ObjectiveQuestion() {
                 <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                 </svg>
-                <h3 className="text-sm font-semibold">Scientific Calculator</h3>
+                <h3 className="text-sm font-semibold">{t('scientific_calculator')}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowCalculator(false)}
                   className="text-gray-300 hover:text-white p-1 rounded-full hover:bg-gray-700 transition-colors"
-                  title="Close Calculator"
+                  title={t('close_calculator')}
                 >
                   <svg
                     className="w-4 h-4"
@@ -1683,15 +1640,15 @@ export default function ObjectiveQuestion() {
                   }
                 }}
                 className="text-xs text-gray-600 hover:text-gray-800 px-2 py-1 hover:bg-gray-100 rounded"
-                title="Copy Result"
+                title={t('copy_result')}
               >
-                Copy
+                {t('copy_result')}
               </button>
               <button
                 onClick={() => setShowCalculator(false)}
                 className="text-xs bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors"
               >
-                Close
+                {t('close')}
               </button>
             </div>
           </div>
@@ -1703,7 +1660,7 @@ export default function ObjectiveQuestion() {
           className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
-          aria-label="Enlarged question image"
+          aria-label={t('enlarged_question_image')}
           onClick={(event) => {
             if (event.target === event.currentTarget) setZoomedImage(null);
           }}
@@ -1719,7 +1676,7 @@ export default function ObjectiveQuestion() {
               type="button"
               onClick={() => setZoomedImage(null)}
               className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-slate-950/80 text-white shadow-lg transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-white"
-              aria-label="Close enlarged image"
+              aria-label={t('close_enlarged_image')}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1739,7 +1696,7 @@ export default function ObjectiveQuestion() {
         timeElapsed={timeElapsed}
         getTimeColor={getTimeColor}
         formatTime={formatTime}
-        footerContent={<FooterContent />}
+        footerContent={renderFooterContent()}
         answeredQuestions={answeredQuestions}
         selectedAnswer={selectedAnswer}
         handleExitQuiz={handleExitQuiz}
@@ -1764,12 +1721,12 @@ export default function ObjectiveQuestion() {
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="text-gray-800 font-semibold text-sm tracking-wide">
-                      Correct!
+                      {t('correct_feedback')}
                     </span>
                     <span className="text-gray-600 text-[11px]">
                       {firstTryResults[currentQuestionIndex]?.isCorrect
-                        ? "Perfect on first try! 🎉"
-                        : "Next question..."}
+                        ? t('perfect_first_try')
+                        : t('next_question_loading')}
                     </span>
                   </div>
                 </div>
@@ -1790,12 +1747,12 @@ export default function ObjectiveQuestion() {
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="text-gray-800 font-semibold text-sm tracking-wide">
-                      Correct!
+                      {t('correct_feedback')}
                     </span>
                     <span className="text-gray-600 text-[11px]">
                       {firstTryResults[currentQuestionIndex]?.isCorrect
-                        ? "Perfect on first try! 🎉"
-                        : "Next question..."}
+                        ? t('perfect_first_try')
+                        : t('next_question_loading')}
                     </span>
                   </div>
                 </div>
@@ -1815,17 +1772,9 @@ export default function ObjectiveQuestion() {
                       </svg>
                       <span className="text-red-800 font-medium text-sm">
                         {firstTryResults[currentQuestionIndex]?.isCorrect === false && !answeredQuestions.has(currentQuestionIndex)
-                          ? "Incorrect. Try another answer!"
-                          : "First attempt incorrect. Try again!"}
+                          ? t('incorrect_try_another')
+                          : t('first_attempt_incorrect')}
                       </span>
-                    </div>
-                    <div className="text-center">
-                      <button
-                        onClick={handleNextQuestion}
-                        className="text-gray-600 hover:text-gray-800 underline text-sm font-medium transition-colors hover:scale-105 transform duration-200"
-                      >
-                        Skip this question
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -1841,17 +1790,9 @@ export default function ObjectiveQuestion() {
                       </svg>
                       <span className="text-red-800 font-medium text-xs leading-tight">
                         {firstTryResults[currentQuestionIndex]?.isCorrect === false && !answeredQuestions.has(currentQuestionIndex)
-                          ? "Incorrect. Try another answer!"
-                          : "First attempt incorrect. Try again!"}
+                          ? t('incorrect_try_another')
+                          : t('first_attempt_incorrect')}
                       </span>
-                    </div>
-                    <div className="text-center pt-0.5">
-                      <button
-                        onClick={handleNextQuestion}
-                        className="text-gray-600 hover:text-gray-800 underline text-xs font-medium transition-colors hover:scale-105 transform duration-200"
-                      >
-                        Skip this question
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -1870,7 +1811,7 @@ export default function ObjectiveQuestion() {
                   </h2>
                   {/* Display KBAT only if difficulty_type_id === 4 */}
                   {currentQuestion.difficulty_type_id === 4 && (
-                    <div className="bg-gray-200 rounded-md text-gray-500 font-bold p-2">KBAT</div>
+                    <div className="bg-gray-200 rounded-md text-gray-500 font-bold p-2">{t('higher_order_thinking')}</div>
                   )}
 
                   {/* Optional: Display other difficulty levels if needed */}
@@ -1880,9 +1821,9 @@ export default function ObjectiveQuestion() {
                           currentQuestion.difficulty_type_id === 3 ? 'bg-red-500' :
                             'bg-gray-500'
                       }`}>
-                      {currentQuestion.difficulty_type_id === 1 ? 'Easy' :
-                        currentQuestion.difficulty_type_id === 2 ? 'Medium' :
-                          currentQuestion.difficulty_type_id === 3 ? 'Hard' :
+                      {currentQuestion.difficulty_type_id === 1 ? t('difficulty_easy') :
+                        currentQuestion.difficulty_type_id === 2 ? t('difficulty_medium') :
+                          currentQuestion.difficulty_type_id === 3 ? t('difficulty_hard') :
                             'Unknown'}
                     </div>
                   )}
@@ -1901,13 +1842,13 @@ export default function ObjectiveQuestion() {
                 </div>
 
                 {/* Instructions */}
-                <span className="text-gray-600 text-sm sm:text-sm mb-4 block">Pilih 1 jawapan : </span>
+                <span className="text-gray-600 text-sm sm:text-sm mb-4 block">{t('select_one_answer')}:</span>
 
                 {/* Answer Options */}
                 <div className="space-y-3 mb-6">
                   {currentQuestion.options && currentQuestion.options.map((option, index) => {
                     const isCurrentSelected = selectedAnswer.index === index;
-                    const isDisabled = incorrectAnswers.has(index) || answeredQuestions.has(currentQuestionIndex);
+                    const isDisabled = incorrectAnswers.has(index) || answeredQuestions.has(currentQuestionIndex) || (isAnswerCorrect === false && !isRetrying);
                     const isCorrectAnswer = index === currentQuestion.correctAnswer;
                     const showAsCorrect = showExplanation && isCorrectAnswer;
 
@@ -1933,7 +1874,7 @@ export default function ObjectiveQuestion() {
                       <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Explanation:
+                      {t('explanation')}:
                     </h3>
                     <div
                       className="text-blue-700 text-sm sm:text-base prose prose-blue max-w-none"

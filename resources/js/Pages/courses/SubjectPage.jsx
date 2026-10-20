@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import SubjectLayout from '@/Layouts/SubjectLayout';
 import { Head, router, usePage } from '@inertiajs/react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '@/Contexts/LanguageContext';
 import {
   ArrowRightIcon,
@@ -8,6 +9,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   DocumentTextIcon,
+  InformationCircleIcon,
   PencilSquareIcon,
   PlayIcon,
   SparklesIcon,
@@ -31,7 +33,10 @@ export default function SubjectPage({ selectedStandard }) {
   const [currentStandard, setCurrentStandard] = useState(selectedStandard || form || 'Form 4');
   const [activeSection, setActiveSection] = useState('');
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedMastery, setSelectedMastery] = useState(null);
   const sectionRefs = useRef({});
+  const masteryInfoTriggerRef = useRef(null);
+  const masteryInfoCloseRef = useRef(null);
   const currentContent = content || { id: 0, sections: [] };
   const sections = currentContent.sections || [];
 
@@ -47,6 +52,35 @@ export default function SubjectPage({ selectedStandard }) {
     sections.forEach((section) => sectionRefs.current[section.title] && observer.observe(sectionRefs.current[section.title]));
     return () => observer.disconnect();
   }, [sections]);
+
+  useEffect(() => {
+    if (!selectedMastery) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    masteryInfoCloseRef.current?.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setSelectedMastery(null);
+        requestAnimationFrame(() => masteryInfoTriggerRef.current?.focus());
+      } else if (event.key === 'Tab') {
+        event.preventDefault();
+        masteryInfoCloseRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedMastery]);
+
+  const closeMasteryInfo = () => {
+    setSelectedMastery(null);
+    requestAnimationFrame(() => masteryInfoTriggerRef.current?.focus());
+  };
 
   const handleStandardChange = (standard) => {
     setCurrentStandard(standard);
@@ -89,7 +123,10 @@ export default function SubjectPage({ selectedStandard }) {
   };
 
   const totalLessons = sections.reduce((sum, section) => sum + (section.subSections?.length || 0), 0);
-  const completedLessons = sections.reduce((sum, section) => sum + (section.subSections || []).filter((item) => item.mastery?.level === 5).length, 0);
+  const isPracticePassed = (practice) => Number(practice?.score) >= 70;
+  const isModuleComplete = (item) => isPracticePassed(item.lastPractice?.objective)
+    || isPracticePassed(item.lastPractice?.subjective);
+  const completedLessons = sections.reduce((sum, section) => sum + (section.subSections || []).filter(isModuleComplete).length, 0);
   const progress = totalLessons ? Math.round((completedLessons / totalLessons) * 100) : 0;
   const masteryStyles = {
     1: 'bg-slate-100 text-slate-600',
@@ -98,6 +135,7 @@ export default function SubjectPage({ selectedStandard }) {
     4: 'bg-cyan-50 text-cyan-700',
     5: 'bg-emerald-50 text-emerald-700',
   };
+  const masteryLabels = [t('not_started'), t('beginner'), t('developing'), t('proficient'), t('mastered')];
   const getSectionProgress = (section) => {
     const modules = section.subSections || [];
     if (!modules.length) return { percentage: 0, level: 1, label: t('not_started') };
@@ -108,9 +146,7 @@ export default function SubjectPage({ selectedStandard }) {
     );
     const percentage = Math.round((levelPoints / (modules.length * 4)) * 100);
     const level = Math.min(5, Math.max(1, Math.round(levelPoints / modules.length) + 1));
-    const labels = [t('not_started'), t('beginner'), t('developing'), t('proficient'), t('mastered')];
-
-    return { percentage, level, label: labels[level - 1] };
+    return { percentage, level, label: masteryLabels[level - 1] };
   };
 
   if (!content) {
@@ -129,7 +165,7 @@ export default function SubjectPage({ selectedStandard }) {
             <div className="flex items-center gap-3"><span className="rounded-xl bg-cyan-50 p-2.5 text-cyan-600"><DocumentTextIcon className="h-5 w-5" /></span><div><p className="text-xs font-medium text-slate-400">{t('learning_modules')}</p><p className="mt-0.5 text-lg font-semibold text-slate-900">{totalLessons}</p></div></div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-600"><CheckCircleIcon className="h-5 w-5" /></span><div><p className="text-xs font-medium text-slate-400">{t('course_progress')}</p><p className="mt-0.5 text-lg font-semibold text-slate-900">{progress}%</p></div></div><div className="h-10 w-10 rounded-full border-4 border-emerald-100 border-t-emerald-500" /></div>
+            <div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-600"><CheckCircleIcon className="h-5 w-5" /></span><div><p className="text-xs font-medium text-slate-400">{t('course_progress')}</p><p className="mt-0.5 text-lg font-semibold text-slate-900">{progress}%</p></div></div><div role="progressbar" aria-label={t('course_progress')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: `conic-gradient(#10b981 ${progress}%, #d1fae5 ${progress}% 100%)` }}><span className="h-7 w-7 rounded-full bg-white" /></div></div>
           </div>
         </div>
 
@@ -170,10 +206,10 @@ export default function SubjectPage({ selectedStandard }) {
                 <div className="divide-y divide-slate-100">
                   {(section.subSections || []).map((subSection, moduleIndex) => {
                     const mastery = subSection.mastery || { level: 1, label: t('not_started'), session_count: 0, accuracy_percentage: 0 };
-                    const objectiveCompleted = mastery.level === 5;
-                    const subjectiveCompleted = subSection.lastPractice?.subjective?.score >= 70;
-                    const completed = mastery.level === 5;
-                    const masteryLabel = [t('not_started'), t('beginner'), t('developing'), t('proficient'), t('mastered')][mastery.level - 1] || t('not_started');
+                    const objectiveCompleted = isPracticePassed(subSection.lastPractice?.objective);
+                    const subjectiveCompleted = isPracticePassed(subSection.lastPractice?.subjective);
+                    const completed = isModuleComplete(subSection);
+                    const masteryLabel = masteryLabels[mastery.level - 1] || t('not_started');
                     return (
                       <article key={subSection.id} className="p-5 sm:p-6">
                         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
@@ -181,9 +217,23 @@ export default function SubjectPage({ selectedStandard }) {
                             <span className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-lg ${completed ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>{completed ? <CheckCircleIcon className="h-5 w-5" /> : <span className="text-xs font-bold">{moduleIndex + 1}</span>}</span>
                             <div><h3 className="font-semibold text-slate-900">{subSection.title}</h3><p className="mt-1 text-xs text-slate-400">{subSection.questionCounts?.objective || 0} {t('objective')} · {subSection.questionCounts?.subjective || 0} {t('written_questions')}</p></div>
                           </div>
-                          <span className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${masteryStyles[mastery.level] || masteryStyles[1]}`}>
-                            {t('level')} {mastery.level} · {masteryLabel}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${masteryStyles[mastery.level] || masteryStyles[1]}`}>
+                              {t('level')} {mastery.level} · {masteryLabel}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                masteryInfoTriggerRef.current = event.currentTarget;
+                                setSelectedMastery({ topic: subSection.title, mastery });
+                              }}
+                              aria-label={t('mastery_info_open')}
+                              title={t('mastery_info_open')}
+                              className="flex h-8 w-8 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500"
+                            >
+                              <InformationCircleIcon className="h-5 w-5" />
+                            </button>
+                          </div>
                         </div>
 
                         <div className="mt-5 grid gap-4 xl:grid-cols-2">
@@ -239,6 +289,49 @@ export default function SubjectPage({ selectedStandard }) {
             <div className="relative bg-slate-950 pt-[56.25%]">{selectedVideo.platform === 'youtube' ? <iframe src={`${selectedVideo.embedUrl}?autoplay=1&rel=0`} className="absolute inset-0 h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={selectedVideo.title} /> : <video controls autoPlay className="absolute inset-0 h-full w-full"><source src={selectedVideo.embedUrl} type="video/mp4" /></video>}</div>
           </div>
         </div>
+      )}
+      {selectedMastery && createPortal(
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/60 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeMasteryInfo();
+          }}
+        >
+          <div role="dialog" aria-modal="true" aria-labelledby="mastery-info-title" className="max-h-[calc(100dvh-2rem)] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="mastery-info-title" className="text-lg font-bold text-slate-900">{t('mastery_info_title')}</h2>
+                <p className="mt-1 text-sm text-slate-500">{selectedMastery.topic}</p>
+              </div>
+              <button ref={masteryInfoCloseRef} type="button" onClick={closeMasteryInfo} aria-label={t('close')} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="mt-5 text-sm leading-relaxed text-slate-600">{t('mastery_info_intro')}</p>
+            <div className="mt-5 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-950">
+              <p className="font-semibold">{t('mastery_info_current')}</p>
+              <p className="mt-1">{t('level')} {selectedMastery.mastery.level} · {masteryLabels[selectedMastery.mastery.level - 1] || t('not_started')}</p>
+              <p>{selectedMastery.mastery.session_count || 0} {t('sessions')} · {t('latest_accuracy')}: {selectedMastery.mastery.accuracy_percentage || 0}%</p>
+              <p>{t('inactivity_penalty')}: −{selectedMastery.mastery.inactivity_penalty_percentage || 0} {t('percentage_points')}</p>
+            </div>
+
+            <h3 className="mt-5 text-sm font-bold text-slate-900">{t('mastery_info_levels_title')}</h3>
+            <ol className="mt-2 space-y-2 text-sm text-slate-600">
+              {masteryLabels.map((label, index) => (
+                <li key={label} className="flex gap-2">
+                  <span className="font-semibold text-slate-800">{index + 1}.</span>
+                  <span><strong className="text-slate-800">{label}:</strong> {t(`mastery_info_level_${index + 1}`)}</span>
+                </li>
+              ))}
+            </ol>
+
+            <h3 className="mt-5 text-sm font-bold text-slate-900">{t('mastery_info_penalty_title')}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{t('mastery_info_penalty_rule')}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{t('mastery_info_penalty_scope')}</p>
+          </div>
+        </div>,
+        document.body
       )}
     </SubjectLayout>
   );

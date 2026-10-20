@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ResultChallenge from '@/Components/ResultChallenge';
 import QuestionReportButton from '@/Components/QuestionReportButton';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { showAlert, confirmAlert } from '@/Components/sweetAlert';
 
 export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId, subjectKey, topicId, topicName }) {
+    const { t } = useLanguage();
     const [sessionId, setSessionId] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -200,7 +203,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
             loadNextQuestion(data.session_id);
         } catch (error) {
             console.error('Full error details:', error);
-            alert(`Failed to start practice. Error: ${error.message}`);
+            showAlert(t, { text: t('practice_start_failed'), icon: 'error' });
             setLoading(false);
         }
     };
@@ -334,7 +337,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
         // Don't auto-load next question - wait for user to click "Next"
     } catch (error) {
         console.error('Error submitting answer:', error);
-        alert(`Failed to submit answer: ${error.message}`);
+        showAlert(t, { text: t('practice_submit_failed'), icon: 'error' });
     } finally {
         setIsSubmitting(false);
     }
@@ -406,7 +409,12 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
     }
 };
 
-    const handleClose = () => {
+    const handleClose = async () => {
+        if (sessionId && !summary && !showResultModal && !(await confirmAlert(t, {
+            title: t('exit_practice_title'),
+            text: t('exit_subjective_practice'),
+            confirmText: t('exit_practice_action'),
+        }))) return;
         // Clean up timer
         if (sessionTimer) {
             clearInterval(sessionTimer);
@@ -503,12 +511,12 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                 {loading && !currentQuestion ? (
                     <div className="p-12 text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading practice session...</p>
+                        <p className="mt-4 text-gray-600">{t('loading_practice_session')}</p>
                     </div>
                 ) : summary ? (
                     <div className="p-12 text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Preparing your results...</p>
+                        <p className="text-gray-600">{t('preparing_results')}</p>
                     </div>
                 ) : currentQuestion ? (
                     <div>
@@ -524,9 +532,9 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
 
                             <div className="flex flex-col md:flex-row items-start justify-between pr-8 space-y-4 md:space-y-0">
                                 <div>
-                                    <h3 className="text-lg font-semibold">Practice Session: {topicName}</h3>
+                                    <h3 className="text-lg font-semibold">{t('practice_session')}: {topicName}</h3>
                                     <p className="text-sm text-green-100 mt-1">
-                                        Question {questionNumber} of {totalQuestions}
+                                        {t('question')} {questionNumber} {t('of')} {totalQuestions}
                                     </p>
                                 </div>
 
@@ -541,12 +549,12 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                 {formatTime(elapsedTime)}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-green-100 mt-1">Session Time</p>
+                                        <p className="text-xs text-green-100 mt-1">{t('session_time')}</p>
                                     </div>
 
                                     <div className="text-right">
                                         <p className="text-sm font-medium mb-2">
-                                            Solve {remainingProblems} more problem{remainingProblems !== 1 ? 's' : ''}
+                                            {remainingProblems} {t('solve_more_problems')}
                                         </p>
                                         <div className="flex items-center justify-end space-x-2">
                                             {Array.from({ length: totalQuestions }).map((_, index) => {
@@ -592,7 +600,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                             ></div>
                             {/* Time Indicator */}
                             <div className="absolute top-3 right-4 text-xs text-gray-500">
-                                Time: {formatTimeDisplay(elapsedTime)}
+                                {t('time')}: {formatTimeDisplay(elapsedTime)}
                             </div>
                         </div>
 
@@ -608,7 +616,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                     <div className="flex justify-center">
                                         <img
                                             src={currentQuestion.question_file}
-                                            alt="Question"
+                                            alt={t('question')}
                                             className="max-w-full h-auto rounded-lg shadow"
                                         />
                                     </div>
@@ -662,7 +670,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                         ) : answer.answer_option_file ? (
                                                             <img
                                                                 src={answer.answer_option_file}
-                                                                alt="Answer option"
+                                                                alt={t('option')}
                                                                 className="max-w-xs h-auto rounded"
                                                             />
                                                         ) : (
@@ -686,7 +694,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                         );
                                     })
                                 ) : (
-                                    <p className="text-gray-500">No answers available</p>
+                                    <p className="text-gray-500">{t('no_answers_available')}</p>
                                 )}
                             </div>
 
@@ -703,9 +711,9 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                         </svg>
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="font-semibold text-green-800">Good work!</p>
+                                                        <p className="font-semibold text-green-800">{t('good_work')}</p>
                                                         <p className="text-sm text-green-700">
-                                                            That's the right answer. Session time: {formatTimeDisplay(elapsedTime)}
+                                                            {t('right_answer_session_time')} {formatTimeDisplay(elapsedTime)}
                                                         </p>
                                                     </div>
                                                 </>
@@ -717,9 +725,9 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-red-800">Incorrect</p>
+                                                        <p className="font-semibold text-red-800">{t('incorrect')}</p>
                                                         <p className="text-sm text-red-700">
-                                                            Review the correct answer above. Session time: {formatTimeDisplay(elapsedTime)}
+                                                            {t('review_answer_session_time')} {formatTimeDisplay(elapsedTime)}
                                                         </p>
                                                     </div>
                                                 </>
@@ -743,7 +751,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                                             </svg>
-                                                            <span>Answer Description</span>
+                                                            <span>{t('answer_description')}</span>
                                                         </button>
                                                     )}
 
@@ -756,7 +764,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                                     </svg>
                                                                 </div>
                                                                 <div className="flex-1">
-                                                                    <p className="font-semibold text-blue-900 mb-2">Answer Description</p>
+                                                                    <p className="font-semibold text-blue-900 mb-2">{t('answer_description')}</p>
                                                                     {correctAnswer.reason && (
                                                                         <div className="prose prose-sm max-w-none text-blue-800 mb-2">
                                                                             {renderContent(correctAnswer.reason)}
@@ -771,7 +779,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                                                                         <div className="mt-2">
                                                                             <img
                                                                                 src={correctAnswer.reason_file}
-                                                                                alt="Answer explanation"
+                                                                                alt={t('explanation')}
                                                                                 className="max-w-full h-auto rounded shadow"
                                                                             />
                                                                         </div>
@@ -793,13 +801,13 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
 <div className="mt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
     <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
         <div className="text-sm text-gray-600">
-            {questionNumber} of {totalQuestions}
+            {questionNumber} {t('of')} {totalQuestions}
         </div>
         <div className="flex items-center space-x-2 text-sm text-gray-600">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{formatTimeDisplay(elapsedTime)} elapsed</span>
+            <span>{formatTimeDisplay(elapsedTime)} {t('elapsed')}</span>
         </div>
     </div>
     <div className="flex space-x-3">
@@ -812,14 +820,14 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                 {isSubmitting ? (
                     <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Submitting...</span>
+                        <span>{t('submitting')}</span>
                     </>
                 ) : (
                     <>
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span>Submit Answer</span>
+                        <span>{t('submit_answer')}</span>
                     </>
                 )}
             </button>
@@ -830,7 +838,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                     onClick={handleNext}
                     className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2"
                 >
-                    <span>Next Question</span>
+                    <span>{t('next_question')}</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -843,7 +851,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                     }}
                     className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center space-x-2"
                 >
-                    <span>See Results</span>
+                    <span>{t('see_results')}</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -856,7 +864,7 @@ export default function PracticeChallenge({ isOpen, onClose, subjectId, levelId,
                     </div>
                 ) : (
                     <div className="p-12 text-center">
-                        <p className="text-gray-500">No question data available</p>
+                        <p className="text-gray-500">{t('no_question_data')}</p>
                     </div>
                 )}
             </div>

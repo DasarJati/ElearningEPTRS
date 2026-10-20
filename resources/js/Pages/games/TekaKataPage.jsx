@@ -1,7 +1,10 @@
 // src/Pages/WordGridGame.jsx
 import React, { useState, useEffect } from "react";
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { showAlert } from '@/Components/sweetAlert';
 
 export default function WordGridGame() {
+  const { t } = useLanguage();
   // Senarai soalan
   const questions = [
     {
@@ -153,7 +156,7 @@ export default function WordGridGame() {
       setStatus(null);
       setShowHint(false);
     } else {
-      alert("🎉 Semua soalan selesai!");
+      showAlert(t, { text: t('all_questions_finished'), icon: 'success' });
     }
   };
 
@@ -161,7 +164,7 @@ export default function WordGridGame() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-100 to-yellow-200 p-6">
       <div className="bg-white shadow-xl rounded-3xl p-8 w-full max-w-lg text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Permainan Teka Kata
+          {t('word_game')}
         </h1>
 
         {/* Grid huruf */}
@@ -193,7 +196,7 @@ export default function WordGridGame() {
 
         {/* Jawapan */}
         <div className="text-lg font-semibold text-gray-700 mb-3">
-          Jawapan:{" "}
+          {t('answer_label')}:{" "}
           <span
             className={`px-2 py-1 rounded-md ${
               status === "correct"
@@ -210,12 +213,12 @@ export default function WordGridGame() {
         {/* Status */}
         {status === "correct" && (
           <div className="text-green-600 font-bold text-xl mb-3">
-            ✅ Betul!
+            ✅ {t('correct_feedback')}
           </div>
         )}
         {status === "wrong" && (
           <div className="text-red-600 font-bold text-xl mb-3">
-            ❌ Salah, cuba lagi
+            ❌ {t('wrong_try_again')}
           </div>
         )}
 
@@ -224,7 +227,7 @@ export default function WordGridGame() {
           onClick={() => setShowHint(!showHint)}
           className="mb-4 text-sm text-blue-600 underline"
         >
-          {showHint ? "Sembunyikan Petunjuk" : "Lihat Petunjuk"}
+          {showHint ? t('hide_hint') : t('show_hint')}
         </button>
 
         {/* Hints */}
@@ -242,14 +245,14 @@ export default function WordGridGame() {
             onClick={handleReset}
             className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
           >
-            Reset
+            {t('reset')}
           </button>
           {status === "correct" && (
             <button
               onClick={handleNext}
               className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
             >
-              Next
+              {t('next')}
             </button>
           )}
         </div>

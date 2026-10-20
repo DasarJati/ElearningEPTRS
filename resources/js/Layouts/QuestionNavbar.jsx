@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import Dropdown from '@/Components/Dropdown';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { confirmAlert } from '@/Components/sweetAlert';
 
 export default function QuestionNavbar({ title, visible = true }) {
+  const { t } = useLanguage();
   const { auth } = usePage().props;
   const user = auth?.user;
   const [isOpen, setIsOpen] = useState(false);
@@ -116,9 +119,11 @@ export default function QuestionNavbar({ title, visible = true }) {
                 </Dropdown.Trigger>
                 <Dropdown.Content>
                   <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                  <Dropdown.Link href={route('logout')} method="post" as="button">
-                    Log 
-                  </Dropdown.Link>
+                  <button type="button" onClick={async () => {
+                    if (await confirmAlert(t, { title: t('sign_out'), text: t('sign_out_confirmation'), confirmText: t('sign_out') })) {
+                      router.post(route('logout'));
+                    }
+                  }} className="block w-full px-4 py-2 text-left text-sm">{t('sign_out')}</button>
                 </Dropdown.Content>
               </Dropdown>
             </div>

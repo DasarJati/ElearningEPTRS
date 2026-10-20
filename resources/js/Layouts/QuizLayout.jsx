@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import QuestionNavbar from './QuestionNavbar';
 import ScientificCalculator from '../Components/ScientificCalculator';
 import StandardFooter from '@/Components/StandardFooter';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 const QuizLayout = ({ 
   children, 
@@ -11,6 +12,7 @@ const QuizLayout = ({
   bgColor = "bg-white",
   footer = null 
 }) => {
+  const { t } = useLanguage();
   const [navbarVisible, setNavbarVisible] = useState(true);
   const [calculatorVisible, setCalculatorVisible] = useState(false);
   const [calculatorPosition, setCalculatorPosition] = useState({ x: 20, y: 20 });
@@ -113,8 +115,8 @@ const QuizLayout = ({
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Quiz</h1>
-            <p className="text-gray-400">Test your knowledge!</p>
+            <h1 className="text-2xl font-bold">{t('quiz')}</h1>
+            <p className="text-gray-400">{t('test_knowledge')}</p>
           </div>
         </div>
 
@@ -157,7 +159,7 @@ const QuizLayout = ({
           <button
             onClick={toggleCalculator}
             className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
-            title="Open Calculator"
+            title={t('open_calculator')}
           >
             {calculatorIcon}
           </button>
@@ -184,13 +186,13 @@ const QuizLayout = ({
               <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              <span className="text-sm text-white font-medium">Scientific Calculator</span>
+              <span className="text-sm text-white font-medium">{t('scientific_calculator')}</span>
             </div>
             <div className="flex space-x-1">
               <button
                 onClick={() => setCalculatorVisible(false)}
                 className="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs transition-colors"
-                title="Close"
+                title={t('close')}
               >
                 ×
               </button>

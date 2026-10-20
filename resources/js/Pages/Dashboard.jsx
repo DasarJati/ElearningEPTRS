@@ -37,7 +37,7 @@ function formatTime(seconds) {
 }
 
 export default function Dashboard() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const {
     auth,
     student,
@@ -61,6 +61,10 @@ export default function Dashboard() {
   const averageScore = Number(dashboardStats.accuracy_percentage || 0);
   const bestSession = dashboardStats.best_session;
   const calendarDays = activityCalendar.days || [];
+  const calendarLocale = locale === 'ms' ? 'ms-MY' : 'en-MY';
+  const calendarMonth = calendarDays[0]?.date
+    ? new Intl.DateTimeFormat(calendarLocale, { month: 'long', year: 'numeric' }).format(new Date(`${calendarDays[0].date}T12:00:00`))
+    : activityCalendar.month_label || t('learning_activity');
   const calendarOffset = Number(activityCalendar.first_day_offset || 0);
   const calendarTrailingDays = (7 - ((calendarOffset + calendarDays.length) % 7)) % 7;
   const weeklyGoal = Number(activityCalendar.weekly_goal || 5);
@@ -112,14 +116,14 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <Head title="Dashboard" />
+      <Head title={t('dashboard')} />
 
       <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
         <motion.section
           {...cardMotion}
           transition={{ duration: 0.35 }}
-          className="relative min-w-0 overflow-hidden rounded-3xl bg-slate-950 px-5 py-6 text-white shadow-xl shadow-slate-200 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:col-span-3">
+          className="relative min-w-0 overflow-hidden rounded-3xl bg-slate-950 px-5 py-6 text-white shadow-xl shadow-slate-200 sm:px-8 sm:py-8 lg:px-10 lg:py-9">
           <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-indigo-500/30 blur-3xl" />
           <div className="absolute bottom-[-8rem] right-48 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
           <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_auto]">
@@ -165,7 +169,7 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.section>
-         <section className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
+         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
           {stats.map((stat, index) => (
             <motion.div key={stat.label} {...cardMotion} transition={{ duration: 0.35, delay: 0.06 * (index + 1) }} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between">
@@ -212,7 +216,11 @@ export default function Dashboard() {
                         <ArrowRightIcon className="h-4 w-4 text-slate-300 transition group-hover:translate-x-1 group-hover:text-indigo-500" />
                       </div>
                       <h3 className="mt-5 font-semibold text-slate-900">{subject.name || subject.title}</h3>
-                      <p className="mt-1 text-xs text-slate-500">{subject.topic || t('continue_latest_topic')}</p>
+                      <p className="mt-1 text-xs text-slate-500">{subject.total !== undefined
+                        ? Number(subject.total) > 0
+                          ? `${subject.progress || 0} / ${subject.total} ${t('topics_completed_count')}`
+                          : t('course_content_coming_soon')
+                        : subject.topic || t('continue_latest_topic')}</p>
                       <div className="mt-4 flex items-center justify-between text-xs">
                         <span className="font-medium text-slate-500">{t('course_progress')}</span>
                         <span className="font-semibold text-slate-700">{progress}%</span>
@@ -265,15 +273,15 @@ export default function Dashboard() {
             <motion.section {...cardMotion} transition={{ duration: 0.35, delay: 0.2 }} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-slate-900">{activityCalendar.month_label || t('learning_activity')}</h2>
+                  <h2 className="font-semibold text-slate-900">{calendarMonth}</h2>
                   <p className="mt-1 text-xs text-slate-500">{activityCalendar.days_in_month || calendarDays.length} {t('days')} · {activityCalendar.active_days || 0} {t('active')}</p>
                 </div>
                 <div className="rounded-xl bg-orange-50 p-2.5 text-orange-500"><FireIcon className="h-5 w-5" /></div>
               </div>
 
               <div className="mt-5 grid grid-cols-7 gap-1.5 text-center">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <span key={day} className="pb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">{day.slice(0, 1)}</span>
+                {[1, 2, 3, 4, 5, 6, 0].map((day) => (
+                  <span key={day} className="pb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">{new Intl.DateTimeFormat(calendarLocale, { weekday: 'narrow' }).format(new Date(2026, 0, 4 + day))}</span>
                 ))}
                 {Array.from({ length: calendarOffset }).map((_, index) => (
                   <span key={`calendar-offset-${index}`} className="h-10 rounded-xl border border-dashed border-slate-100 bg-slate-50/40" aria-hidden="true" />
@@ -281,7 +289,7 @@ export default function Dashboard() {
                 {calendarDays.map((day) => (
                   <div
                     key={day.date}
-                    title={`${day.date}: ${day.sessions_completed} session${day.sessions_completed === 1 ? '' : 's'} completed`}
+                    title={`${day.date}: ${day.sessions_completed} ${t('sessions_completed')}`}
                     className={`relative flex h-10 flex-col items-center justify-center rounded-xl border text-[10px] font-semibold transition ${
                       day.is_active
                         ? 'border-orange-400 bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-sm shadow-orange-200'

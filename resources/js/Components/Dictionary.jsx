@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { confirmAlert, showToast } from '@/Components/sweetAlert';
 
 const Dictionary = () => {
+  const { t } = useLanguage();
   const [word, setWord] = useState('');
   const [definition, setDefinition] = useState('');
   const [loading, setLoading] = useState(false);
@@ -67,10 +70,7 @@ const Dictionary = () => {
         setDefinition(definitions);
         
         // Show success message
-        const event = new CustomEvent('showToast', {
-          detail: { message: `Found definition for "${word}"`, type: 'success' }
-        });
-        window.dispatchEvent(event);
+        showToast({ text: t('definition_found').replace('{word}', word) });
       }
     } catch (error) {
       setError('Word not found. Please try another word.');
@@ -106,8 +106,8 @@ const Dictionary = () => {
     loadSearchHistory();
   }, []);
 
-  const clearHistory = () => {
-    if (window.confirm('Clear search history?')) {
+  const clearHistory = async () => {
+    if (await confirmAlert(t, { title: t('clear_search_history_title'), text: t('clear_search_history_message'), confirmText: t('clear_history_action') })) {
       setSearchHistory([]);
       localStorage.removeItem('dictionary-history');
     }
@@ -152,10 +152,7 @@ const Dictionary = () => {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(definition.replace(/<[^>]*>/g, ''));
-                  const event = new CustomEvent('showToast', {
-                    detail: { message: 'Definition copied!', type: 'success' }
-                  });
-                  window.dispatchEvent(event);
+                  showToast({ text: t('definition_copied') });
                 }}
                 className="text-sm text-blue-500 hover:text-blue-700"
               >

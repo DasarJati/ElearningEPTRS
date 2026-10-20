@@ -1,8 +1,11 @@
 import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { useLanguage } from '@/Contexts/LanguageContext';
+import { confirmAlert } from '@/Components/sweetAlert';
 
 export default function VerifyEmail({ status }) {
+    const { t } = useLanguage();
     const { post, processing } = useForm({});
 
     const submit = (e) => {
@@ -13,36 +16,35 @@ export default function VerifyEmail({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
+            <Head title={t('email_verification')} />
 
             <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
+                {t('email_verification_intro')}
             </div>
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                    {t('verification_link_sent')}
                 </div>
             )}
 
             <form onSubmit={submit}>
                 <div className="mt-4 flex items-center justify-between">
                     <PrimaryButton disabled={processing}>
-                        Resend Verification Email
+                        {t('resend_verification_email')}
                     </PrimaryButton>
 
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            if (await confirmAlert(t, { title: t('sign_out'), text: t('sign_out_confirmation'), confirmText: t('sign_out') })) {
+                                router.post(route('logout'));
+                            }
+                        }}
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Log Out
-                    </Link>
+                        {t('sign_out')}
+                    </button>
                 </div>
             </form>
         </GuestLayout>

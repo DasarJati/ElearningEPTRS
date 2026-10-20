@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, Head } from '@inertiajs/react';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 
 const ReviewQuestionDisplay = ({ question }) => {
-  if (!question) return <p className="text-gray-500">No question available</p>;
+  const { t } = useLanguage();
+  if (!question) return <p className="text-gray-500">{t('no_question_available')}</p>;
 
   const processQuestionHtml = (html) => {
     if (!html) return html;
@@ -58,7 +60,7 @@ const ReviewQuestionDisplay = ({ question }) => {
           <div className="flex justify-center">
             <img
               src={imageUrl}
-              alt="Question"
+              alt={t('question')}
               className="max-w-full h-auto rounded-lg shadow-md max-h-96 object-contain"
               onError={(e) => {
                 e.target.onerror = null;
@@ -76,7 +78,7 @@ const ReviewQuestionDisplay = ({ question }) => {
         <svg className="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p className="text-gray-500">No question content available</p>
+        <p className="text-gray-500">{t('no_question_content')}</p>
       </div>
     );
   };
@@ -91,6 +93,7 @@ const ReviewQuestionDisplay = ({ question }) => {
 
 // Simplified ReviewOptionDisplay - Handles text, HTML, and image answers
 const ReviewOptionDisplay = ({ option, index, isChosen, isCorrect, wasCorrect, wasWrong }) => {
+  const { t } = useLanguage();
   const getOptionStyles = () => {
     if (wasCorrect) return 'bg-green-50 border-green-500';
     if (wasWrong) return 'bg-red-50 border-red-500';
@@ -121,7 +124,7 @@ const ReviewOptionDisplay = ({ option, index, isChosen, isCorrect, wasCorrect, w
           {/* Image */}
           <img
             src={option.file}
-            alt={`Option ${String.fromCharCode(65 + index)}`}
+            alt={`${t('option')} ${String.fromCharCode(65 + index)}`}
             className="max-w-full h-auto rounded-lg shadow-sm max-h-48 object-contain"
             onError={(e) => {
               console.error('Failed to load option image:', option.file);
@@ -129,7 +132,7 @@ const ReviewOptionDisplay = ({ option, index, isChosen, isCorrect, wasCorrect, w
               if (!e.target.parentNode.querySelector('.image-fallback')) {
                 const fallback = document.createElement('div');
                 fallback.className = 'image-fallback text-red-500 text-center p-2 bg-red-50 rounded-lg text-sm';
-                fallback.textContent = 'Image failed to load';
+                fallback.textContent = t('image_load_failed');
                 e.target.parentNode.appendChild(fallback);
               }
             }}
@@ -160,9 +163,9 @@ const ReviewOptionDisplay = ({ option, index, isChosen, isCorrect, wasCorrect, w
   };
 
   const getStatusText = () => {
-    if (wasCorrect) return 'Your Answer (Correct)';
-    if (wasWrong) return 'Your Answer (Incorrect)';
-    if (isCorrect) return 'Correct Answer';
+    if (wasCorrect) return t('your_answer_correct');
+    if (wasWrong) return t('your_answer_incorrect');
+    if (isCorrect) return t('correct_answer');
     return '';
   };
 
@@ -201,6 +204,7 @@ const ReviewOptionDisplay = ({ option, index, isChosen, isCorrect, wasCorrect, w
 };
 
 const ExplanationDisplay = ({ explanation }) => {
+  const { t } = useLanguage();
   if (!explanation || explanation === "Explanation not available.") {
     return null;
   }
@@ -237,7 +241,7 @@ const ExplanationDisplay = ({ explanation }) => {
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
           </svg>
         </div>
-        <h4 className="font-semibold text-blue-800 text-lg">Explanation</h4>
+        <h4 className="font-semibold text-blue-800 text-lg">{t('explanation')}</h4>
       </div>
 
       <div className="ml-11">
@@ -249,7 +253,7 @@ const ExplanationDisplay = ({ explanation }) => {
         {/* Additional learning tips */}
         <div className="mt-4 pt-3 border-t border-blue-200">
           <p className="text-sm text-blue-700 font-medium">
-            💡 <span className="font-semibold">Learning Tip:</span> Review this explanation carefully and try similar questions to reinforce your understanding.
+            💡 <span className="font-semibold">{t('learning_tip')}:</span> {t('review_learning_tip')}
           </p>
         </div>
       </div>
@@ -258,6 +262,7 @@ const ExplanationDisplay = ({ explanation }) => {
 };
 
 const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
+  const { t } = useLanguage();
   if (questionType !== 'subjective') return null;
 
   return (
@@ -270,7 +275,7 @@ const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h4 className="font-semibold text-blue-800 text-lg">Your Answer</h4>
+          <h4 className="font-semibold text-blue-800 text-lg">{t('your_answer')}</h4>
         </div>
 
         <div className="ml-13">
@@ -285,7 +290,7 @@ const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
               <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p>No answer provided</p>
+              <p>{t('no_answer_provided')}</p>
             </div>
           )}
         </div>
@@ -299,7 +304,7 @@ const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h4 className="font-semibold text-green-800 text-lg">Schema Answer</h4>
+          <h4 className="font-semibold text-green-800 text-lg">{t('schema_answer')}</h4>
         </div>
 
         <div className="ml-13">
@@ -321,7 +326,7 @@ const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
               <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p>No schema answer available</p>
+              <p>{t('no_schema_answer')}</p>
             </div>
           )}
         </div>
@@ -334,6 +339,7 @@ const SubjectiveAnswerDisplay = ({ attempt, questionType }) => {
 
 // Main component
 export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
+  const { t } = useLanguage();
   const [session, setSession] = useState(null);
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -377,7 +383,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
       }
     } catch (error) {
       console.error('Error fetching question attempts:', error);
-      setError('Failed to load review data. Please try again.');
+      setError(t('load_review_failed'));
     } finally {
       setLoading(false);
     }
@@ -427,11 +433,11 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">
-                Question Review
+                {t('question_review')}
               </h2>
               {session && (
                 <p className="text-gray-600 mt-1">
-                  Session: {session.topic_name} • {session.created_at}
+                  {t('session')}: {session.topic_name} • {session.created_at}
                 </p>
               )}
             </div>
@@ -458,20 +464,20 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                 onClick={fetchQuestionAttempts}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
-                Retry
+                {t('try_again')}
               </button>
             </div>
           ) : loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="text-gray-600 mt-4">Loading review data...</p>
+              <p className="text-gray-600 mt-4">{t('loading_review_data')}</p>
             </div>
           ) : attempts.length === 0 ? (
             <div className="text-center py-12">
               <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="text-gray-500 text-lg">No question attempts found for this session</p>
+              <p className="text-gray-500 text-lg">{t('no_question_attempts')}</p>
             </div>
           ) : (
             <>
@@ -480,7 +486,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
               {/* Question List (Mini Navigation) */}
               <div className="mb-2">
                 <h4 className="font-medium text-gray-700 mb-3">
-                  All Questions ({totalQuestions})
+                  {t('all_questions')} ({totalQuestions})
                 </h4>
 
                 <div className="grid grid-cols-5 md:grid-cols-10 gap-3">
@@ -501,9 +507,9 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                                 : 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200'
                           }
   `}
-                        title={`Question ${index + 1}: ${attempt.chosen_answer_id === 0 && attempt.answer_status === 0
-                          ? 'Unanswered'
-                          : attempt.is_correct ? 'Correct' : 'Incorrect'
+                        title={`${t('question')} ${index + 1}: ${attempt.chosen_answer_id === 0 && attempt.answer_status === 0
+                          ? t('unanswered')
+                          : attempt.is_correct ? t('correct_answers') : t('incorrect')
                           }`}
                       >
                         {index + 1}
@@ -520,7 +526,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <span className="font-bold text-blue-700">Q{currentQuestionIndex + 1}</span>
+                        <span className="font-bold text-blue-700">{t('question_short')}{currentQuestionIndex + 1}</span>
                     </div>
                     <div>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${currentAttempt.question_type === 'objective'
@@ -528,12 +534,12 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                         : 'bg-blue-100 text-blue-800'
                         }`}>
                         {currentAttempt.question_type === 'objective'
-                          ? (currentAttempt.is_correct ? '✓ Correct' : '✗ Incorrect')
-                          : '📝 Subjective'}
+                          ? (currentAttempt.is_correct ? `✓ ${t('correct_answers')}` : `✗ ${t('incorrect')}`)
+                          : `📝 ${t('subjective_type')}`}
                       </span>
                       {currentAttempt.time_taken > 0 && (
                         <span className="ml-2 text-gray-500 text-sm">
-                          ⏱️ Time: {formatTime(currentAttempt.time_taken || 0)}
+                          ⏱️ {t('time')}: {formatTime(currentAttempt.time_taken || 0)}
                         </span>
                       )}
                     </div>
@@ -555,7 +561,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                 {currentAttempt.question_type === 'objective' ? (
                   // Objective Question - Show Options
                   <div className="space-y-3 mb-8">
-                    <h4 className="font-medium text-gray-700 mb-4">Answer Options:</h4>
+                    <h4 className="font-medium text-gray-700 mb-4">{t('answer_options')}:</h4>
                     {currentAttempt.answers && currentAttempt.answers.map((answer, index) => (
                       <ReviewOptionDisplay
                         key={answer.id || index}
@@ -594,11 +600,11 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                   >
-                    Previous
+                    {t('previous')}
                   </button>
 
                   <div className="text-gray-700 font-medium">
-                    Question <span className="text-blue-600">{currentQuestionIndex + 1}</span> of {totalQuestions}
+                    {t('question')} <span className="text-blue-600">{currentQuestionIndex + 1}</span> {t('of')} {totalQuestions}
                   </div>
 
                   <button
@@ -608,7 +614,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                   >
-                    Next
+                    {t('next')}
                   </button>
                 </div>
 
@@ -627,7 +633,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
             <div className="text-gray-600">
               {session && (
                 <span className="text-sm">
-                  Topic: <span className="font-medium">{session.topic_name}</span>
+                  {t('topic')}: <span className="font-medium">{session.topic_name}</span>
                 </span>
               )}
             </div>
@@ -636,7 +642,7 @@ export default function QuestionReviewModal({ isOpen, onClose, sessionId }) {
                 onClick={onClose}
                 className="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
               >
-                Close Review
+                {t('close_review')}
               </button>
             </div>
           </div>

@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
+import { showAlert } from '@/Components/sweetAlert';
 
 const LanguageContext = createContext();
 
@@ -75,11 +76,14 @@ export const LanguageProvider = ({ children, pageProps }) => {
             syncLanguageProps(data);
         } catch (error) {
             console.error('Failed to change language:', error);
-            alert('Failed to change language. Please try again.');
+            showAlert((key) => translations[key] || key, {
+                text: translations.language_change_failed || 'Failed to change language. Please try again.',
+                icon: 'error',
+            });
         } finally {
             setIsChanging(false);
         }
-    }, [availableLocales, isChanging, locale, syncLanguageProps]);
+    }, [availableLocales, isChanging, locale, syncLanguageProps, translations]);
 
     const t = useCallback((key, fallback = '') => {
         if (key.includes('.')) {

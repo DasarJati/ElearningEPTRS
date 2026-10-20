@@ -3,8 +3,10 @@ import { usePage, router } from "@inertiajs/react";
 import SubjectLayout from "@/Layouts/SubjectLayout";
 import MasteryChallenge from "@/Components/MasteryChallenge";
 import PracticeChallenge from "@/Components/PracticeChallenge";
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function SubjectMissionPage() {
+    const { t } = useLanguage();
     const { props } = usePage();
     const subjectKey = props.subject_abbr;
     const subjectTitle = props.subject;
@@ -106,7 +108,7 @@ export default function SubjectMissionPage() {
         return (
             <SubjectLayout subject={subjectKey} activeTab="Mission">
                 <div className="flex justify-center items-center h-96">
-                    <p className="text-gray-500">Loading...</p>
+                    <p className="text-gray-500">{t('loading')}</p>
                 </div>
             </SubjectLayout>
         );
@@ -125,7 +127,7 @@ export default function SubjectMissionPage() {
                     {/* LEFT: Mastery Progress */}
                     <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                            MASTERY PROGRESS
+                            {t('mastery_progress')}
                         </h2>
 
                         <div className="flex flex-col items-center">
@@ -165,23 +167,23 @@ export default function SubjectMissionPage() {
                             <ul className="text-sm text-gray-600 space-y-1 w-full">
                                 <li className="flex items-center space-x-2">
                                     <div className="w-3 h-3 rounded-sm bg-sky-700"></div>
-                                    <span>{progressData?.skills.mastered || 0} skills mastered</span>
+                                    <span>{progressData?.skills.mastered || 0} {t('skills_mastered')}</span>
                                 </li>
                                 <li className="flex items-center space-x-2">
                                     <div className="w-3 h-3 rounded-sm bg-sky-600"></div>
-                                    <span>{progressData?.skills.proficient || 0} skills proficient</span>
+                                    <span>{progressData?.skills.proficient || 0} {t('skills_proficient')}</span>
                                 </li>
                                 <li className="flex items-center space-x-2">
                                     <div className="w-3 h-3 rounded-sm bg-sky-400"></div>
-                                    <span>{progressData?.skills.familiar || 0} skills familiar</span>
+                                    <span>{progressData?.skills.familiar || 0} {t('skills_familiar')}</span>
                                 </li>
                                 <li className="flex items-center space-x-2">
                                     <div className="w-3 h-3 rounded-sm bg-sky-200"></div>
-                                    <span>{progressData?.skills.practiced || 0} skills practiced</span>
+                                    <span>{progressData?.skills.practiced || 0} {t('skills_practiced')}</span>
                                 </li>
                                 <li className="flex items-center space-x-2">
                                     <div className="w-3 h-3 rounded-sm bg-gray-300"></div>
-                                    <span>{progressData?.skills.needPractice || 0} skills need practice</span>
+                                    <span>{progressData?.skills.needPractice || 0} {t('skills_need_practice')}</span>
                                 </li>
                             </ul>
                         </div>
@@ -227,7 +229,7 @@ export default function SubjectMissionPage() {
                                         onClick={() => setOpen(true)}
                                         className="px-6 py-3 bg-white text-teal-600 rounded-lg shadow-lg hover:bg-gray-50 font-semibold transition-all hover:scale-105"
                                     >
-                                        Start
+                                        {t('start')}
                                     </button>
                                 </div>
                             </div>
@@ -260,11 +262,11 @@ export default function SubjectMissionPage() {
                         {/* Skills to Practice */}
                         <div className="bg-white rounded-lg shadow p-6">
                             <h3 className="text-lg font-bold text-gray-800 mb-4">
-                                SKILLS YOU NEED TO PRACTICE
+                                {t('skills_to_practice')}
                             </h3>
                             {skills.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-gray-500">Great job! All skills are mastered or proficient.</p>
+                                    <p className="text-gray-500">{t('all_skills_mastered')}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -286,7 +288,7 @@ export default function SubjectMissionPage() {
                                                 onClick={() => handlePractice(skill.id, skill.name)}
                                                 className="px-4 py-2 border border-sky-500 text-sky-500 rounded-full hover:bg-sky-500 hover:text-white transition-colors"
                                             >
-                                                Practice
+                                                {t('practice')}
                                             </button>
                                         </div>
                                     ))}

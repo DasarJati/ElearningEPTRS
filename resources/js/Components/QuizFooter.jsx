@@ -1,6 +1,7 @@
 // Components/QuizFooter.jsx - VERSI SIMPLIFIED
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/Contexts/LanguageContext';
 
 export default function QuizFooter({
   showExplanation,
@@ -13,6 +14,7 @@ export default function QuizFooter({
   onToggleCalculator,
   calculatorOpen = false
 }) {
+  const { t } = useLanguage();
   const progress = questions.length > 0
     ? Math.round(((currentQuestion + 1) / questions.length) * 100)
     : 0;
@@ -30,10 +32,10 @@ export default function QuizFooter({
         {/* Question info */}
         <div className="min-w-0">
           <div className="text-sm font-bold text-white sm:text-base">
-            Question <span className="text-yellow-300">{currentQuestion + 1}</span> / {questions.length}
+            {t('question')} <span className="text-yellow-300">{currentQuestion + 1}</span> / {questions.length}
           </div>
           <p className="hidden text-xs text-blue-100/80 sm:block">
-            {showExplanation ? 'Great effort—review and continue your quest!' : 'Choose carefully, then check your answer.'}
+            {t(showExplanation ? 'review_continue_quest' : 'choose_then_check')}
           </p>
         </div>
         
@@ -45,13 +47,13 @@ export default function QuizFooter({
               whileTap={{ scale: 0.95 }}
               onClick={onToggleCalculator}
               aria-pressed={calculatorOpen}
-              title="Calculator"
+              title={t('calculator')}
               className={`rounded-xl border p-2.5 text-white shadow-lg ${calculatorOpen ? 'border-yellow-300 bg-white/25' : 'border-white/30 bg-white/10 hover:bg-white/20'}`}
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              <span className="sr-only">Calculator</span>
+              <span className="sr-only">{t('calculator')}</span>
             </motion.button>
           )}
           {!showExplanation ? (
@@ -62,7 +64,7 @@ export default function QuizFooter({
               disabled={selectedOption === null || checking}
               className={`rounded-xl border px-4 py-2.5 font-bold text-white shadow-lg sm:px-6 ${selectedOption === null || checking ? 'cursor-not-allowed border-white/10 bg-slate-500/80' : 'border-emerald-300 bg-emerald-500 hover:bg-emerald-600'}`}
             >
-              {checking ? 'Checking...' : 'Check Answer'}
+              {t(checking ? 'checking' : 'check_answer')}
             </motion.button>
           ) : (
             // TAMPILKAN LANGSUNG NEXT BUTTON TANPA TRY AGAIN
@@ -72,7 +74,7 @@ export default function QuizFooter({
               onClick={onNextQuestion}
               className="rounded-xl border border-yellow-300 bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-2.5 font-bold text-slate-900 shadow-lg sm:px-6"
             >
-              {currentQuestion < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+              {t(currentQuestion < questions.length - 1 ? 'next_question' : 'finish_quiz')}
             </motion.button>
           )}
         </div>
