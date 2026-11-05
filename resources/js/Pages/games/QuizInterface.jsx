@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import QuizLayout from '@/Layouts/QuizLayout';
 import QuizFooter from '@/Components/QuizFooter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
 const formatTime = (totalSeconds) => {
@@ -12,51 +12,81 @@ const formatTime = (totalSeconds) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-// Memoized Timer Display Component - COMPACT GAMING STYLE
-const TimerDisplay = memo(({ timeElapsed }) => (
-  <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg shadow px-4 py-2 flex items-center border-2 border-yellow-400">
+const TimerDisplay = memo(({ timeElapsed, reducedMotion }) => (
+  <div className="flex items-center rounded-2xl border border-white/20 bg-white/10 px-4 py-2 text-white shadow-lg backdrop-blur-sm">
     <span className="text-lg mr-2">⏰</span>
-    <span className="text-lg font-bold font-mono">{formatTime(timeElapsed)}</span>
+    <motion.span
+      key={timeElapsed}
+      initial={reducedMotion ? false : { opacity: 0.65, y: -5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="text-lg font-bold font-mono tabular-nums"
+    >
+      {formatTime(timeElapsed)}
+    </motion.span>
   </div>
 ));
 
-// Memoized Question Options Component - COMPACT
-const QuestionOptions = memo(({ options, selectedOption, answer, disabled, handleOptionSelect }) => (
-  <div className="space-y-3 mb-4">
+const optionColors = [
+  'bg-violet-500 hover:bg-violet-400',
+  'bg-cyan-600 hover:bg-cyan-500',
+  'bg-amber-400 hover:bg-amber-300',
+  'bg-pink-600 hover:bg-pink-500',
+];
+
+const QuestionOptions = memo(({ options, selectedOption, answer, disabled, handleOptionSelect, reducedMotion }) => (
+  <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
     {options.map((option, index) => {
       const isSelected = selectedOption === index;
       const isCorrectOption = answer && index === answer.correct_answer;
       const isWrongPick = answer && isSelected && !answer.correct;
+      const tileColor = isCorrectOption
+        ? 'bg-green-500 hover:bg-green-500'
+        : isWrongPick
+          ? 'bg-red-500 hover:bg-red-500'
+          : optionColors[index % optionColors.length];
 
       return (
         <motion.button
           key={index}
-          initial={{ y: 5, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 + index * 0.05 }}
+          initial={reducedMotion ? false : { y: 22, opacity: 0, scale: 0.96 }}
+          animate={reducedMotion
+            ? { opacity: 1 }
+            : isWrongPick
+              ? { x: [0, -7, 7, -4, 0], y: 0, opacity: 1, scale: 1 }
+              : isCorrectOption
+                ? { x: 0, y: 0, opacity: 1, scale: [1, 1.045, 1] }
+                : { x: 0, y: isSelected ? -4 : 0, opacity: 1, scale: isSelected ? 1.015 : 1 }}
+          transition={{ delay: answer ? 0 : 0.08 + index * 0.065, duration: answer ? 0.38 : 0.3, ease: 'easeOut' }}
+          whileHover={!disabled && !reducedMotion ? { y: -4, scale: 1.015 } : undefined}
+          whileTap={!disabled && !reducedMotion ? { scale: 0.97 } : undefined}
           onClick={() => handleOptionSelect(index)}
           disabled={disabled}
           aria-pressed={isSelected}
-          className={`group w-full p-3.5 sm:p-4 text-left transition-all duration-200 rounded-xl border-2 ${
-            isSelected
-              ? "border-yellow-500 bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg sm:scale-[1.01]"
-              : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:shadow-md"
-          } ${isCorrectOption ? "border-green-500 bg-gradient-to-r from-green-400 to-emerald-400 text-white" : ""
-          } ${isWrongPick ? "border-red-500 bg-gradient-to-r from-red-400 to-pink-400 text-white" : ""}`}
+          className={`group relative min-h-24 w-full rounded-2xl border-2 p-4 text-left shadow-[0_6px_0_rgba(20,10,55,0.28)] transition-colors duration-150 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-32 sm:p-5 ${tileColor} ${index % optionColors.length === 2 && !isCorrectOption && !isWrongPick ? 'text-[#241044]' : 'text-white'} ${isSelected ? 'border-white ring-4 ring-white/60 shadow-[0_10px_0_rgba(20,10,55,0.28)]' : 'border-white/15'}`}
         >
-          <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-lg border flex items-center justify-center flex-shrink-0 mr-3 font-bold ${
-              isSelected ? "bg-white text-orange-600 border-white" : "bg-gray-100 text-gray-700 border-gray-300"
-            } ${isCorrectOption ? "bg-white text-green-600 border-white" : ""
-            } ${isWrongPick ? "bg-white text-red-600 border-white" : ""}`}>
+          <AnimatePresence>
+            {isSelected && !answer && (
+              <motion.span
+                initial={reducedMotion ? false : { scale: 0, rotate: -25 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 19 }}
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-[#241044] shadow-sm"
+                aria-hidden="true"
+              >✓</motion.span>
+            )}
+          </AnimatePresence>
+          <div className="flex h-full items-center gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/20 text-lg font-black sm:h-12 sm:w-12">
               {String.fromCharCode(65 + index)}
             </div>
-            <div className="text-base flex-1">{option}</div>
+            <div className="flex-1 text-base font-bold leading-snug sm:text-lg">{option}</div>
             {isCorrectOption && (
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-2 text-xl">✅</motion.div>
+              <motion.div initial={reducedMotion ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 18 }} className="ml-2 text-xl">✅</motion.div>
             )}
             {isWrongPick && (
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-2 text-xl">❌</motion.div>
+              <motion.div initial={reducedMotion ? false : { scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 18 }} className="ml-2 text-xl">❌</motion.div>
             )}
           </div>
         </motion.button>
@@ -97,15 +127,16 @@ const Confetti = memo(() => (
 
 const SubmittingScreen = ({ correct, total, timeElapsed }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
   return (
   <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
+      initial={reducedMotion ? false : { scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       className="bg-gray-800 bg-opacity-90 backdrop-blur-lg rounded-3xl border-2 border-yellow-400 shadow-2xl p-8 max-w-md w-full text-center"
     >
       <motion.div
-        animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
+        animate={reducedMotion ? undefined : { y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         className="text-6xl mb-6"
       >
@@ -119,7 +150,7 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => {
           className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full"
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: reducedMotion ? 0 : 2, repeat: reducedMotion ? 0 : Infinity, ease: "easeInOut" }}
         />
       </div>
       <p className="text-blue-300 mb-6 text-lg font-semibold">🎮 {t('securing_rank')}</p>
@@ -148,6 +179,7 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => {
  */
 export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting = false, submitError = null }) {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
   const { questions } = quiz;
   const [answers, setAnswers] = useState(quiz.answers);
   const [currentQuestion, setCurrentQuestion] = useState(() => {
@@ -250,25 +282,41 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
       <Head title={t('random_quiz')} />
 
       <AnimatePresence>
-        {showConfetti && <Confetti />}
+        {showConfetti && !reducedMotion && <Confetti />}
       </AnimatePresence>
 
       <div
-        className="relative overflow-hidden bg-cover bg-bottom bg-no-repeat"
-        style={{ backgroundImage: 'linear-gradient(135deg, rgba(30,64,175,0.16), rgba(88,28,135,0.20)), url(/images/background_quiz.jpg)' }}
+        className="relative min-h-[calc(100dvh-160px)] overflow-hidden bg-gradient-to-br from-[#241044] via-[#341568] to-[#16103d]"
       >
-        <div className="pointer-events-none absolute -left-16 top-12 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-12 bottom-8 h-44 w-44 rounded-full bg-purple-500/20 blur-3xl" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px), radial-gradient(circle, #ffffff 1px, transparent 1px)',
+            backgroundSize: '48px 48px, 48px 48px',
+            backgroundPosition: '0 0, 24px 24px',
+          }}
+          aria-hidden="true"
+        />
+        <motion.div
+          className="pointer-events-none absolute -left-16 top-12 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-3xl"
+          animate={reducedMotion ? undefined : { x: [0, 22, 0], y: [0, -15, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="pointer-events-none absolute -right-12 bottom-8 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl"
+          animate={reducedMotion ? undefined : { x: [0, -24, 0], y: [0, 18, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-3 pt-4 pb-2 sm:px-4 sm:pt-6">
+        <div className="relative z-10 mx-auto max-w-5xl px-3 py-5 sm:px-5 sm:py-7">
           {/* Compact Header */}
           <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
-            <div className="rounded-xl border border-yellow-300/80 bg-gradient-to-r from-purple-700 to-blue-700 px-3 py-2 text-white shadow-lg sm:px-4">
+            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-white shadow-md backdrop-blur-sm sm:px-5">
               <span className="font-bold">🎯 {t('quiz_quest')}</span>
-              <span className="ml-2 hidden text-xs text-blue-100 sm:inline">{questions.length} {t('quick_questions')}</span>
+              <span className="ml-2 hidden text-xs text-violet-200 sm:inline">{questions.length} {t('quick_questions')}</span>
             </div>
 
-            <TimerDisplay timeElapsed={timeElapsed} />
+            <TimerDisplay timeElapsed={timeElapsed} reducedMotion={reducedMotion} />
           </div>
 
           {(submitError || answerError) && (
@@ -277,52 +325,62 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
             </div>
           )}
 
+          <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentQuestion}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden rounded-2xl border-2 border-yellow-400 bg-white/95 shadow-2xl backdrop-blur-sm"
+            initial={reducedMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reducedMotion ? undefined : { opacity: 0, y: -18, scale: 0.985 }}
+            transition={{ duration: reducedMotion ? 0 : 0.28, ease: 'easeOut' }}
+            className="overflow-hidden rounded-3xl border border-white/15 bg-[#2c1757] shadow-2xl shadow-black/30"
           >
             {/* Compact Progress Header */}
-            <div className="border-b-2 border-yellow-400 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 p-3.5 sm:p-4">
+            <div className="border-b border-white/10 bg-white/5 p-4 sm:px-6 sm:py-5">
               <div className="flex justify-between items-center">
                 <div className="min-w-0 text-white font-bold">
                   <span>{t('question')} {currentQuestion + 1} {t('of')} {questions.length}</span>
-                  <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-yellow-400 px-2 py-1 align-middle text-xs text-gray-900 sm:max-w-none">
+                  <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-violet-500 px-2.5 py-1 align-middle text-xs text-white sm:max-w-none">
                     {question.category}
                   </span>
                 </div>
-                <div className="shrink-0 text-right text-xs font-bold text-yellow-300">
-                  ⭐ {correctAnswersCount} {t('correct_answers')}
+                <div className="shrink-0 text-right text-xs font-bold text-amber-300">
+                  ⭐ <motion.span
+                    key={correctAnswersCount}
+                    initial={reducedMotion ? false : { scale: 1.4, opacity: 0.5 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+                    className="inline-block"
+                  >{correctAnswersCount}</motion.span> {t('correct_answers')}
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`${t('question')} ${currentQuestion + 1} ${t('of')} ${questions.length}`}>
                 {questions.map((_, index) => (
-                  <div
+                  <motion.div
                     key={index}
+                    initial={false}
+                    animate={index === currentQuestion && firstAnswers[index] === null && !reducedMotion ? { opacity: [1, 0.55, 1] } : { opacity: 1 }}
+                    transition={index === currentQuestion && firstAnswers[index] === null && !reducedMotion ? { duration: 1.8, repeat: Infinity } : { duration: 0.2 }}
                     className={`h-1.5 rounded-full transition-colors ${
                       firstAnswers[index] !== null
                         ? firstAnswers[index] ? 'bg-emerald-400' : 'bg-rose-400'
-                        : index === currentQuestion ? 'bg-yellow-300' : 'bg-white/25'
+                        : index === currentQuestion ? 'bg-amber-300' : 'bg-white/25'
                     }`}
                   />
                 ))}
               </div>
             </div>
 
-            <div className="p-4 sm:p-6">
+            <div className="p-4 sm:p-7">
               <motion.h2
-                className="mb-5 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 text-left text-lg font-bold leading-relaxed text-gray-800 sm:mb-6 sm:p-5 sm:text-center sm:text-xl"
-                initial={{ y: -5, opacity: 0 }}
+                className="mb-6 rounded-2xl border border-white/10 bg-white/10 p-6 text-center text-xl font-extrabold leading-relaxed text-white shadow-inner sm:mb-7 sm:p-8 sm:text-3xl"
+                initial={reducedMotion ? false : { y: -8, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: reducedMotion ? 0 : 0.08, duration: 0.28 }}
               >
                 {question.question}
               </motion.h2>
 
-              <div className="mb-3 text-sm font-bold text-gray-600 sm:mb-4">🎯 {t('choose_answer')}</div>
+              <div className="mb-4 text-center text-sm font-semibold text-violet-200">{t('choose_answer')}</div>
 
               <QuestionOptions
                 options={question.options}
@@ -330,29 +388,34 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                 answer={currentAnswer}
                 disabled={showExplanation || checking}
                 handleOptionSelect={handleOptionSelect}
+                reducedMotion={reducedMotion}
               />
 
               {/* Compact Explanation Toggle */}
               {showExplanation && (
-                <div className="flex justify-center mb-4">
+                <motion.div
+                  initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 mt-6 flex justify-center"
+                >
                   <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={reducedMotion ? undefined : { scale: 1.03 }}
+                    whileTap={reducedMotion ? undefined : { scale: 0.97 }}
                     onClick={() => setExplanationVisible(visible => !visible)}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow hover:shadow-md transition duration-200 flex items-center gap-2"
                   >
                     <span>📖</span>
                     <span>{t(explanationVisible ? 'hide' : 'reveal')}</span>
                   </motion.button>
-                </div>
+                </motion.div>
               )}
 
               {/* Compact Explanation */}
               {showExplanation && explanationVisible && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
+                  initial={reducedMotion ? false : { height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.25 }}
                   className={`mt-4 rounded-xl border-2 p-4 ${currentAnswer.correct ? 'border-green-400 bg-green-50' : 'border-amber-400 bg-amber-50'}`}
                 >
                   <div className="flex items-start">
@@ -372,6 +435,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
               )}
             </div>
           </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </QuizLayout>
