@@ -13,7 +13,7 @@ const formatTime = (totalSeconds) => {
 };
 
 const TimerDisplay = memo(({ timeElapsed, reducedMotion }) => (
-  <div className="flex items-center rounded-2xl border border-white/20 bg-white/10 px-4 py-2 text-white shadow-lg backdrop-blur-sm">
+  <div className={`flex items-center rounded-2xl border px-4 py-2 text-white shadow-lg backdrop-blur-sm ${timeElapsed <= 15 ? 'border-rose-300 bg-rose-500/30' : 'border-white/20 bg-white/10'}`}>
     <span className="text-lg mr-2">⏰</span>
     <motion.span
       key={timeElapsed}
@@ -125,7 +125,7 @@ const Confetti = memo(() => (
   </div>
 ));
 
-const SubmittingScreen = ({ correct, total, timeElapsed }) => {
+const SubmittingScreen = ({ correct, total, points, timeElapsed }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   return (
@@ -165,7 +165,7 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => {
         </div>
         <div className="bg-gray-700 p-2 rounded-lg">
           <div className="text-yellow-400 font-bold">🎯 {t('score')}</div>
-          <div className="text-white">{Math.round((correct / total) * 100)}%</div>
+          <div className="text-white">{points.toLocaleString()} pts</div>
         </div>
       </div>
     </motion.div>
@@ -180,83 +180,105 @@ const SubmittingScreen = ({ correct, total, timeElapsed }) => {
 export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting = false, submitError = null }) {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
-  const { questions } = quiz;
-  const [answers, setAnswers] = useState(quiz.answers);
-  const [currentQuestion, setCurrentQuestion] = useState(() => {
-    const firstUnanswered = quiz.answers.findIndex(answer => answer === null);
-    return firstUnanswered === -1 ? questions.length - 1 : firstUnanswered;
-  });
+  const [game, setGame] = useState(quiz);
+  const { questions, answers } = game;
+  const currentQuestion = game.current_index;
   const [selectedOption, setSelectedOption] = useState(null);
-  const [explanationVisible, setExplanationVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [checking, setChecking] = useState(false);
   const [answerError, setAnswerError] = useState(null);
+  const [advancing, setAdvancing] = useState(false);
+  const advanceRef = useRef(false);
+  const submitRef = useRef(false);
 
   // Display-only timer; the server measures the real time from its own start time.
   const startedAtRef = useRef(Date.now() - quiz.elapsed_seconds * 1000);
-  const [timeElapsed, setTimeElapsed] = useState(quiz.elapsed_seconds);
+  const [timeElapsed, setTimeElapsed] = useState(Math.min(quiz.duration_seconds, quiz.elapsed_seconds));
 
   useEffect(() => {
     if (submitting) return;
     const intervalId = setInterval(() => {
-      setTimeElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000));
+      setTimeElapsed(Math.min(game.duration_seconds, Math.floor((Date.now() - startedAtRef.current) / 1000)));
     }, 1000);
     return () => clearInterval(intervalId);
-  }, [submitting]);
+  }, [submitting, game.duration_seconds]);
+
+  useEffect(() => {
+    if (timeElapsed >= game.duration_seconds && !submitRef.current && !submitting) {
+      submitRef.current = true;
+      onSubmit();
+    }
+  }, [timeElapsed, game.duration_seconds, submitting, onSubmit]);
 
   useEffect(() => {
     onAnswered?.(answers.filter(Boolean).length);
   }, [answers, onAnswered]);
 
-  const currentAnswer = answers[currentQuestion];
+  const currentAnswer = answers[currentQuestion] ?? null;
   const showExplanation = currentAnswer !== null;
   const firstAnswers = useMemo(() => answers.map(answer => (answer ? answer.correct : null)), [answers]);
   const correctAnswersCount = firstAnswers.filter(answer => answer === true).length;
 
-  const handleOptionSelect = (optionIndex) => {
-    if (!showExplanation && !checking) {
-      setSelectedOption(optionIndex);
-    }
-  };
+  const handleOptionSelect = async (optionIndex) => {
+    if (showExplanation || checking || advancing || timeElapsed >= game.duration_seconds) return;
 
-  const checkAnswer = async () => {
-    if (selectedOption === null || showExplanation || checking) return;
-
+    setSelectedOption(optionIndex);
     setChecking(true);
     setAnswerError(null);
 
     try {
-      const { data } = await axios.post('/quiz/answer', { index: currentQuestion, option: selectedOption });
-      setAnswers(prev => prev.map((answer, index) => (index === currentQuestion ? data.answer : answer)));
-      setExplanationVisible(true);
+      const { data } = await axios.post('/quiz/answer', { index: currentQuestion, option: optionIndex });
+      setGame(data.quiz);
 
       if (data.answer.correct) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 1500);
       }
     } catch (error) {
+      if (error.response?.data?.expired) {
+        submitRef.current = true;
+        onSubmit();
+        return;
+      }
       setAnswerError(error.response?.data?.message || t('check_answer_failed'));
     } finally {
       setChecking(false);
     }
   };
 
-  const nextQuestion = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+  const nextQuestion = async () => {
+    if (advanceRef.current || submitRef.current) return;
+    advanceRef.current = true;
+    setAdvancing(true);
+    try {
+      const { data } = await axios.post('/quiz/next');
+      setGame(data.quiz);
       setSelectedOption(null);
-      setExplanationVisible(false);
       setAnswerError(null);
-    } else {
-      onSubmit();
+    } catch (error) {
+      if (error.response?.data?.expired) {
+        submitRef.current = true;
+        onSubmit();
+      } else {
+        setAnswerError(error.response?.data?.message || 'Gagal memuat soalan seterusnya. Cuba lagi.');
+      }
+    } finally {
+      advanceRef.current = false;
+      setAdvancing(false);
     }
   };
+
+  useEffect(() => {
+    if (!showExplanation || submitting || timeElapsed >= game.duration_seconds) return;
+    const timeout = setTimeout(nextQuestion, reducedMotion ? 1900 : 2800);
+    return () => clearTimeout(timeout);
+  }, [currentQuestion, showExplanation, submitting, game.duration_seconds]);
 
   if (submitting) {
     return (
       <QuizLayout title={t('submitting_results')}>
         <Head title={t('submitting_results')} />
-        <SubmittingScreen correct={correctAnswersCount} total={questions.length} timeElapsed={timeElapsed} />
+        <SubmittingScreen correct={correctAnswersCount} total={game.answered_count} points={game.points} timeElapsed={timeElapsed} />
       </QuizLayout>
     );
   }
@@ -265,17 +287,19 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
 
   return (
     <QuizLayout
-      title={`${t('random_quiz')} (${questions.length} ${t('questions')})`}
-      firstAnswers={firstAnswers}
+      title={`${t('random_quiz')} · 2 minit`}
+      firstAnswers={[]}
       footer={
         <QuizFooter
           showExplanation={showExplanation}
           currentQuestion={currentQuestion}
           selectedOption={showExplanation ? currentAnswer.selected : selectedOption}
-          checking={checking}
-          onCheckAnswer={checkAnswer}
+          checking={checking || advancing}
           onNextQuestion={nextQuestion}
-          questions={questions}
+          answeredCount={game.answered_count}
+          points={game.points}
+          remainingSeconds={Math.max(0, game.duration_seconds - timeElapsed)}
+          durationSeconds={game.duration_seconds}
         />
       }
     >
@@ -313,15 +337,16 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
           <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
             <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-white shadow-md backdrop-blur-sm sm:px-5">
               <span className="font-bold">🎯 {t('quiz_quest')}</span>
-              <span className="ml-2 hidden text-xs text-violet-200 sm:inline">{questions.length} {t('quick_questions')}</span>
+              <span className="ml-2 hidden text-xs text-violet-200 sm:inline">Jawab sebanyak mungkin dalam 2 minit</span>
             </div>
 
-            <TimerDisplay timeElapsed={timeElapsed} reducedMotion={reducedMotion} />
+            <TimerDisplay timeElapsed={Math.max(0, game.duration_seconds - timeElapsed)} reducedMotion={reducedMotion} />
           </div>
 
           {(submitError || answerError) && (
             <div className="mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">
               {submitError || answerError}
+              {submitError && <button type="button" onClick={onSubmit} className="ml-3 rounded bg-red-700 px-3 py-1 text-white">Cuba simpan semula</button>}
             </div>
           )}
 
@@ -338,36 +363,25 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
             <div className="border-b border-white/10 bg-white/5 p-4 sm:px-6 sm:py-5">
               <div className="flex justify-between items-center">
                 <div className="min-w-0 text-white font-bold">
-                  <span>{t('question')} {currentQuestion + 1} {t('of')} {questions.length}</span>
+                  <span>{t('question')} {currentQuestion + 1}</span>
                   <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-violet-500 px-2.5 py-1 align-middle text-xs text-white sm:max-w-none">
                     {question.category}
                   </span>
                 </div>
                 <div className="shrink-0 text-right text-xs font-bold text-amber-300">
                   ⭐ <motion.span
-                    key={correctAnswersCount}
+                    key={game.points}
                     initial={reducedMotion ? false : { scale: 1.4, opacity: 0.5 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 360, damping: 18 }}
                     className="inline-block"
-                  >{correctAnswersCount}</motion.span> {t('correct_answers')}
+                  >{game.points.toLocaleString()}</motion.span> pts
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-5 gap-1.5" aria-label={`${t('question')} ${currentQuestion + 1} ${t('of')} ${questions.length}`}>
-                {questions.map((_, index) => (
-                  <motion.div
-                    key={index}
-                    initial={false}
-                    animate={index === currentQuestion && firstAnswers[index] === null && !reducedMotion ? { opacity: [1, 0.55, 1] } : { opacity: 1 }}
-                    transition={index === currentQuestion && firstAnswers[index] === null && !reducedMotion ? { duration: 1.8, repeat: Infinity } : { duration: 0.2 }}
-                    className={`h-1.5 rounded-full transition-colors ${
-                      firstAnswers[index] !== null
-                        ? firstAnswers[index] ? 'bg-emerald-400' : 'bg-rose-400'
-                        : index === currentQuestion ? 'bg-amber-300' : 'bg-white/25'
-                    }`}
-                  />
-                ))}
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/15" aria-label="Masa berbaki">
+                <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-fuchsia-400 transition-[width] duration-1000" style={{ width: `${Math.max(0, 100 * (game.duration_seconds - timeElapsed) / game.duration_seconds)}%` }} />
               </div>
+              <p className="mt-2 text-xs text-violet-200">Bonus kelajuan untuk jawapan betul dalam 10 saat pertama</p>
             </div>
 
             <div className="p-4 sm:p-7">
@@ -386,32 +400,12 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                 options={question.options}
                 selectedOption={showExplanation ? currentAnswer.selected : selectedOption}
                 answer={currentAnswer}
-                disabled={showExplanation || checking}
+                disabled={showExplanation || checking || advancing}
                 handleOptionSelect={handleOptionSelect}
                 reducedMotion={reducedMotion}
               />
 
-              {/* Compact Explanation Toggle */}
               {showExplanation && (
-                <motion.div
-                  initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 mt-6 flex justify-center"
-                >
-                  <motion.button
-                    whileHover={reducedMotion ? undefined : { scale: 1.03 }}
-                    whileTap={reducedMotion ? undefined : { scale: 0.97 }}
-                    onClick={() => setExplanationVisible(visible => !visible)}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow hover:shadow-md transition duration-200 flex items-center gap-2"
-                  >
-                    <span>📖</span>
-                    <span>{t(explanationVisible ? 'hide' : 'reveal')}</span>
-                  </motion.button>
-                </motion.div>
-              )}
-
-              {/* Compact Explanation */}
-              {showExplanation && explanationVisible && (
                 <motion.div
                   initial={reducedMotion ? false : { height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -429,6 +423,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                         {currentAnswer.correct ? `${t('correct_feedback')} 🎉` : `${t('learn')}: `}
                       </h3>
                       <p className="text-gray-700 mt-1 text-sm">{currentAnswer.explanation}</p>
+                      <p className="mt-2 text-xs font-bold text-gray-600">+{currentAnswer.points} mata · bonus {currentAnswer.bonus_points} · Soalan seterusnya sebentar lagi…</p>
                     </div>
                   </div>
                 </motion.div>

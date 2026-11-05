@@ -15,6 +15,9 @@ class QuizSession extends Model
     protected $fillable = [
         'total_correct', 
         'total_time_seconds',
+        'total_answered',
+        'total_points',
+        'quiz_mode',
         'school_id', // Changed from school_name
         'display_name',
         'ic_number',
@@ -30,6 +33,8 @@ class QuizSession extends Model
         'updated_at' => 'datetime',
         'total_correct' => 'integer',
         'total_time_seconds' => 'integer',
+        'total_answered' => 'integer',
+        'total_points' => 'integer',
         'school_id' => 'integer' // Add this cast
     ];
 

@@ -17,6 +17,9 @@ use RuntimeException;
 class QuizArenaService
 {
     public const QUESTION_COUNT = 5;
+    public const DURATION_SECONDS = 120;
+    public const BONUS_WINDOW_SECONDS = 10;
+    public const POINTS_PER_CORRECT = 1000;
 
     private const SESSION_KEY = 'quiz_arena';
     private const TOPIC_ROTATION_CACHE_KEY = 'quiz_arena.general_topic_index';
@@ -39,16 +42,23 @@ class QuizArenaService
 
     public function current(): ?array
     {
-        return Session::get(self::SESSION_KEY);
+        $game = Session::get(self::SESSION_KEY);
+
+        return ($game['mode'] ?? null) === 'sprint' ? $game : null;
     }
 
     public function start(array $player): array
     {
+        $startedAt = microtime(true);
+        $questions = $this->pickQuestions();
         $game = [
+            'mode' => 'sprint',
             'player' => $player,
-            'questions' => $this->pickQuestions(),
-            'answers' => array_fill(0, self::QUESTION_COUNT, null),
-            'started_at' => microtime(true),
+            'questions' => $questions,
+            'answers' => array_fill(0, count($questions), null),
+            'current_index' => 0,
+            'question_started_at' => $startedAt,
+            'started_at' => $startedAt,
         ];
 
         Session::put(self::SESSION_KEY, $game);
@@ -64,26 +74,67 @@ class QuizArenaService
     {
         $game = $this->current();
 
-        if (!$game || !isset($game['questions'][$index])) {
+        if (!$game || !isset($game['questions'][$index]) || $index !== $game['current_index']) {
             throw new RuntimeException('No active quiz question.');
         }
 
         if ($game['answers'][$index] === null) {
+            if ($this->isExpired($game)) {
+                throw new RuntimeException('Quiz time expired.');
+            }
+
             $question = $game['questions'][$index];
 
             if (!isset($question['options'][$option])) {
                 throw new RuntimeException('Invalid option.');
             }
 
+            $questionSeconds = max(0, (int) floor(microtime(true) - $game['question_started_at']));
+            $correct = $option === $question['correctAnswer'];
+            $bonus = $correct ? max(0, (self::BONUS_WINDOW_SECONDS - $questionSeconds) * 10) : 0;
+
             $game['answers'][$index] = [
                 'selected' => $option,
-                'correct' => $option === $question['correctAnswer'],
+                'correct' => $correct,
+                'bonus_points' => $bonus,
+                'points' => $correct ? self::POINTS_PER_CORRECT + $bonus : 0,
+                'seconds' => $questionSeconds,
             ];
 
             Session::put(self::SESSION_KEY, $game);
         }
 
         return $this->publicAnswer($game, $index);
+    }
+
+    public function nextQuestion(): array
+    {
+        $game = $this->current();
+
+        if (!$game || $game['answers'][$game['current_index']] === null) {
+            throw new RuntimeException('Answer the current question first.');
+        }
+
+        if ($this->isExpired($game)) {
+            throw new RuntimeException('Quiz time expired.');
+        }
+
+        $nextIndex = $game['current_index'] + 1;
+        if ($nextIndex >= count($game['questions'])) {
+            $used = array_map(
+                fn ($question) => ($question['_pool'] ?? $question['category']).':'.$question['id'],
+                $game['questions']
+            );
+            $extra = $this->pickQuestions($used);
+            $game['questions'] = array_merge($game['questions'], $extra);
+            $game['answers'] = array_merge($game['answers'], array_fill(0, count($extra), null));
+        }
+
+        $game['current_index'] = $nextIndex;
+        $game['question_started_at'] = microtime(true);
+        Session::put(self::SESSION_KEY, $game);
+
+        return $game;
     }
 
     public function forget(): void
@@ -96,9 +147,29 @@ class QuizArenaService
         return collect($game['answers'])->where('correct', true)->count();
     }
 
+    public function answeredCount(array $game): int
+    {
+        return collect($game['answers'])->filter(fn ($answer) => $answer !== null)->count();
+    }
+
+    public function points(array $game): int
+    {
+        return collect($game['answers'])->sum(fn ($answer) => $answer['points'] ?? 0);
+    }
+
     public function elapsedSeconds(array $game): int
     {
-        return max(0, (int) floor(microtime(true) - $game['started_at']));
+        return min(self::DURATION_SECONDS, max(0, (int) floor(microtime(true) - $game['started_at'])));
+    }
+
+    public function remainingSeconds(array $game): int
+    {
+        return max(0, (int) ceil(self::DURATION_SECONDS - (microtime(true) - $game['started_at'])));
+    }
+
+    public function isExpired(array $game): bool
+    {
+        return microtime(true) - $game['started_at'] >= self::DURATION_SECONDS;
     }
 
     /**
@@ -121,6 +192,12 @@ class QuizArenaService
             'answers' => collect(array_keys($game['answers']))
                 ->map(fn ($index) => $this->publicAnswer($game, $index))
                 ->all(),
+            'current_index' => $game['current_index'],
+            'duration_seconds' => self::DURATION_SECONDS,
+            'remaining_seconds' => $this->remainingSeconds($game),
+            'question_elapsed_seconds' => max(0, (int) floor(microtime(true) - $game['question_started_at'])),
+            'answered_count' => $this->answeredCount($game),
+            'points' => $this->points($game),
             'elapsed_seconds' => $this->elapsedSeconds($game),
         ];
     }
@@ -140,10 +217,13 @@ class QuizArenaService
             'correct' => $answer['correct'],
             'correct_answer' => $question['correctAnswer'],
             'explanation' => $question['explanation'],
+            'bonus_points' => $answer['bonus_points'] ?? 0,
+            'points' => $answer['points'] ?? 0,
+            'seconds' => $answer['seconds'] ?? 0,
         ];
     }
 
-    private function pickQuestions(): array
+    private function pickQuestions(array $used = []): array
     {
         $bank = $this->bank();
         [$firstTopic, $secondTopic] = $this->nextGeneralTopics();
@@ -157,9 +237,9 @@ class QuizArenaService
         ];
 
         try {
-            $questions = Cache::lock('quiz_arena.pick_questions', 10)->block(5, function () use ($pools) {
+            $questions = Cache::lock('quiz_arena.pick_questions', 10)->block(5, function () use ($pools, $used) {
                 $recentGames = Cache::get(self::RECENT_QUESTIONS_CACHE_KEY, []);
-                [$questions, $picked] = $this->pickFromPools($pools, array_merge([], ...$recentGames));
+                [$questions, $picked] = $this->pickFromPools($pools, array_merge($used, ...$recentGames));
 
                 $recentGames[] = $picked;
                 Cache::forever(self::RECENT_QUESTIONS_CACHE_KEY, array_slice($recentGames, 1 - self::NO_REPEAT_GAMES));
@@ -167,7 +247,7 @@ class QuizArenaService
                 return $questions;
             });
         } catch (LockTimeoutException) {
-            [$questions] = $this->pickFromPools($pools, []);
+            [$questions] = $this->pickFromPools($pools, $used);
         }
 
         shuffle($questions);
@@ -193,7 +273,9 @@ class QuizArenaService
             $candidates = array_values(array_filter($fresh, fn ($q) => $q['difficulty'] === $difficulty)) ?: $fresh ?: $pool;
             $question = $candidates[array_rand($candidates)];
 
-            $questions[] = $this->shuffleOptions($question);
+            $selected = $this->shuffleOptions($question);
+            $selected['_pool'] = $name;
+            $questions[] = $selected;
             $picked[] = "{$name}:{$question['id']}";
         }
 

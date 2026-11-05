@@ -30,7 +30,7 @@ class GamesController extends Controller
             'title' => 'Quiz Section',
             'schools' => School::select('id', 'name')->orderBy('name')->get(),
             'leaderboard' => $this->leaderboard(),
-            'totalPlayers' => QuizSession::count(),
+            'totalPlayers' => QuizSession::where('quiz_mode', 'sprint')->count(),
             'activeQuiz' => $game ? $this->quiz->publicState($game) : null,
         ]);
     }
@@ -60,17 +60,29 @@ class GamesController extends Controller
     public function answerQuestion(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'index' => 'required|integer|min:0|max:' . (QuizArenaService::QUESTION_COUNT - 1),
+            'index' => 'required|integer|min:0',
             'option' => 'required|integer|min:0',
         ]);
 
         try {
             $answer = $this->quiz->answer($validated['index'], $validated['option']);
         } catch (RuntimeException $e) {
-            return response()->json(['message' => 'Sesi kuiz tidak dijumpai. Sila mulakan semula.'], 409);
+            return response()->json(['message' => $e->getMessage(), 'expired' => $e->getMessage() === 'Quiz time expired.'], 409);
         }
 
-        return response()->json(['answer' => $answer]);
+        $game = $this->quiz->current();
+        return response()->json(['answer' => $answer, 'quiz' => $this->quiz->publicState($game)]);
+    }
+
+    public function nextQuestion(): JsonResponse
+    {
+        try {
+            $game = $this->quiz->nextQuestion();
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage(), 'expired' => $e->getMessage() === 'Quiz time expired.'], 409);
+        }
+
+        return response()->json(['quiz' => $this->quiz->publicState($game)]);
     }
 
     public function storeQuizResult(): JsonResponse
@@ -83,11 +95,13 @@ class GamesController extends Controller
 
         $player = $game['player'];
         $score = $this->quiz->score($game);
+        $answered = $this->quiz->answeredCount($game);
+        $points = $this->quiz->points($game);
         $time = $this->quiz->elapsedSeconds($game);
 
         // Lock so two players finishing with the same name at once cannot both be saved.
         try {
-            $session = Cache::lock('quiz_arena.save_result', 10)->block(5, function () use ($player, $score, $time) {
+            $session = Cache::lock('quiz_arena.save_result', 10)->block(5, function () use ($player, $score, $answered, $points, $time) {
                 if ($this->nameTaken($player['display_name'])) {
                     return null;
                 }
@@ -96,6 +110,9 @@ class GamesController extends Controller
                     'display_name' => $player['display_name'],
                     'school_id' => $player['school_id'],
                     'total_correct' => $score,
+                    'total_answered' => $answered,
+                    'total_points' => $points,
+                    'quiz_mode' => 'sprint',
                     'total_time_seconds' => $time,
                 ]);
             });
@@ -115,10 +132,11 @@ class GamesController extends Controller
             'result' => [
                 'id' => $session->id,
                 'correct' => $session->total_correct,
-                'total' => QuizArenaService::QUESTION_COUNT,
+                'answered' => $session->total_answered,
+                'points' => $session->total_points,
                 'time' => $session->total_time_seconds,
                 'rank' => $this->rankOf($session),
-                'total_players' => QuizSession::count(),
+                'total_players' => QuizSession::where('quiz_mode', 'sprint')->count(),
             ],
         ]);
     }
@@ -126,7 +144,9 @@ class GamesController extends Controller
     private function leaderboard()
     {
         return QuizSession::with('school:id,name')
-            ->select('id', 'display_name', 'school_id', 'total_correct', 'total_time_seconds')
+            ->where('quiz_mode', 'sprint')
+            ->select('id', 'display_name', 'school_id', 'total_correct', 'total_answered', 'total_points', 'total_time_seconds')
+            ->orderByDesc('total_points')
             ->orderByDesc('total_correct')
             ->orderBy('total_time_seconds')
             ->orderBy('id')
@@ -136,6 +156,8 @@ class GamesController extends Controller
                 'nickname' => $s->display_name,
                 'school' => $s->school?->name ?? 'Unknown School',
                 'correct' => $s->total_correct,
+                'answered' => $s->total_answered,
+                'points' => $s->total_points,
                 'time' => $s->total_time_seconds,
             ]);
     }
@@ -143,19 +165,24 @@ class GamesController extends Controller
     // Same ordering as the leaderboard: score desc, time asc, earliest first.
     private function rankOf(QuizSession $session): int
     {
-        return QuizSession::where('total_correct', '>', $session->total_correct)
-            ->orWhere(fn ($q) => $q->where('total_correct', $session->total_correct)
+        return QuizSession::where('quiz_mode', 'sprint')
+            ->where(fn ($q) => $q->where('total_points', '>', $session->total_points)
+            ->orWhere(fn ($q) => $q->where('total_points', $session->total_points)
+                ->where('total_correct', '>', $session->total_correct))
+            ->orWhere(fn ($q) => $q->where('total_points', $session->total_points)
+                ->where('total_correct', $session->total_correct)
                 ->where('total_time_seconds', '<', $session->total_time_seconds))
-            ->orWhere(fn ($q) => $q->where('total_correct', $session->total_correct)
+            ->orWhere(fn ($q) => $q->where('total_points', $session->total_points)
+                ->where('total_correct', $session->total_correct)
                 ->where('total_time_seconds', $session->total_time_seconds)
-                ->where('id', '<', $session->id))
+                ->where('id', '<', $session->id)))
             ->count() + 1;
     }
 
     // Case-insensitive via the column collation; TRIM covers older rows saved with spaces.
     private function nameTaken(string $displayName): bool
     {
-        return QuizSession::whereRaw('TRIM(display_name) = ?', [$displayName])->exists();
+        return QuizSession::where('quiz_mode', 'sprint')->whereRaw('TRIM(display_name) = ?', [$displayName])->exists();
     }
 
     private function normalizeName(?string $displayName): string

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { router, Link } from '@inertiajs/react';
 import QuizInterface from './QuizInterface';
@@ -53,7 +53,7 @@ const scoreStyles = [
   { face: '/images/quiz-score-5-lion.png', row: 'bg-emerald-500/10 hover:bg-emerald-500/15', card: 'border-emerald-300/30 bg-emerald-500/10', edge: 'border-emerald-400/70', badge: 'bg-emerald-300/20 text-emerald-100', faceBg: 'bg-emerald-300/20' },
 ];
 
-const getScoreStyle = (correct) => scoreStyles[Math.min(5, Math.max(0, Number(correct) || 0))];
+const getScoreStyle = (correct, answered) => scoreStyles[Math.min(5, Math.max(0, Math.round(5 * correct / (answered || 1))))];
 
 const inputClass = (hasError) =>
   `w-full rounded-xl border bg-white/10 px-4 py-3 text-white placeholder-violet-200/50 focus:outline-none focus:ring-2 ${
@@ -67,10 +67,13 @@ const FieldError = ({ message }) =>
 const QuizGame = ({ quiz, schoolName, onFinished, onSessionLost }) => {
   const { t } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [submitError, setSubmitError] = useState(null);
-  const [answeredCount, setAnsweredCount] = useState(quiz.answers.filter(Boolean).length);
+  const [answeredCount, setAnsweredCount] = useState(quiz.answered_count);
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setSubmitError(null);
 
@@ -88,12 +91,13 @@ const QuizGame = ({ quiz, schoolName, onFinished, onSessionLost }) => {
 
       setSubmitError(message);
       setSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
   const handleExit = async () => {
     const details = `${t('your_results')} ${t('will_be_saved')} ${t('to_leaderboard_now')}\n`
-      + `${t('unanswered_counted_wrong')} (${answeredCount}/${quiz.questions.length} ${t('answered')}).\n`
+      + `${answeredCount} soalan sudah dijawab. Mata semasa akan disimpan.\n`
       + `${t('name')} ${quiz.player.display_name} ${t('name_cannot_retry')}.`;
     if (await confirmAlert(t, { title: t('exit_quiz_question'), text: details, confirmText: t('exit_save') })) {
       handleSubmit();
@@ -141,7 +145,7 @@ const ResultModal = ({ result, onClose }) => {
     <div className="w-full max-w-md overflow-hidden rounded-2xl border-2 border-yellow-400 bg-gray-800 text-center shadow-2xl">
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4">
         <h2 className="text-2xl font-bold text-white">
-          {result.correct === result.total ? `${t('perfect')} 🎉` : `${t('quiz_complete')} 🎯`}
+          {result.answered > 0 && result.correct === result.answered ? `${t('perfect')} 🎉` : `${t('quiz_complete')} 🎯`}
         </h2>
       </div>
       <div className="p-6">
@@ -155,7 +159,7 @@ const ResultModal = ({ result, onClose }) => {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="rounded-lg bg-gray-700 p-3">
             <div className="text-xs font-bold text-green-400">✓ {t('correct_answers')}</div>
-            <div className="text-lg font-bold text-white">{result.correct}/{result.total}</div>
+            <div className="text-lg font-bold text-white">{result.correct}/{result.answered}</div>
           </div>
           <div className="rounded-lg bg-gray-700 p-3">
             <div className="text-xs font-bold text-blue-400">⏱️ {t('time')}</div>
@@ -163,7 +167,7 @@ const ResultModal = ({ result, onClose }) => {
           </div>
           <div className="rounded-lg bg-gray-700 p-3">
             <div className="text-xs font-bold text-yellow-400">🎯 {t('score')}</div>
-            <div className="text-lg font-bold text-white">{Math.round((result.correct / result.total) * 100)}%</div>
+            <div className="text-lg font-bold text-white">{result.points.toLocaleString()} pts</div>
           </div>
         </div>
         <button
@@ -294,7 +298,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
             </div>
             <p className="mt-2 max-w-xl text-xs leading-relaxed text-violet-100/80 sm:text-sm">{t('quiz_arena_intro')}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-white">
-              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 backdrop-blur-sm">🎯 5 {t('questions')}</span>
+              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 backdrop-blur-sm">⏱️ 2 minit · jawab sebanyak mungkin</span>
               <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 backdrop-blur-sm">⏱️ {t('beat_clock')}</span>
             </div>
           </div>
@@ -497,8 +501,8 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                       </p>
                       <p className="quiz-school-name relative mt-0.5 pr-20 text-xs text-white/70 md:pr-14 lg:pr-20" title={entry.school}>{entry.school}</p>
                       <div className="relative mt-4 flex items-center gap-2 pr-20 text-xs font-bold md:pr-14 lg:pr-20">
-                        <span className={`rounded-full px-2.5 py-1 ${podiumStyles[index].stat}`}>{entry.correct}/5 {t('correct_answers')}</span>
-                        <span className="text-white/80">{Math.round((entry.correct / 5) * 100)}%</span>
+                        <span className={`rounded-full px-2.5 py-1 ${podiumStyles[index].stat}`}>{entry.correct}/{entry.answered} {t('correct_answers')}</span>
+                        <span className="text-amber-200 font-bold">⭐ {entry.points.toLocaleString()} pts</span>
                       </div>
                     </motion.div>
                   ))}
@@ -506,7 +510,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
 
                 {remainingPlayers.length > 0 && <div className="mt-5 max-h-[520px] space-y-2 overflow-y-auto pr-1 md:hidden">
                   {remainingPlayers.map((entry, index) => {
-                    const scoreStyle = getScoreStyle(entry.correct);
+                    const scoreStyle = getScoreStyle(entry.correct, entry.answered);
                     return (
                       <div key={entry.id} className={`rounded-2xl border p-4 ${scoreStyle.card} ${result?.id === entry.id ? 'ring-2 ring-amber-300' : ''}`}>
                         <div className="flex items-start gap-3">
@@ -521,8 +525,8 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                           <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${scoreStyle.faceBg}`} aria-hidden="true">
                             <img src={scoreStyle.face} alt="" loading="lazy" decoding="async" className="h-9 w-9 object-contain" />
                           </span>
-                          <span className={`rounded-full px-2.5 py-1 ${scoreStyle.badge}`}>{entry.correct}/5</span>
-                          <span className="text-violet-100/75">{Math.round((entry.correct / 5) * 100)}%</span>
+                          <span className={`rounded-full px-2.5 py-1 ${scoreStyle.badge}`}>{entry.correct}/{entry.answered}</span>
+                          <span className="text-amber-200">⭐ {entry.points.toLocaleString()} pts</span>
                         </div>
                       </div>
                     );
@@ -542,9 +546,9 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                     </thead>
                     <tbody className="divide-y divide-white/10">
                       {remainingPlayers.map((entry, index) => {
-                        const percentage = Math.round((entry.correct / 5) * 100);
+                        const percentage = Math.round((entry.correct / (entry.answered || 1)) * 100);
                         const isLatestPlayer = result?.id === entry.id;
-                        const scoreStyle = getScoreStyle(entry.correct);
+                        const scoreStyle = getScoreStyle(entry.correct, entry.answered);
 
                         return (
                           <tr
@@ -570,7 +574,8 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${scoreStyle.faceBg}`} aria-hidden="true">
                                   <img src={scoreStyle.face} alt="" loading="lazy" decoding="async" className="h-9 w-9 object-contain" />
                                 </span>
-                                <span className={`rounded-md px-2 py-1 text-xs font-bold ${scoreStyle.badge}`}>{entry.correct}/5</span>
+                                <span className={`rounded-md px-2 py-1 text-xs font-bold ${scoreStyle.badge}`}>{entry.correct}/{entry.answered}</span>
+                                <span className="text-xs font-bold text-amber-200">⭐ {entry.points.toLocaleString()}</span>
                                 <span className="text-xs font-semibold text-violet-100/75">{percentage}%</span>
                               </div>
                             </td>
