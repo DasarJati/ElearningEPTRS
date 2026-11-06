@@ -185,10 +185,14 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
   const currentQuestion = game.current_index;
   const [selectedOption, setSelectedOption] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [scoreFx, setScoreFx] = useState(null);
   const [checking, setChecking] = useState(false);
   const [answerError, setAnswerError] = useState(null);
   const [advancing, setAdvancing] = useState(false);
   const advanceRef = useRef(false);
+  const pendingNextRef = useRef(null);
+  const gameRef = useRef(quiz);
+  gameRef.current = game;
   const submitRef = useRef(false);
 
   // Display-only timer; the server measures the real time from its own start time.
@@ -219,16 +223,30 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
   const firstAnswers = useMemo(() => answers.map(answer => (answer ? answer.correct : null)), [answers]);
   const correctAnswersCount = firstAnswers.filter(answer => answer === true).length;
 
-  const handleOptionSelect = async (optionIndex) => {
+  const handleOptionSelect = (optionIndex) => {
     if (showExplanation || checking || advancing || timeElapsed >= game.duration_seconds) return;
-
     setSelectedOption(optionIndex);
+    setAnswerError(null);
+  };
+
+  const handleCheckAnswer = async () => {
+    if (selectedOption === null || showExplanation || checking || advancing || timeElapsed >= game.duration_seconds) return;
+
     setChecking(true);
     setAnswerError(null);
 
     try {
-      const { data } = await axios.post('/quiz/answer', { index: currentQuestion, option: optionIndex });
+      // The server must have moved to this question before it can take the answer.
+      if (pendingNextRef.current) await pendingNextRef.current;
+      const { data } = await axios.post('/quiz/answer', { index: currentQuestion, option: selectedOption });
       setGame(data.quiz);
+
+      const delta = data.answer.applied_points ?? data.answer.points;
+      if (delta !== 0) {
+        const id = Date.now();
+        setScoreFx({ id, value: delta });
+        setTimeout(() => setScoreFx(current => (current?.id === id ? null : current)), 1600);
+      }
 
       if (data.answer.correct) {
         setShowConfetti(true);
@@ -246,33 +264,51 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
     }
   };
 
+  // Questions are already in the browser, so move to the next one instantly and
+  // tell the server in the background instead of waiting for its response.
   const nextQuestion = async () => {
     if (advanceRef.current || submitRef.current) return;
+    const current = gameRef.current;
+    const fromIndex = current.current_index;
+    if (current.answers[fromIndex] === null) return;
+
     advanceRef.current = true;
-    setAdvancing(true);
-    try {
-      const { data } = await axios.post('/quiz/next');
-      setGame(data.quiz);
+    const hasNext = fromIndex + 1 < current.questions.length;
+
+    if (hasNext) {
+      setGame(prev => ({ ...prev, current_index: fromIndex + 1 }));
       setSelectedOption(null);
       setAnswerError(null);
-    } catch (error) {
-      if (error.response?.data?.expired) {
-        submitRef.current = true;
-        onSubmit();
-      } else {
-        setAnswerError(error.response?.data?.message || 'Gagal memuat soalan seterusnya. Cuba lagi.');
-      }
-    } finally {
-      advanceRef.current = false;
-      setAdvancing(false);
+    } else {
+      setAdvancing(true);
     }
-  };
 
-  useEffect(() => {
-    if (!showExplanation || submitting || timeElapsed >= game.duration_seconds) return;
-    const timeout = setTimeout(nextQuestion, reducedMotion ? 1900 : 2800);
-    return () => clearTimeout(timeout);
-  }, [currentQuestion, showExplanation, submitting, game.duration_seconds]);
+    const run = async () => {
+      try {
+        const { data } = await axios.post('/quiz/next');
+        setGame(data.quiz);
+        if (!hasNext) {
+          setSelectedOption(null);
+          setAnswerError(null);
+        }
+      } catch (error) {
+        if (error.response?.data?.expired) {
+          submitRef.current = true;
+          onSubmit();
+        } else {
+          setAnswerError(error.response?.data?.message || 'Gagal memuat soalan seterusnya. Cuba lagi.');
+          if (hasNext) setGame(prev => ({ ...prev, current_index: fromIndex }));
+        }
+      } finally {
+        advanceRef.current = false;
+        pendingNextRef.current = null;
+        if (!hasNext) setAdvancing(false);
+      }
+    };
+
+    pendingNextRef.current = run();
+    await pendingNextRef.current;
+  };
 
   if (submitting) {
     return (
@@ -295,6 +331,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
           currentQuestion={currentQuestion}
           selectedOption={showExplanation ? currentAnswer.selected : selectedOption}
           checking={checking || advancing}
+          onCheckAnswer={handleCheckAnswer}
           onNextQuestion={nextQuestion}
           answeredCount={game.answered_count}
           points={game.points}
@@ -310,17 +347,8 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
       </AnimatePresence>
 
       <div
-        className="relative min-h-[calc(100dvh-160px)] overflow-hidden bg-gradient-to-br from-[#241044] via-[#341568] to-[#16103d]"
+        className="quiz-sprint-background relative min-h-[calc(100dvh-160px)] overflow-hidden"
       >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #ffffff 1.5px, transparent 1.5px), radial-gradient(circle, #ffffff 1px, transparent 1px)',
-            backgroundSize: '48px 48px, 48px 48px',
-            backgroundPosition: '0 0, 24px 24px',
-          }}
-          aria-hidden="true"
-        />
         <motion.div
           className="pointer-events-none absolute -left-16 top-12 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-3xl"
           animate={reducedMotion ? undefined : { x: [0, 22, 0], y: [0, -15, 0] }}
@@ -368,20 +396,35 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                     {question.category}
                   </span>
                 </div>
-                <div className="shrink-0 text-right text-xs font-bold text-amber-300">
+                <div className={`relative shrink-0 text-right text-sm font-extrabold transition-colors duration-300 ${scoreFx ? (scoreFx.value < 0 ? 'text-red-300' : 'text-green-300') : 'text-amber-300'}`}>
                   ⭐ <motion.span
                     key={game.points}
-                    initial={reducedMotion ? false : { scale: 1.4, opacity: 0.5 }}
+                    initial={reducedMotion ? false : { scale: scoreFx?.value < 0 ? 0.7 : 1.4, opacity: 0.5 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 360, damping: 18 }}
                     className="inline-block"
                   >{game.points.toLocaleString()}</motion.span> pts
+                  <AnimatePresence>
+                    {scoreFx && (
+                      <motion.span
+                        key={scoreFx.id}
+                        initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 6, scale: 0.8 }}
+                        animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 22, scale: 1.1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.4, ease: 'easeOut' }}
+                        className={`pointer-events-none absolute right-0 top-full z-20 whitespace-nowrap rounded-full px-3 py-1 text-sm font-black text-white shadow-lg ${scoreFx.value < 0 ? 'bg-red-500' : 'bg-green-500'}`}
+                        role="status"
+                      >
+                        {scoreFx.value < 0 ? '−' : '+'}{Math.abs(scoreFx.value).toLocaleString()}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/15" aria-label="Masa berbaki">
                 <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-fuchsia-400 transition-[width] duration-1000" style={{ width: `${Math.max(0, 100 * (game.duration_seconds - timeElapsed) / game.duration_seconds)}%` }} />
               </div>
-              <p className="mt-2 text-xs text-violet-200">Bonus kelajuan untuk jawapan betul dalam 10 saat pertama</p>
+              <p className="mt-2 text-xs text-violet-200">Betul +1,000 (bonus kelajuan dalam 10 saat pertama) · Salah −333</p>
             </div>
 
             <div className="p-4 sm:p-7">
@@ -423,7 +466,11 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                         {currentAnswer.correct ? `${t('correct_feedback')} 🎉` : `${t('learn')}: `}
                       </h3>
                       <p className="text-gray-700 mt-1 text-sm">{currentAnswer.explanation}</p>
-                      <p className="mt-2 text-xs font-bold text-gray-600">+{currentAnswer.points} mata · bonus {currentAnswer.bonus_points} · Soalan seterusnya sebentar lagi…</p>
+                      <p className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-black text-white ${currentAnswer.correct ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {currentAnswer.correct
+                          ? `+${currentAnswer.points.toLocaleString()} mata${currentAnswer.bonus_points ? ` (termasuk bonus ${currentAnswer.bonus_points})` : ''}`
+                          : (currentAnswer.applied_points ?? currentAnswer.points) === 0 ? 'Salah · 0 mata' : `−${Math.abs(currentAnswer.applied_points ?? currentAnswer.points).toLocaleString()} mata`}
+                      </p>
                     </div>
                   </div>
                 </motion.div>

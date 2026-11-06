@@ -16,6 +16,28 @@
   min-width: 0;
 }
 
+/* Quiz Arena artwork keeps the centre calm behind questions and rankings. */
+.quiz-sprint-background {
+  background: #241044 url('/images/quiz-sprint-bg-desktop.webp') center center / cover no-repeat;
+}
+
+.quiz-leaderboard-background {
+  background: linear-gradient(180deg, rgb(12 10 34 / 0.28), rgb(18 12 48 / 0.08) 45%, rgb(10 9 30 / 0.34)),
+    #241044 url('/images/quiz-leaderboard-bg-desktop.webp') center top / cover no-repeat;
+}
+
+@media (max-width: 640px) {
+  .quiz-sprint-background {
+    background-image: url('/images/quiz-sprint-bg-mobile.webp');
+    background-position: center top;
+  }
+
+  .quiz-leaderboard-background {
+    background-image: linear-gradient(180deg, rgb(12 10 34 / 0.25), rgb(18 12 48 / 0.08) 45%, rgb(10 9 30 / 0.34)),
+      url('/images/quiz-leaderboard-bg-mobile.webp');
+  }
+}
+
 html {
   background: #f6f7fb;
 }

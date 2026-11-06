@@ -20,6 +20,7 @@ class QuizArenaService
     public const DURATION_SECONDS = 120;
     public const BONUS_WINDOW_SECONDS = 10;
     public const POINTS_PER_CORRECT = 1000;
+    public const PENALTY_PER_WRONG = 333;
 
     private const SESSION_KEY = 'quiz_arena';
     private const TOPIC_ROTATION_CACHE_KEY = 'quiz_arena.general_topic_index';
@@ -97,7 +98,7 @@ class QuizArenaService
                 'selected' => $option,
                 'correct' => $correct,
                 'bonus_points' => $bonus,
-                'points' => $correct ? self::POINTS_PER_CORRECT + $bonus : 0,
+                'points' => $correct ? self::POINTS_PER_CORRECT + $bonus : -self::PENALTY_PER_WRONG,
                 'seconds' => $questionSeconds,
             ];
 
@@ -120,7 +121,8 @@ class QuizArenaService
         }
 
         $nextIndex = $game['current_index'] + 1;
-        if ($nextIndex >= count($game['questions'])) {
+        // Keep one question in reserve so the browser always has the next one ready.
+        if ($nextIndex + 1 >= count($game['questions'])) {
             $used = array_map(
                 fn ($question) => ($question['_pool'] ?? $question['category']).':'.$question['id'],
                 $game['questions']
@@ -152,9 +154,25 @@ class QuizArenaService
         return collect($game['answers'])->filter(fn ($answer) => $answer !== null)->count();
     }
 
-    public function points(array $game): int
+    /**
+     * Total points after the first $upTo answers (all when null). A wrong answer
+     * subtracts points, but the running total never drops below 0.
+     */
+    public function points(array $game, ?int $upTo = null): int
     {
-        return collect($game['answers'])->sum(fn ($answer) => $answer['points'] ?? 0);
+        $total = 0;
+
+        foreach ($game['answers'] as $index => $answer) {
+            if ($upTo !== null && $index >= $upTo) {
+                break;
+            }
+
+            if ($answer !== null) {
+                $total = max(0, $total + ($answer['points'] ?? 0));
+            }
+        }
+
+        return $total;
     }
 
     public function elapsedSeconds(array $game): int
@@ -219,6 +237,8 @@ class QuizArenaService
             'explanation' => $question['explanation'],
             'bonus_points' => $answer['bonus_points'] ?? 0,
             'points' => $answer['points'] ?? 0,
+            // Points actually added or removed, after the 0 floor is applied.
+            'applied_points' => $this->points($game, $index + 1) - $this->points($game, $index),
             'seconds' => $answer['seconds'] ?? 0,
         ];
     }

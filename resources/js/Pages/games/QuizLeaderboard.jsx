@@ -7,7 +7,7 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 import { confirmAlert } from '@/Components/sweetAlert';
 import { motion, useReducedMotion } from 'framer-motion';
 
-const LEADERBOARD_TITLE = 'k-semanis 2026';
+const LEADERBOARD_TITLE = 'Selangor Education Summit 2026';
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -262,8 +262,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
 
   return (
     <div
-      className="relative min-h-screen bg-[#110e2b] bg-cover bg-center text-white"
-      style={{ backgroundImage: 'linear-gradient(180deg, rgba(12,10,34,0.88), rgba(18,12,48,0.78) 50%, rgba(10,9,30,0.92)), url(/images/background.jpg)' }}
+      className="quiz-leaderboard-background relative min-h-screen text-white"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-violet-950/30 via-transparent to-blue-950/30" />
       <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-3 sm:px-6 sm:pt-4 lg:pb-12">
