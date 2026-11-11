@@ -131,6 +131,9 @@ class GamesController extends Controller
         return response()->json([
             'result' => [
                 'id' => $session->id,
+                'nickname' => $session->display_name,
+                'school' => $session->school?->name,
+                'prize_top' => config('quiz.prize_top'),
                 'correct' => $session->total_correct,
                 'answered' => $session->total_answered,
                 'points' => $session->total_points,
@@ -139,6 +142,18 @@ class GamesController extends Controller
                 'total_players' => QuizSession::where('quiz_mode', 'sprint')->count(),
             ],
         ]);
+    }
+
+    // Admin confirms a prize winner by entering the prize password.
+    public function verifyPrize(Request $request): JsonResponse
+    {
+        $validated = $request->validate(['password' => 'required|string|max:100']);
+
+        if (!hash_equals((string) config('quiz.prize_password'), $validated['password'])) {
+            return response()->json(['message' => 'Kata laluan admin salah.'], 422);
+        }
+
+        return response()->json(['verified' => true]);
     }
 
     private function leaderboard()

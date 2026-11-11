@@ -84,6 +84,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/quiz/next', [GamesController::class, 'nextQuestion'])->name('quiz.next');
         Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
     });
+    Route::post('/quiz/prize/verify', [GamesController::class, 'verifyPrize'])
+        ->middleware('throttle:10,1')
+        ->name('quiz.prize.verify');
 
 
     Route::get('/chat', [ChatController::class, 'lobby'])->name('chat.lobby');

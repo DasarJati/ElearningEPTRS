@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pratonton Bunyi Top 3</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#1d1b39;color:#fff;max-width:480px;margin:40px auto;padding:0 16px}
+button{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0;padding:18px;font-size:20px;font-weight:700;border:0;border-radius:16px;cursor:pointer;color:#1d1b39}
+.a{background:#fbbf24}.b{background:#cbd5e1}.c{background:#f59e0b99}
+small{font-weight:400;font-size:14px;opacity:.7}
+</style></head><body>
+<h1>Bunyi Top 3 Quiz Arena</h1>
+<button class="a" onclick="p('top1.wav')">🥇 Top 1 <small>fanfare</small></button>
+<button class="b" onclick="p('top2.wav')">🥈 Top 2 <small>chime naik</small></button>
+<button class="c" onclick="p('top3.wav')">🥉 Top 3 <small>ding ringkas</small></button>
+<script>let a;function p(f){if(a)a.pause();a=new Audio(f);a.play()}</script>
+</body></html>

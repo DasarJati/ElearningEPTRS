@@ -493,16 +493,16 @@
       },
       {
         "id": "56",
-        "question": "Sebuah motosikal bergerak 20 km bagi setiap liter petrol. Selepas perjalanan 85 km daripada tangki berisi 5 liter, berapa liter petrol masih ada?",
+        "question": "Hitung (45 − 9) ÷ 6 + 4 × (3 + 2).",
         "options": [
-          "0.50 liter",
-          "0.75 liter",
-          "1.00 liter",
-          "1.25 liter"
+          "22",
+          "26",
+          "30",
+          "50"
         ],
         "correctAnswer": 1,
-        "explanation": "85 ÷ 20 = 4.25 liter digunakan. 5 - 4.25 = 0.75 liter masih ada.",
-        "category": "Penyelesaian Masalah",
+        "explanation": "Kurungan dahulu: 36 dan 5. Kemudian 36 ÷ 6 = 6 dan 4 × 5 = 20. Akhir sekali 6 + 20 = 26.",
+        "category": "Susunan Operasi",
         "difficulty": "hard"
       },
       {
@@ -563,44 +563,44 @@
       },
       {
         "id": "61",
-        "question": "Kedai A menjual baju RM60 dengan diskaun 25%. Kedai B menjual baju yang sama pada RM52 dengan diskaun 10%. Kedai manakah lebih murah?",
+        "question": "Hitung 6 + 4 × 5 − 2.",
         "options": [
-          "Kedai B, lebih murah RM1.80",
-          "Kedai A, lebih murah RM1.80",
-          "Kedai A, lebih murah RM9.80",
-          "Harga sama, iaitu RM45"
+          "48",
+          "24",
+          "18",
+          "28"
         ],
         "correctAnswer": 1,
-        "explanation": "Kedai A: RM60 − RM15 = RM45. Kedai B: RM52 − RM5.20 = RM46.80. Kedai A lebih murah RM1.80.",
-        "category": "Kewangan Harian",
-        "difficulty": "hard"
+        "explanation": "Darab dahulu: 4 × 5 = 20. Kemudian dari kiri: 6 + 20 − 2 = 24.",
+        "category": "Susunan Operasi",
+        "difficulty": "medium"
       },
       {
         "id": "62",
-        "question": "Paip A memenuhkan sebuah tangki dalam 6 jam. Paip B memenuhkannya dalam 3 jam. Jika kedua-dua paip dibuka serentak, berapa lama tangki itu penuh?",
+        "question": "Hitung 7 × 6 − 8.",
         "options": [
-          "1 jam 30 minit",
-          "2 jam",
-          "2 jam 30 minit",
-          "4 jam 30 minit"
+          "50",
+          "34",
+          "36",
+          "48"
         ],
         "correctAnswer": 1,
-        "explanation": "Dalam 1 jam, paip A mengisi 1/6 dan paip B mengisi 1/3 tangki, iaitu 1/2 tangki. Jadi tangki penuh dalam 2 jam.",
-        "category": "Penyelesaian Masalah",
-        "difficulty": "hard"
+        "explanation": "Sifir 7: 7 × 6 = 42. Kemudian tolak: 42 − 8 = 34.",
+        "category": "Sifir",
+        "difficulty": "medium"
       },
       {
         "id": "63",
-        "question": "Ali ada RM50. Dia mesti membeli 2 buah buku berharga RM8 sebuah, dan mahu membeli seberapa banyak pen berharga RM3 sebatang. Berapakah bilangan pen paling banyak yang boleh dibelinya?",
+        "question": "Hitung 3 × (12 − 4) + 18 ÷ 6.",
         "options": [
-          "10",
-          "12",
-          "11",
-          "14"
+          "24",
+          "30",
+          "27",
+          "7"
         ],
         "correctAnswer": 2,
-        "explanation": "Buku: 2 × RM8 = RM16. Baki RM34 ÷ RM3 = 11 batang pen, dengan baki RM1.",
-        "category": "Penyelesaian Masalah",
+        "explanation": "Kurungan dahulu: 12 − 4 = 8. Kemudian darab dan bahagi: 3 × 8 = 24 dan 18 ÷ 6 = 3. Akhir sekali tambah: 24 + 3 = 27.",
+        "category": "Kurungan",
         "difficulty": "hard"
       }
     ],
@@ -1603,15 +1603,15 @@
       },
       {
         "id": "209",
-        "question": "Pendapatan ialah RM2,400. Komitmen tetap RM1,250, makanan RM450 dan pengangkutan RM300. Jika sasaran dana kecemasan RM500 sebulan, apakah keadaan bajet?",
+        "question": "Dalam peraturan bajet 50/30/20, 20% pendapatan sepatutnya digunakan untuk apa?",
         "options": [
-          "Lebihan RM100",
-          "Cukup tepat",
-          "Kurang RM100",
-          "Kurang RM500"
+          "Kehendak seperti hiburan",
+          "Keperluan seperti makanan dan sewa",
+          "Simpanan dan hutang",
+          "Perbelanjaan harian tanpa had"
         ],
         "correctAnswer": 2,
-        "explanation": "Jumlah termasuk simpanan ialah RM2,500, iaitu RM100 melebihi pendapatan.",
+        "explanation": "Peraturan 50/30/20: 50% keperluan, 30% kehendak, 20% simpanan dan pembayaran hutang.",
         "category": "Kewangan",
         "difficulty": "hard"
       },
@@ -1785,17 +1785,17 @@
       },
       {
         "id": "222",
-        "question": "Mentol LED berharga RM15 dan menggunakan elektrik RM2 sebulan. Mentol biasa berharga RM5 dan menggunakan elektrik RM6 sebulan. Mulai bulan ke berapakah jumlah kos mentol LED menjadi lebih rendah?",
+        "question": "Mengapakah bateri lama tidak boleh dibuang ke dalam tong sampah biasa?",
         "options": [
-          "Bulan ke-2",
-          "Bulan ke-4",
-          "Bulan ke-5",
-          "Bulan ke-3"
+          "Kerana bateri terlalu berat",
+          "Kerana bateri boleh dijual semula",
+          "Kerana bateri mudah reput",
+          "Kerana mengandungi bahan kimia berbahaya yang mencemarkan alam sekitar"
         ],
         "correctAnswer": 3,
-        "explanation": "Bulan ke-2: LED RM19, mentol biasa RM17. Bulan ke-3: LED RM21, mentol biasa RM23.",
+        "explanation": "Bateri mengandungi logam dan bahan kimia berbahaya. Ia perlu dihantar ke tempat kutipan bahan buangan khas.",
         "category": "Kelestarian",
-        "difficulty": "hard"
+        "difficulty": "medium"
       },
       {
         "id": "223",

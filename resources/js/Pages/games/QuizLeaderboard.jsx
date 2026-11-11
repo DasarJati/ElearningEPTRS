@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { router, Link } from '@inertiajs/react';
 import QuizInterface from './QuizInterface';
@@ -14,6 +14,13 @@ const formatTime = (seconds) => {
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, '0')} min`;
 };
+
+const RANK_SOUNDS = {
+  1: '/sounds/rank/top1_voice.wav',
+  2: '/sounds/rank/top2_voice.wav',
+  3: '/sounds/rank/top3_voice.wav',
+};
+const SOUND_POLL_MS = 8000;
 
 const rankMark = (index) => ['🥇', '🥈', '🥉'][index] || `#${index + 1}`;
 
@@ -140,6 +147,36 @@ const QuizGame = ({ quiz, schoolName, onFinished, onSessionLost }) => {
 
 const ResultModal = ({ result, onClose }) => {
   const { t } = useLanguage();
+  const isPrizeWinner = result.rank <= (result.prize_top ?? 10);
+  const [verified, setVerified] = useState(!isPrizeWinner);
+  const [password, setPassword] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  // A prize winner must not leave before the admin verifies the prize.
+  useEffect(() => {
+    if (verified) return undefined;
+    const block = (e) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', block);
+    return () => window.removeEventListener('beforeunload', block);
+  }, [verified]);
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!password || verifying) return;
+    setVerifying(true);
+    setPasswordError('');
+    try {
+      await axios.post('/quiz/prize/verify', { password });
+      setVerified(true);
+    } catch (error) {
+      setPasswordError(error.response?.data?.message || 'Pengesahan gagal. Cuba lagi.');
+      setPassword('');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4">
     <div className="w-full max-w-md overflow-hidden rounded-2xl border-2 border-yellow-400 bg-gray-800 text-center shadow-2xl">
@@ -170,11 +207,50 @@ const ResultModal = ({ result, onClose }) => {
             <div className="text-lg font-bold text-white">{result.points.toLocaleString()} pts</div>
           </div>
         </div>
+        {isPrizeWinner && (
+          <div className={`mb-6 rounded-xl border-2 p-4 text-left ${verified ? 'border-green-400 bg-green-500/10' : 'border-amber-300 bg-amber-300/10'}`}>
+            <div className="text-center">
+              <div className="text-4xl">🎁</div>
+              <h3 className="mt-1 text-lg font-extrabold text-amber-200">KAD HADIAH · TOP {result.prize_top ?? 10}</h3>
+              <p className="text-sm text-white">{result.nickname}</p>
+              {result.school && <p className="text-xs text-gray-300">{result.school}</p>}
+              <p className="mt-1 text-sm font-bold text-yellow-300">Kedudukan #{result.rank}</p>
+            </div>
+            {verified ? (
+              <p className="mt-3 text-center text-sm font-bold text-green-300">✅ Hadiah disahkan oleh admin</p>
+            ) : (
+              <form onSubmit={handleVerify} className="mt-3">
+                <p className="mb-2 text-center text-xs text-amber-100">
+                  Tahniah! Sila tunjuk skrin ini kepada admin. Admin perlu masukkan kata laluan untuk sahkan hadiah sebelum anda boleh teruskan.
+                </p>
+                <label htmlFor="prize-password" className="sr-only">Kata laluan admin</label>
+                <input
+                  id="prize-password"
+                  type="password"
+                  autoComplete="off"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}
+                  placeholder="Kata laluan admin"
+                  className="w-full rounded-lg border border-white/20 bg-gray-900 px-3 py-2 text-white placeholder-gray-500"
+                />
+                {passwordError && <p role="alert" className="mt-1 text-xs font-bold text-red-400">{passwordError}</p>}
+                <button
+                  type="submit"
+                  disabled={!password || verifying}
+                  className="mt-2 w-full rounded-lg bg-amber-400 py-2 font-bold text-gray-900 disabled:opacity-50"
+                >
+                  {verifying ? 'Menyemak...' : 'Sahkan Hadiah (Admin)'}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
         <button
           onClick={onClose}
-          className="w-full rounded-lg border-2 border-green-400 bg-gradient-to-r from-green-500 to-blue-500 py-3 font-bold text-white hover:shadow-lg"
+          disabled={!verified}
+          className="w-full rounded-lg border-2 border-green-400 bg-gradient-to-r from-green-500 to-blue-500 py-3 font-bold text-white hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {t('view_leaderboard')}
+          {verified ? t('view_leaderboard') : '🔒 Menunggu pengesahan admin'}
         </button>
       </div>
     </div>
@@ -255,6 +331,57 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
     refreshLeaderboard();
   };
 
+  // Admin alert: play a sound when a player newly enters the top 3.
+  const [soundOn, setSoundOn] = useState(false);
+  const audioRef = useRef({});
+  const prevTopRef = useRef(null);
+
+  const toggleSound = () => {
+    if (soundOn) {
+      setSoundOn(false);
+      return;
+    }
+    // Clicking is the user gesture browsers need before audio may play later.
+    Object.entries(RANK_SOUNDS).forEach(([rank, src]) => {
+      const audio = audioRef.current[rank] || new Audio(src);
+      audioRef.current[rank] = audio;
+      audio.muted = true;
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+      }).catch(() => { audio.muted = false; });
+    });
+    setSoundOn(true);
+  };
+
+  useEffect(() => {
+    const currentTop = new Map(leaderboard.slice(0, 3).map((p, i) => [p.id, i + 1]));
+    const prevTop = prevTopRef.current;
+    prevTopRef.current = currentTop;
+    if (!soundOn || !prevTop) return;
+
+    // Best rank among players who were not in the top 3 before.
+    const newRanks = [...currentTop.entries()]
+      .filter(([id]) => !prevTop.has(id))
+      .map(([, rank]) => rank);
+    if (newRanks.length === 0) return;
+
+    const rank = Math.min(...newRanks);
+    const audio = audioRef.current[rank] || new Audio(RANK_SOUNDS[rank]);
+    audioRef.current[rank] = audio;
+    Object.values(audioRef.current).forEach(a => { a.pause(); a.currentTime = 0; });
+    audio.play().catch(() => {});
+  }, [leaderboard, soundOn]);
+
+  useEffect(() => {
+    if (!soundOn || quiz) return undefined;
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') refreshLeaderboard();
+    }, SOUND_POLL_MS);
+    return () => clearInterval(timer);
+  }, [soundOn, quiz]);
+
   if (quiz) {
     const schoolName = schools.find(s => s.id == quiz.player.school_id)?.name;
     return <QuizGame quiz={quiz} schoolName={schoolName} onFinished={handleQuizFinished} onSessionLost={handleSessionLost} />;
@@ -276,7 +403,17 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
-          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-violet-100 backdrop-blur-sm">{LEADERBOARD_TITLE}</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-pressed={soundOn}
+              className={`rounded-full border px-3 py-1.5 text-xs font-bold backdrop-blur-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${soundOn ? 'border-amber-300/70 bg-amber-300/25 text-amber-100' : 'border-white/15 bg-white/10 text-violet-100 hover:bg-white/20'}`}
+            >
+              {soundOn ? '🔔 Top 3 alert: ON' : '🔕 Top 3 alert: OFF'}
+            </button>
+            <span className="hidden rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-violet-100 backdrop-blur-sm sm:inline">{LEADERBOARD_TITLE}</span>
+          </div>
         </div>
 
         <motion.header
