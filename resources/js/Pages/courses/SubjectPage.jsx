@@ -241,13 +241,68 @@ export default function SubjectPage({ selectedStandard }) {
                             <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{t('practice')}</p>
                             <div className="space-y-3">
                               {subSection.questionCounts?.objective > 0 && (
-                                <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition hover:border-indigo-200 hover:bg-white hover:shadow-sm">
-                                  <div className="flex gap-3"><span className="h-fit rounded-lg bg-indigo-50 p-2 text-indigo-600"><DocumentTextIcon className="h-5 w-5" /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-slate-800">{t('objective_practice')}</p><span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{subSection.questionCounts.objective} {t('questions')}</span></div><p className="mt-1 text-xs text-slate-500">{subSection.practiceTitle || t('test_understanding')}</p><div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><button onClick={() => startPractice('objective-page', section, subSection)} className="inline-flex w-fit items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700">{objectiveCompleted ? t('try_again') : t('start_practice')}<ArrowRightIcon className="h-3.5 w-3.5" /></button>{subSection.lastPractice?.objective && <div className="text-left text-[11px] leading-5 text-slate-500 sm:text-right"><p><span className="text-slate-500">{t('last_session_result')}:</span> <span className="font-semibold text-slate-700">{subSection.lastPractice.objective.total_correct}/{subSection.lastPractice.objective.total_questions} {t('correct')}</span></p><p><span className="text-slate-500">{t('session_score')}:</span> <span className="font-semibold text-slate-700">{subSection.lastPractice.objective.score}%</span></p><p>{t('last_answered')}: {subSection.lastPractice.objective.last_practice_at}</p></div>}</div><div className="mt-3 border-t border-slate-200 pt-3 text-[11px] leading-5 text-slate-500"><span className="font-semibold text-slate-700">{mastery.session_count} {t('sessions')}</span> · {t('latest_accuracy')}: <span className="font-semibold text-slate-700">{mastery.accuracy_percentage}%</span>{mastery.inactivity_penalty_percentage > 0 && <span className="text-rose-600"> · {t('inactivity_penalty')}: −{mastery.inactivity_penalty_percentage} {t('percentage_points')}</span>}{mastery.level < 5 && <span> · {t('mastery_requirement')}</span>}</div></div></div>
+                                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
+                                  <div className="flex items-start gap-3.5">
+                                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm shadow-indigo-200"><DocumentTextIcon className="h-5 w-5" /></span>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <p className="text-[15px] font-bold tracking-tight text-slate-900">{t('objective_practice')}</p>
+                                        <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-600 ring-1 ring-inset ring-indigo-100">{subSection.questionCounts.objective} {t('questions')}</span>
+                                      </div>
+                                      <p className="mt-0.5 text-[13px] leading-5 text-slate-500">{subSection.practiceTitle || t('test_understanding')}</p>
+                                    </div>
+                                  </div>
+
+                                  {subSection.lastPractice?.objective && (
+                                    <dl className="mt-4 grid grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-2">
+                                      <div className="rounded-xl bg-slate-50 px-3 py-2.5">
+                                        <dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('last_result_short')}</dt>
+                                        <dd className="mt-0.5 text-sm font-bold text-slate-800">{subSection.lastPractice.objective.total_correct}/{subSection.lastPractice.objective.total_questions} <span className="text-[11px] font-medium text-slate-500">{t('correct')}</span></dd>
+                                        <p className="text-[10px] text-slate-400">{t('latest_session_hint')}</p>
+                                      </div>
+                                      <div className="rounded-xl bg-slate-50 px-3 py-2.5">
+                                        <dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('score_short')}</dt>
+                                        <dd className="mt-0.5 text-sm font-bold text-slate-800">{subSection.lastPractice.objective.score}%</dd>
+                                        <p className="text-[10px] text-slate-400">{t('score_hint')}</p>
+                                      </div>
+                                      <div className="rounded-xl bg-slate-50 px-3 py-2.5">
+                                        <dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('last_answered_short')}</dt>
+                                        {(() => {
+                                          const [datePart, ...rest] = String(subSection.lastPractice.objective.last_practice_at || '').split(', ');
+                                          return (
+                                            <dd className="mt-0.5 leading-tight">
+                                              <span className="block whitespace-nowrap text-sm font-bold text-slate-800">{datePart}</span>
+                                              {rest.length > 0 && <span className="block whitespace-nowrap text-[11px] font-medium text-slate-500">{rest.join(', ')}</span>}
+                                            </dd>
+                                          );
+                                        })()}
+                                      </div>
+                                    </dl>
+                                  )}
+
+                                  <button onClick={() => startPractice('objective-page', section, subSection)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{objectiveCompleted ? t('try_again') : t('start_practice')}<ArrowRightIcon className="h-4 w-4" /></button>
+
+                                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3.5 text-xs">
+                                    <span title={t('sessions_hint')} className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">{mastery.session_count} {t('sessions')}</span>
+                                    <span title={t('mastery_hint')} className="whitespace-nowrap rounded-full bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700">{t('accuracy_short')} {mastery.accuracy_percentage}%</span>
+                                    {mastery.inactivity_penalty_percentage > 0 && <span title={t('penalty_hint')} className="whitespace-nowrap rounded-full bg-rose-50 px-2.5 py-1 font-semibold text-rose-600">−{mastery.inactivity_penalty_percentage}%</span>}
+                                    {mastery.level < 5 && <p className="basis-full text-[11px] text-slate-400">{t('mastery_requirement')}</p>}
+                                  </div>
                                 </div>
                               )}
                               {subSection.questionCounts?.subjective > 0 && (
-                                <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition hover:border-violet-200 hover:bg-white hover:shadow-sm">
-                                  <div className="flex gap-3"><span className="h-fit rounded-lg bg-violet-50 p-2 text-violet-600"><PencilSquareIcon className="h-5 w-5" /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-slate-800">{t('written_practice')}</p><span className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-600">{subSection.questionCounts.subjective} {t('questions')}</span></div><p className="mt-1 text-xs text-slate-500">{t('build_written_response')}</p><button onClick={() => startPractice('subjective-page', section, subSection)} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-violet-700">{subjectiveCompleted ? t('try_again') : t('start_writing')}<ArrowRightIcon className="h-3.5 w-3.5" /></button></div></div>
+                                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-violet-200 hover:shadow-md">
+                                  <div className="flex items-start gap-3.5">
+                                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 text-white shadow-sm shadow-violet-200"><PencilSquareIcon className="h-5 w-5" /></span>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <p className="text-[15px] font-bold tracking-tight text-slate-900">{t('written_practice')}</p>
+                                        <span className="rounded-full bg-violet-50 px-2.5 py-0.5 text-[11px] font-semibold text-violet-600 ring-1 ring-inset ring-violet-100">{subSection.questionCounts.subjective} {t('questions')}</span>
+                                      </div>
+                                      <p className="mt-0.5 text-[13px] leading-5 text-slate-500">{t('build_written_response')}</p>
+                                    </div>
+                                  </div>
+                                  <button onClick={() => startPractice('subjective-page', section, subSection)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-200 transition hover:bg-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600">{subjectiveCompleted ? t('try_again') : t('start_writing')}<ArrowRightIcon className="h-4 w-4" /></button>
                                 </div>
                               )}
                               {!subSection.questionCounts?.objective && !subSection.questionCounts?.subjective && <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-xs text-slate-400">{t('practice_coming_soon')}</div>}

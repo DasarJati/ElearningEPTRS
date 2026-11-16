@@ -46,13 +46,18 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validated();
+        $request->user()->fill(collect($validated)->except('class_name')->all());
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
         $request->user()->save();
+
+        if (array_key_exists('class_name', $validated) && $request->user()->student) {
+            $request->user()->student->update(['class_name' => $validated['class_name']]);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

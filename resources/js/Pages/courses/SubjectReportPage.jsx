@@ -142,6 +142,7 @@ export default function SubjectReportPage() {
     <SubjectLayout
       subject={subject}
       activeTab="Report"
+      disableLoadingOverlay
       selectedStandard={currentStandard}
       onStandardChange={handleStandardChange}
     >
@@ -195,16 +196,6 @@ export default function SubjectReportPage() {
               </button>
             </div>
           </div>
-
-          {/* Global loading overlay */}
-          {isLoading && (
-            <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-gray-700">{t('loading_data')}</p>
-              </div>
-            </div>
-          )}
 
           {/* Progress Details */}
           <div className="mb-8 min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-opacity duration-300">

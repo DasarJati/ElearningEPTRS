@@ -140,7 +140,7 @@ const OptionDisplay = ({ option, index, isSelected, isCorrect, isIncorrect, isDi
     }
     // Incorrect answer styling (red with shake animation)
     if (isIncorrect) {
-      return 'bg-red-100 border-red-500 text-red-800 cursor-default animate-shake';
+      return 'bg-red-100 border-red-500 text-red-800 ring-2 ring-red-300 cursor-not-allowed animate-shake';
     }
     // Selected but not yet checked (blue)
     if (isSelected) {
@@ -251,6 +251,10 @@ const OptionDisplay = ({ option, index, isSelected, isCorrect, isIncorrect, isDi
  * 
  * @returns {JSX.Element} - The complete quiz interface
  */
+const scrollFeedbackIntoView = (el) => {
+  if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
+
 export default function ObjectiveQuestion() {
   const { t } = useLanguage();
   // Extract props from Inertia page
@@ -1130,7 +1134,7 @@ export default function ObjectiveQuestion() {
    * @returns {JSX.Element} - Progress circles row
    */
   const ProgressCircles = () => (
-    <div className="flex justify-center space-x-2 md:space-x-2 mb-2 md:mb-6">
+    <div className="flex justify-center gap-1.5">
       {questions.map((_, index) => {
         let circleColor = 'bg-gray-300';
 
@@ -1146,7 +1150,7 @@ export default function ObjectiveQuestion() {
         return (
           <div
             key={index}
-            className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white font-semibold transition-all duration-300 ${circleColor} ${index === currentQuestionIndex ? 'ring-2 md:ring-4 ring-blue-200 scale-110' : ''
+            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-semibold transition-all duration-300 ${circleColor} ${index === currentQuestionIndex ? 'ring-2 ring-blue-200 ring-offset-1' : ''
               }`}
           >
             {index + 1}
@@ -1366,12 +1370,14 @@ export default function ObjectiveQuestion() {
                   {t('try_again')}
                 </button>
               )}
-              <button
-                onClick={handleNextQuestion}
-                className="bg-white text-gray-700 border border-gray-300 px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-sm text-base sm:text-sm md:text-base hover:bg-gray-100"
-              >
-                {t('skip_question')}
-              </button>
+              {!isRetrying && (
+                <button
+                  onClick={handleNextQuestion}
+                  className="bg-white text-gray-700 border border-gray-300 px-6 py-3 sm:px-5 sm:py-2 md:px-6 md:py-3 rounded-lg font-medium shadow-sm text-base sm:text-sm md:text-base hover:bg-gray-100"
+                >
+                  {t('skip_question')}
+                </button>
+              )}
             </div>
           )}
       </div>
@@ -1704,119 +1710,23 @@ export default function ObjectiveQuestion() {
         onExitWithResults={handleExitConfirmation}
       >
         <div className="relative p-0" onClickCapture={handleObjectiveImageClick}>
-          {/* Desktop Feedback Messages (Correct Answer) */}
-          {isAnswerCorrect === true && (
-            <>
-              <div className="hidden lg:block absolute lg:right-4 lg:top-3/4 lg:transform lg:-translate-y-1/2 z-10">
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-300 rounded-xl p-3 shadow-sm w-[260px] mx-auto flex items-center gap-3 hover:shadow-md transition-all duration-300">
-                  <div className="flex items-center justify-center bg-white rounded-lg p-2 shadow-sm">
-                    <svg
-                      className="w-6 h-6 text-yellow-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.383 2.46a1 1 0 00-.364 1.118l1.286 3.974c.3.921-.755 1.688-1.54 1.118l-3.383-2.46a1 1 0 00-1.176 0l-3.383 2.46c-.785.57-1.84-.197-1.54-1.118l1.286-3.974a1 1 0 00-.364-1.118L2.045 9.4c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.288-3.973z" />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-gray-800 font-semibold text-sm tracking-wide">
-                      {t('correct_feedback')}
-                    </span>
-                    <span className="text-gray-600 text-[11px]">
-                      {firstTryResults[currentQuestionIndex]?.isCorrect
-                        ? t('perfect_first_try')
-                        : t('next_question_loading')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Feedback Messages (Correct Answer) */}
-              <div className="lg:hidden absolute bottom-4 right-4 z-10">
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-300 rounded-xl p-3 shadow-sm w-[260px] mx-auto flex items-center gap-3 hover:shadow-md transition-all duration-300">
-                  <div className="flex items-center justify-center bg-white rounded-lg p-2 shadow-sm">
-                    <svg
-                      className="w-6 h-6 text-yellow-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.383 2.46a1 1 0 00-.364 1.118l1.286 3.974c.3.921-.755 1.688-1.54 1.118l-3.383-2.46a1 1 0 00-1.176 0l-3.383 2.46c-.785.57-1.84-.197-1.54-1.118l1.286-3.974a1 1 0 00-.364-1.118L2.045 9.4c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.288-3.973z" />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="text-gray-800 font-semibold text-sm tracking-wide">
-                      {t('correct_feedback')}
-                    </span>
-                    <span className="text-gray-600 text-[11px]">
-                      {firstTryResults[currentQuestionIndex]?.isCorrect
-                        ? t('perfect_first_try')
-                        : t('next_question_loading')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Desktop Feedback Messages (Incorrect Answer) */}
-          {isAnswerCorrect === false && (
-            <>
-              <div className="hidden lg:block absolute lg:right-4 lg:top-3/4 lg:transform lg:-translate-y-1/2 z-10">
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 shadow-lg w-[320px] animate-shake">
-                  <div className="flex flex-col space-y-3">
-                    <div className="flex items-start">
-                      <svg className="w-6 h-6 text-red-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      <span className="text-red-800 font-medium text-sm">
-                        {firstTryResults[currentQuestionIndex]?.isCorrect === false && !answeredQuestions.has(currentQuestionIndex)
-                          ? t('incorrect_try_another')
-                          : t('first_attempt_incorrect')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Feedback Messages (Incorrect Answer) */}
-              <div className="lg:hidden absolute bottom-4 right-4 z-10">
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-1.5 shadow-lg w-[250px] animate-shake">
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex items-start">
-                      <svg className="w-3 h-3 text-red-600 mr-1.5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      <span className="text-red-800 font-medium text-xs leading-tight">
-                        {firstTryResults[currentQuestionIndex]?.isCorrect === false && !answeredQuestions.has(currentQuestionIndex)
-                          ? t('incorrect_try_another')
-                          : t('first_attempt_incorrect')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
           {/* Main Quiz Content Area */}
           <div className="py-2 sm:py-4 bg-cover bg-center bg-no-repeat h-auto" style={{ backgroundImage: 'url(/images/background_classroom.jpg)' }}>
             <div className="mx-auto relative px-4 sm:px-0 md:px-4 lg:px-10 max-w-full sm:max-w-2xl md:max-w-full lg:max-w-2xl xl:max-w-5xl 2xl:max-w-6xl">
               {/* Question Card */}
-              <div className="bg-white opacity-100 rounded-2xl shadow-xl p-6 mb-10 transition-all duration-300 hover:shadow-2xl">
+              <div className="relative bg-white opacity-100 rounded-2xl shadow-xl p-6 pt-11 mb-10 transition-all duration-300 hover:shadow-2xl">
                 <div className="flex justify-between items-start mb-6">
                   <h2 className="text-sm md:text-lg lg:text-lg xl:text-xl font-semibold flex-1 leading-relaxed text-gray-800 lg:text-gray-900">
                     <QuestionDisplay question={currentQuestion} />
                   </h2>
                   {/* Display KBAT only if difficulty_type_id === 4 */}
                   {currentQuestion.difficulty_type_id === 4 && (
-                    <div className="bg-gray-200 rounded-md text-gray-500 font-bold p-2">{t('higher_order_thinking')}</div>
+                    <div className="absolute top-3 right-3 z-10 rounded-full bg-gray-200 px-2.5 py-0.5 text-[11px] font-bold text-gray-600">{t('higher_order_thinking')}</div>
                   )}
 
                   {/* Optional: Display other difficulty levels if needed */}
                   {currentQuestion.difficulty_type_id && currentQuestion.difficulty_type_id !== 4 && (
-                    <div className={`rounded-md text-white font-bold p-2 text-xs ${currentQuestion.difficulty_type_id === 1 ? 'bg-green-500' :
+                    <div className={`absolute top-3 right-3 z-10 rounded-full px-2.5 py-0.5 text-[11px] text-white font-bold ${currentQuestion.difficulty_type_id === 1 ? 'bg-green-500' :
                         currentQuestion.difficulty_type_id === 2 ? 'bg-yellow-500' :
                           currentQuestion.difficulty_type_id === 3 ? 'bg-red-500' :
                             'bg-gray-500'
@@ -1859,7 +1769,7 @@ export default function ObjectiveQuestion() {
                         index={index}
                         isSelected={isCurrentSelected}
                         isCorrect={showAsCorrect}
-                        isIncorrect={isCurrentSelected && isAnswerCorrect === false}
+                        isIncorrect={incorrectAnswers.has(index) && !showAsCorrect}
                         isDisabled={isDisabled}
                         onClick={() => handleAnswerSelect(index)}
                       />
@@ -1883,6 +1793,34 @@ export default function ObjectiveQuestion() {
                   </div>
                 )}
               </div>
+
+              {/* Feedback Card (below question card) */}
+              {isAnswerCorrect !== null && isAnswerCorrect !== undefined && (() => {
+                const isCorrect = isAnswerCorrect === true;
+                const firstTry = firstTryResults[currentQuestionIndex]?.isCorrect;
+                const retryHint = firstTry === false && !answeredQuestions.has(currentQuestionIndex);
+                const title = isCorrect
+                  ? (firstTry ? t('fb_correct_first_title') : t('fb_correct_retry_title'))
+                  : t('fb_wrong_title');
+                const text = isCorrect
+                  ? (firstTry ? t('fb_correct_first_text') : t('fb_correct_retry_text'))
+                  : (retryHint ? t('fb_wrong_try_another') : t('fb_wrong_first_attempt'));
+                return (
+                  <div
+                    key={`${currentQuestionIndex}-${isCorrect ? 'ok' : 'no'}`}
+                    ref={scrollFeedbackIntoView}
+                    role="status"
+                    aria-live="polite"
+                    className={`-mt-6 mb-10 flex items-center gap-4 rounded-2xl border p-4 shadow-xl ${isCorrect ? 'animate-fade-in border-emerald-200 bg-gradient-to-r from-emerald-50 to-white' : 'animate-shake border-amber-200 bg-gradient-to-r from-amber-50 to-white'}`}
+                  >
+                    <span className={`flex h-12 w-12 flex-none items-center justify-center rounded-xl text-2xl shadow-sm ${isCorrect ? 'bg-emerald-100' : 'bg-amber-100'}`} aria-hidden="true">{isCorrect ? (firstTry ? '🌟' : '💪') : '🤔'}</span>
+                    <div className="min-w-0">
+                      <p className={`text-base font-bold ${isCorrect ? 'text-emerald-800' : 'text-amber-800'}`}>{title}</p>
+                      <p className="mt-0.5 text-sm leading-5 text-slate-600">{text}</p>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

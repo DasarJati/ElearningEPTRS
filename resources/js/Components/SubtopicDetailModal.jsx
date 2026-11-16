@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import DonutChart from '@/Components/ChartJsDonut';
 import QuestionReviewModal from '@/Components/QuestionReviewModal';
 import { exportSessionsToPdf } from '@/utils/exportPdf';
 import { useLanguage } from '@/Contexts/LanguageContext';
@@ -102,190 +101,153 @@ export default function SubtopicDetailModal({ isOpen, onClose, subtopicData, que
             />
 
             {/* Subtopic Detail Modal */}
-            <div className="fixed inset-0 z-[9998] bg-black bg-opacity-50 flex items-center justify-center p-4">
-                <div className="max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-xl bg-white">
+            <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-slate-900/50 p-3 backdrop-blur-sm sm:p-6">
+                <div className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
                     {/* Header */}
-                    <div className="flex items-start justify-between gap-3 border-b border-gray-200 p-4 sm:items-center sm:p-6">
-                        <h2 className="min-w-0 break-words text-lg font-bold text-gray-800 sm:text-xl">
-                            {subtopicData?.name || t('subtopic')}
-                        </h2>
+                    <div className="flex flex-none items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-7 sm:py-5">
+                        <div className="min-w-0">
+                            <h2 className="break-words text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+                                {subtopicData?.name || t('subtopic')}
+                            </h2>
+                            {sessions.length > 0 && (
+                                <p className="mt-0.5 text-xs font-medium text-slate-500">{sessions.length} {t('sessions')}</p>
+                            )}
+                        </div>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                            aria-label={t('close')}
+                            className="flex h-9 w-9 flex-none items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                                                
-                    
                     </div>
 
                     {/* Content */}
-                    <div className="p-4 sm:p-6">
+                    <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-7">
                         {error ? (
-                            <div className="text-center py-8">
-                                <div className="text-red-600 mb-4">{error}</div>
+                            <div className="py-10 text-center">
+                                <div className="mb-4 text-rose-600">{error}</div>
                                 <button
                                     onClick={fetchSessionDetails}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
                                 >
                                     {t('try_again')}
                                 </button>
                             </div>
                         ) : loading ? (
-                            <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                                <p className="text-gray-600 mt-4">{t('loading_session_details')}</p>
+                            <div className="py-10 text-center">
+                                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-b-2 border-indigo-600"></div>
+                                <p className="mt-4 text-slate-600">{t('loading_session_details')}</p>
                             </div>
                         ) : sessions.length === 0 ? (
-                            <div className="text-center py-8">
-                                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <div className="py-10 text-center">
+                                <svg className="mx-auto mb-4 h-14 w-14 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <p className="text-gray-500 text-lg">{t('no_practice_sessions')}</p>
+                                <p className="text-slate-500">{t('no_practice_sessions')}</p>
                             </div>
                         ) : (
-                            <>
-                                {/* Sessions Table */}
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-[860px] border border-gray-200 bg-white">
-                                        <thead>
-                                            <tr className="bg-gray-50">
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('number')}
-                                                </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('total_questions')}
-                                                </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t(questionType === 'Objective' ? 'correct_answers' : 'answered')}
-                                                </th>
-                                                {/* Show Wrong column only for Objective */}
-                                                {questionType === 'Objective' && (
-                                                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                        {t('wrong_answers')}
-                                                    </th>
-                                                )}
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('skipped')}
-                                                </th>
-                                                {/* Show Score column only for Objective */}
-                                                {questionType === 'Objective' && (
-                                                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                        {t('score')}
-                                                    </th>
-                                                )}
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('time_spent')}
-                                                </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('average_time')}
-                                                </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('session_date')}
-                                                </th>
-                                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                                    {t('actions')}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-50">
-                                            {sessions.map((session, index) => (
-                                                <tr key={session.id || index} className="">
-                                                    <td className="px-4 py-3 text-sm text-gray-500 text-center whitespace-nowrap">
-                                                        {index + 1}
+                            <div className="overflow-x-auto rounded-xl border border-slate-200">
+                                <table className="w-full min-w-[820px] border-collapse bg-white text-sm">
+                                    <thead className="bg-slate-50">
+                                        <tr className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                            <th className="px-4 py-3 text-center">{t('number')}</th>
+                                            <th className="px-4 py-3 text-center">{t('total_questions')}</th>
+                                            <th className="px-4 py-3 text-center">{t(questionType === 'Objective' ? 'correct_answers' : 'answered')}</th>
+                                            {questionType === 'Objective' && <th className="px-4 py-3 text-center">{t('wrong_answers')}</th>}
+                                            <th className="px-4 py-3 text-center">{t('skipped')}</th>
+                                            {questionType === 'Objective' && <th className="px-4 py-3 text-left">{t('score')}</th>}
+                                            <th className="px-4 py-3 text-center">{t('time_spent')}</th>
+                                            <th className="px-4 py-3 text-center">{t('average_time')}</th>
+                                            <th className="px-4 py-3 text-center">{t('session_date')}</th>
+                                            <th className="px-4 py-3 text-center">{t('actions')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {sessions.map((session, index) => {
+                                            const score = Math.max(0, Math.min(100, parseFloat(session.score) || 0));
+                                            const scoreTone = score >= 80 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-rose-500';
+                                            const scoreText = score >= 80 ? 'text-emerald-700' : score >= 50 ? 'text-amber-700' : 'text-rose-700';
+                                            return (
+                                                <tr key={session.id || index} className="transition hover:bg-slate-50/70">
+                                                    <td className="whitespace-nowrap px-4 py-3.5 text-center font-medium text-slate-400">{index + 1}</td>
+                                                    <td className="px-4 py-3.5 text-center font-semibold text-slate-700">{session.total_questions || 0}</td>
+                                                    <td className="px-4 py-3.5 text-center">
+                                                        <span className="inline-flex min-w-[2rem] justify-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">{session.total_correct || 0}</span>
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-700 text-center bg-gray-100">
-                                                        {session.total_questions || 0}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-sm text-green-700 font-medium text-center bg-green-100">
-                                                        {session.total_correct || 0}
-                                                    </td>
-                                                    {/* Show Wrong cell only for Objective */}
                                                     {questionType === 'Objective' && (
-                                                        <td className="px-4 py-3 text-sm text-red-700 font-medium text-center bg-red-100">
-                                                            {session.total_wrong || 0}
+                                                        <td className="px-4 py-3.5 text-center">
+                                                            <span className="inline-flex min-w-[2rem] justify-center rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700">{session.total_wrong || 0}</span>
                                                         </td>
                                                     )}
-                                                    <td className="px-4 py-3 text-sm text-yellow-700 font-medium text-center bg-yellow-100">
-                                                        {session.total_skipped || 0}
+                                                    <td className="px-4 py-3.5 text-center">
+                                                        <span className="inline-flex min-w-[2rem] justify-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">{session.total_skipped || 0}</span>
                                                     </td>
-                                                    {/* Show Score cell only for Objective */}
                                                     {questionType === 'Objective' && (
-                                                        <td className="px-4 py-3 text-center bg-gray-50">
-                                                            <div className="flex justify-center items-center">
-                                                                <DonutChart
-                                                                    percentage={parseFloat(session.score) || 0}
-                                                                    size={40}
-                                                                    strokeWidth={4}
-                                                                    label={t('score')}
-                                                                    color="#3b82f6"
-                                                                />
+                                                        <td className="px-4 py-3.5">
+                                                            <div className="flex min-w-[110px] items-center gap-2">
+                                                                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+                                                                    <div className={`h-full rounded-full ${scoreTone}`} style={{ width: `${score}%` }} />
+                                                                </div>
+                                                                <span className={`w-10 text-right text-xs font-bold ${scoreText}`}>{score}%</span>
                                                             </div>
                                                         </td>
                                                     )}
-                                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                                    <td className="whitespace-nowrap px-4 py-3.5 text-center text-slate-600">
                                                         {session.total_time || `0 ${t('minutes_short')} 0 ${t('seconds_short')}`}
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-600 text-center">
+                                                    <td className="whitespace-nowrap px-4 py-3.5 text-center text-slate-600">
                                                         {session.average_time || `0 ${t('minutes_short')} 0 ${t('seconds_short')}`}
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                                                        {session.session_date || '-'}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-center">
+                                                    <td className="whitespace-nowrap px-4 py-3.5 text-center text-slate-700">{session.session_date || '-'}</td>
+                                                    <td className="px-4 py-3.5 text-center">
                                                         <button
                                                             onClick={() => openReviewModal(session.id)}
-                                                            className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
+                                                            className="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-600 hover:text-white"
                                                             title={t('review_questions')}
                                                         >
                                                             {t('review')}
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
 
                     {/* Footer */}
-                    <div className="flex flex-wrap justify-end gap-2 border-t border-gray-200 p-4 sm:p-6">
-                        <div className="flex items-center space-x-3">
-                            {sessions.length > 0 && (
-                                <button
-                                    onClick={handleExportToPdf}
-                                    disabled={exporting}
-                                    className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${
-                                        exporting 
-                                            ? 'bg-gray-400 cursor-not-allowed' 
-                                            : 'bg-green-600 hover:bg-green-700'
-                                    } text-white`}
-                                >
-                                    {exporting ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            {t('exporting')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            {t('export_pdf')}
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                            
-                        </div>
-
+                    <div className="flex flex-none flex-wrap items-center justify-end gap-2 border-t border-slate-100 bg-slate-50/60 px-5 py-3.5 sm:px-7">
+                        {sessions.length > 0 && (
+                            <button
+                                onClick={handleExportToPdf}
+                                disabled={exporting}
+                                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition ${
+                                    exporting ? 'cursor-not-allowed bg-slate-400' : 'bg-emerald-600 hover:bg-emerald-700'
+                                }`}
+                            >
+                                {exporting ? (
+                                    <>
+                                        <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+                                        {t('exporting')}
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        {t('export_pdf')}
+                                    </>
+                                )}
+                            </button>
+                        )}
                         <button
                             onClick={onClose}
-                            className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                            className="rounded-lg border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                         >
                             {t('close')}
                         </button>

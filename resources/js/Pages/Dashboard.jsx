@@ -1,3 +1,4 @@
+import LearningSpaceCard from '@/Components/LearningSpaceCard';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
@@ -53,10 +54,7 @@ export default function Dashboard() {
   } = usePage().props;
 
   const user = auth?.user || {};
-  const firstName = (profileData?.name || user.name || t('learner')).split(' ')[0];
   const profilePicture = student?.profile_picture || profileData?.profile_picture;
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? t('good_morning') : hour < 18 ? t('good_afternoon') : t('good_evening');
 
   const averageScore = Number(dashboardStats.accuracy_percentage || 0);
   const bestSession = dashboardStats.best_session;
@@ -67,9 +65,6 @@ export default function Dashboard() {
     : activityCalendar.month_label || t('learning_activity');
   const calendarOffset = Number(activityCalendar.first_day_offset || 0);
   const calendarTrailingDays = (7 - ((calendarOffset + calendarDays.length) % 7)) % 7;
-  const weeklyGoal = Number(activityCalendar.weekly_goal || 5);
-  const weeklyCompleted = Number(activityCalendar.weekly_completed || 0);
-  const weeklyRemaining = Math.max(0, weeklyGoal - weeklyCompleted);
 
   const leaderboard = quizSessions.slice(0, 5).map((session, index) => ({
     rank: index + 1,
@@ -120,55 +115,11 @@ export default function Dashboard() {
 
       <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <motion.section
-          {...cardMotion}
-          transition={{ duration: 0.35 }}
-          className="relative min-w-0 overflow-hidden rounded-3xl bg-slate-950 px-5 py-6 text-white shadow-xl shadow-slate-200 sm:px-8 sm:py-8 lg:px-10 lg:py-9">
-          <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-indigo-500/30 blur-3xl" />
-          <div className="absolute bottom-[-8rem] right-48 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
-          <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1fr_auto]">
-            <div className="max-w-2xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-indigo-100 backdrop-blur-sm">
-                <SparklesIcon className="h-4 w-4" />
-                {t('learning_space')}
-              </div>
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-4xl">
-                {greeting}, {firstName}.
-              </h1>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
-                {t('dashboard_intro')}
-              </p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link href={primarySubjectUrl} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-50 sm:w-auto">
-                  <PlayIcon className="h-4 w-4" />
-                  {t('continue_learning')}
-                </Link>
-                {/* <Link href={route('quiz-page')} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15 sm:w-auto">
-                  <BoltIcon className="h-4 w-4" />
-                  Quick quiz
-                </Link> */}
-              </div>
-            </div>
-
-            <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-md sm:gap-4 sm:p-4 lg:min-w-[285px]">
-              <div className="h-14 w-14 flex-none overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-400 to-cyan-400 ring-4 ring-white/10 sm:h-16 sm:w-16">
-                {profilePicture ? (
-                  <img src={`/storage/${profilePicture}`} alt={profileData?.name || user.name} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-white">{firstName.charAt(0).toUpperCase()}</div>
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="truncate font-semibold">{profileData?.name || user.name}</p>
-                <p className="mt-0.5 truncate text-xs text-slate-300">{profileData?.school || t('add_your_school')}</p>
-                <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-300">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  {t('ready_to_learn')}
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.section>
+        <LearningSpaceCard
+          name={profileData?.name || user.name || t('learner')}
+          school={profileData?.school || t('add_your_school')}
+          picture={profilePicture}
+        />
          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
           {stats.map((stat, index) => (
             <motion.div key={stat.label} {...cardMotion} transition={{ duration: 0.35, delay: 0.06 * (index + 1) }} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
@@ -316,12 +267,7 @@ export default function Dashboard() {
                 <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-indigo-500" /> {t('login_only')}</span>
               </div>
 
-              <div className={`mt-4 rounded-xl px-4 py-3 text-xs leading-5 ${weeklyRemaining === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-indigo-50 text-indigo-700'}`}>
-                <span className="font-semibold">{weeklyCompleted}/{weeklyGoal} {t('days_this_week')}</span>{' '}
-                {weeklyRemaining === 0
-                  ? t('weekly_goal_complete')
-                  : `${weeklyRemaining} ${t(weeklyRemaining === 1 ? 'more_learning_day' : 'more_learning_days')}`}
-              </div>
+
             </motion.section>
 
             {/* <motion.section {...cardMotion} transition={{ duration: 0.35, delay: 0.27 }} className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
@@ -359,3 +305,5 @@ export default function Dashboard() {
     </DashboardLayout>
   );
 }
+
+

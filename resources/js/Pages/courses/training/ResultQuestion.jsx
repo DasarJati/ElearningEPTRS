@@ -1,5 +1,5 @@
 // resources/js/Pages/courses/training/ResultQuestion.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { router } from '@inertiajs/react';
 import { useLanguage } from '@/Contexts/LanguageContext';
 
@@ -22,6 +22,11 @@ export default function ResultQuestion({
   isEarlyExit = false
 }) {
   const { t } = useLanguage();
+  const [ringReady, setRingReady] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setRingReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
   const results = quizType === "objective" ? objectiveResults : subjectiveResults;
 
   const handleBackToSubject = () => {
@@ -109,217 +114,137 @@ export default function ResultQuestion({
                      (results.completionType === 'all_questions') || 
                      (results.skippedAnswers === 0 && !isEarlyExit);
 
+  const statusKey = skippedAnswers === 0 ? 'fully_completed' : 'partially_completed';
+  const hasNext = isComplete && nextTopic?.id;
+
+  // Tier drives the motivational copy, colours and stars
+  const tier = accuracyRate >= 80 ? 'high' : accuracyRate >= 50 ? 'mid' : 'low';
+  const tierStyle = {
+    high: { stroke: '#10b981', soft: 'bg-emerald-50 text-emerald-700', stars: 3, emoji: '🏆' },
+    mid: { stroke: '#f59e0b', soft: 'bg-amber-50 text-amber-700', stars: 2, emoji: '🚀' },
+    low: { stroke: '#6366f1', soft: 'bg-indigo-50 text-indigo-700', stars: 1, emoji: '💪' },
+  }[tier];
+
+  const RADIUS = 54;
+  const CIRC = 2 * Math.PI * RADIUS;
+  const ringOffset = ringReady ? CIRC * (1 - Math.min(100, accuracyRate) / 100) : CIRC;
+
+  const stats = [
+    { label: t('total_correct'), value: correctAnswers, big: true, bg: 'bg-emerald-50 border-emerald-100', tone: 'text-emerald-600' },
+    { label: t('total_skipped'), value: skippedAnswers, big: true, bg: 'bg-rose-50 border-rose-100', tone: 'text-rose-600' },
+    { label: t('total_time'), value: formatTime(results.timeElapsed), bg: 'bg-violet-50 border-violet-100', tone: 'text-violet-600' },
+    { label: t('average_time'), value: averageTimeFormatted, bg: 'bg-amber-50 border-amber-100', tone: 'text-amber-600' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header Section */}
-      <header className="bg-blue-950 shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile & Tablet Header Layout */}
-          <div className="lg:hidden">
-            <div className="flex flex-col items-center py-4 space-y-4">
-              <div className="flex items-center justify-center space-x-3">
-                <button
-                  onClick={handleBackToSubject}
-                  className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer"
-                >
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <div className="text-center">
-                  <h1 className="text-lg font-bold text-gray-50">
-                    {topic}
-                  </h1>
-                  <p className="text-xs text-gray-50">{t('quiz_results')}</p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-slate-50">
+      {/* Compact header */}
+      <header className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-indigo-900 pb-8 text-white sm:pb-10">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
 
-              <div className="flex items-center space-x-3">
-                <div className="text-center">
-                  <p className="text-xs font-medium text-gray-100">{t('completion_status')}</p>
-                  <p className="text-xs text-green-600 font-semibold">
-                    {t(skippedAnswers === 0 ? 'completed' : 'in_progress')}
-                  </p>
-                </div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                  <span className="text-gray-600 text-sm">👤</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Web Header Layout - Unchanged */}
-          <div className="hidden lg:flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <button
-                onClick={handleBackToSubject}
-                className="flex-shrink-0 w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-50">
-                  {topic}
-                </h1>
-                <p className="text-sm text-gray-50">{t('quiz_results')}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-100">{t('completion_status')}</p>
-                <p className="text-sm text-green-600 font-semibold">
-                  {t(skippedAnswers === 0 ? 'completed' : 'in_progress')}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="text-gray-600">👤</span>
-              </div>
-            </div>
+        <div className="relative mx-auto flex max-w-4xl items-center gap-3 px-4 py-3 sm:px-6">
+          <button
+            onClick={handleBackToSubject}
+            aria-label={t('back_to_subject')}
+            title={t('back_to_subject')}
+            className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-white/20"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="min-w-0">
+            <h1 className="truncate text-base font-bold leading-tight sm:text-lg">{topic}</h1>
+            <p className="text-xs text-indigo-200">{t('quiz_results')}</p>
           </div>
         </div>
 
-        {/* Success Message Section */}
-        <div className="text-center py-8 lg:my-16">
-          <div className="flex items-center justify-center space-x-2 lg:space-x-4 mb-4">
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-            <p className="text-xl lg:text-3xl text-gray-100 font-semibold">{t('nice_work')}</p>
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-          </div>
-          <p className="text-gray-100 italic text-base lg:text-2xl px-4">{t('learning_quote')}</p>
+        <div className="relative px-4 pt-3 text-center sm:pt-5">
+          <p className="text-3xl font-extrabold tracking-tight sm:text-4xl">{tierStyle.emoji} {t(`result_tier_${tier}_title`)}</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-indigo-200 sm:text-base">{t(`result_tier_${tier}_text`)}</p>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="py-4 lg:py-8 px-3 sm:px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Main Results Card */}
-          <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg p-4 lg:p-8 mb-6 lg:mb-8 border border-gray-200">
-            {/* Stats Grid - Responsive for tablet and mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-              {/* Total Question Card */}
-              <div className="bg-green-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-green-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_correct')}</h3>
-                    <p className="text-2xl lg:text-3xl font-bold text-green-600 mt-1 lg:mt-2">
-                      {quizType === "objective" ? results.correctAnswers : results.answered}
-                    </p>
-                  </div>
-                  <div className="w-8 h-8 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 text-base lg:text-xl">✅</span>
-                  </div>
-                </div>
-              </div>
-              {/* Total Skipped Question Card */}
-              <div className="bg-red-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-red-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_skipped')}</h3>
-                    <p className="text-2xl lg:text-3xl font-bold text-red-600 mt-1 lg:mt-2">{skippedAnswers}</p>
-                  </div>
-                  <div className="w-8 h-8 lg:w-12 lg:h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <span className="text-red-600 text-base lg:text-xl">⏭️</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Total Time Taken Card */}
-              <div className="bg-purple-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-purple-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('total_time')}</h3>
-                    <p className="text-base lg:text-xl font-bold text-purple-600 mt-1 lg:mt-2">{formatTime(results.timeElapsed)}</p>
-                  </div>
-                  <div className="w-8 h-8 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span className="text-purple-600 text-base lg:text-xl">⏱️</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Average Time Taken Card */}
-              <div className="bg-orange-50 rounded-lg lg:rounded-xl p-4 lg:p-6 border-2 border-orange-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm lg:text-lg font-semibold text-gray-700">{t('average_time')}</h3>
-                    <p className="text-base lg:text-xl font-bold text-orange-600 mt-1 lg:mt-2">{averageTimeFormatted}</p>
-                  </div>
-                  <div className="w-8 h-8 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span className="text-orange-600 text-base lg:text-xl">📊</span>
-                  </div>
-                </div>
+      {/* Main content */}
+      <main className="mx-auto mt-6 max-w-3xl px-3 pb-12 sm:mt-8 sm:px-4">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl shadow-indigo-100 sm:p-8">
+          {/* Score ring */}
+          <div className="flex flex-col items-center text-center">
+            <div className="relative h-36 w-36 sm:h-40 sm:w-40">
+              <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" aria-hidden="true">
+                <circle cx="60" cy="60" r={RADIUS} fill="none" stroke="#eef2ff" strokeWidth="10" />
+                <circle
+                  cx="60" cy="60" r={RADIUS} fill="none" stroke={tierStyle.stroke} strokeWidth="10" strokeLinecap="round"
+                  strokeDasharray={CIRC} strokeDashoffset={ringOffset}
+                  style={{ transition: 'stroke-dashoffset 1.1s ease-out' }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">{accuracyRate}%</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t('accuracy_rate')}</span>
               </div>
             </div>
 
-            {/* Analysis Section */}
-            <div className="bg-gray-50 rounded-lg lg:rounded-xl p-4 lg:p-6 mb-6 lg:mb-8 border-2 border-gray-200">
-              <h3 className="text-lg lg:text-xl font-bold text-gray-800 mb-3 lg:mb-4">{t('analysis')}</h3>
-              <div className="space-y-3 lg:space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm lg:text-base text-gray-600">{t('questions_attempted')}</span>
-                  <span className="text-sm lg:text-base font-semibold text-gray-800">{results.totalQuestions - skippedAnswers}/{results.totalQuestions}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm lg:text-base text-gray-600">{t('accuracy_rate')}</span>
-                  <span className="text-sm lg:text-base font-semibold text-green-600">
-                    {accuracyRate}%
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm lg:text-base text-gray-600">{t('completion_status')}</span>
-                  <span className="text-sm lg:text-base font-semibold text-blue-600">
-                    {t(skippedAnswers === 0 ? 'fully_completed' : 'partially_completed')}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* All Done Section */}
-            <div className="text-center mb-6 lg:mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 lg:w-20 lg:h-20 bg-green-100 rounded-full mb-3 lg:mb-4">
-                <span className="text-2xl lg:text-3xl">🎉</span>
-              </div>
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-2">{t('all_done')}</h2>
-              <p className="text-sm lg:text-base text-gray-600 px-4">{t('assessment_completed')}</p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
-              <button
-                onClick={onTryAgain}
-                className="px-6 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg lg:rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg hover:scale-105 text-base lg:text-lg flex items-center justify-center"
-              >
-                <span className="mr-2">🔄</span>
-                {t('repeat_topic')}
-              </button>
-
-              <button
-                type="button"
-                onClick={isComplete && nextTopic?.id ? handleNextTopic : handleBackToSubject}
-                className="px-6 py-3 lg:px-8 lg:py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg lg:rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 font-medium shadow-lg hover:scale-105 text-base lg:text-lg flex items-center justify-center text-center"
-              >
-                <span className="mr-2">📚</span>
-                {isComplete && nextTopic?.id ? `${t('next_topic')}: ${nextTopic.name}` : t('back_to_subject')}
-              </button>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600">{t('questions_attempted')}: {results.totalQuestions - skippedAnswers}/{results.totalQuestions}</span>
+              <span className={`rounded-full px-3 py-1 ${tierStyle.soft}`}>{t(statusKey)}</span>
             </div>
           </div>
 
-          {/* Review Section */}
-          <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg p-4 lg:p-6 border border-gray-200">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <h3 className="text-lg lg:text-xl font-bold text-gray-800">{t('review')}</h3>
-              <button onClick={handleViewReport} className="px-3 py-2 lg:px-4 lg:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium w-full sm:w-auto text-center">
-                {t('view_detailed_report')}
+          {/* Stats */}
+          <dl className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {stats.map((item) => (
+              <div key={item.label} className={`flex flex-col justify-between rounded-2xl border p-4 ${item.bg}`}>
+                <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{item.label}</dt>
+                <dd className={`mt-2 font-extrabold leading-none ${item.big ? 'text-5xl' : 'text-lg leading-tight'} ${item.tone}`}>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {/* Actions */}
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={onTryAgain}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+            >
+              {t('repeat_topic')}
+            </button>
+
+            <button
+              type="button"
+              onClick={hasNext ? handleNextTopic : handleBackToSubject}
+              className="group inline-flex min-w-0 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <span className="min-w-0 text-left leading-tight">
+                {hasNext ? (
+                  <>
+                    <span className="block text-[11px] font-medium text-indigo-200">{t('next_topic')}</span>
+                    <span className="block truncate">{nextTopic.name}</span>
+                  </>
+                ) : (
+                  t('back_to_subject')
+                )}
+              </span>
+              <svg className="h-5 w-5 flex-none transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+            {hasNext && (
+              <button type="button" onClick={handleBackToSubject} className="font-medium text-slate-500 transition hover:text-slate-800">
+                {t('back_to_subject')}
               </button>
-            </div>
-            <p className="text-sm lg:text-base text-gray-600 mt-2">{t('review_answers_intro')}</p>
+            )}
+            <button type="button" onClick={handleViewReport} className="font-medium text-indigo-600 transition hover:text-indigo-800">
+              {t('view_detailed_report')}
+            </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

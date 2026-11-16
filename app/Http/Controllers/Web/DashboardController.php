@@ -43,10 +43,10 @@ public function index()
 
         // Prepare profile data from student information
         $profileData = [
-            'name' => $student ? $student->name : $user->name,
+            'name' => $user->name,
             'email' => $student ? $student->email : $user->email,
             'school' => $student && $student->school ? $student->school->name : 'Add your school',
-            'grade' => $student->class_name ?? 'Form 5',
+            'grade' => $student->class_name ?? null,
             'display_name' => $student ? $student->display_name : $user->display_name,
             'profile_picture' => $user->profile_picture ?? null,
         ];

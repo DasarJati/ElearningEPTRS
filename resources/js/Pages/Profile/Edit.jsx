@@ -83,7 +83,7 @@ export default function Edit({ mustVerifyEmail, status, student }) {
                         )}
                         <div id="settings-panel-profile" role="tabpanel" aria-labelledby="settings-tab-profile" tabIndex={0} hidden={activeTab !== 'profile'}>
                             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-                                <UpdateProfileInformationForm mustVerifyEmail={mustVerifyEmail} status={status} />
+                                <UpdateProfileInformationForm mustVerifyEmail={mustVerifyEmail} status={status} student={student} />
                             </div>
                         </div>
                         <div id="settings-panel-password" role="tabpanel" aria-labelledby="settings-tab-password" tabIndex={0} hidden={activeTab !== 'password'}>

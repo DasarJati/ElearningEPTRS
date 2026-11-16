@@ -50,14 +50,9 @@ export default function ProfileDropdown({ user, student }) {
       {/* Dropdown Menu */}
       {open && (
         <div className="absolute right-0 z-[60] mt-2 w-64 max-w-[calc(100vw-1rem)] origin-top-right overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/70">
-          {/* Email Header */}
-          <div className="bg-slate-900 px-3 py-3 text-center">
-            <p className="truncate text-xs text-slate-200" title={user?.email}>{user?.email}</p>
-          </div>
-
           {/* Profile Section */}
-          <div className="relative flex flex-col items-center px-4 py-3">
-            <div className="relative">
+          <div className="relative flex items-center gap-4 px-4 py-4">
+            <div className="relative shrink-0">
               <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-gray-300 to-gray-500 text-xl font-semibold text-white shadow-md">
                 {studentData?.profile_picture ? (
                   <img
@@ -89,7 +84,7 @@ export default function ProfileDropdown({ user, student }) {
               </Link>
             </div>
 
-            <h2 className="mt-2 max-w-full truncate text-sm font-semibold text-gray-800">
+            <h2 className="min-w-0 break-words text-sm font-semibold leading-6 text-gray-800">
               {t('hello')}, {user?.name ?? t('learner')}!
             </h2>
 

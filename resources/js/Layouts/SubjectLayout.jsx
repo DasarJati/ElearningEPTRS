@@ -21,6 +21,7 @@ export default function SubjectLayout({
   onStandardChange,
   selectedStandard: propSelectedStandard,
   isLoading = false,
+  disableLoadingOverlay = false,
   studentData = null,
 }) {
   const { props } = usePage();
@@ -59,7 +60,7 @@ export default function SubjectLayout({
   };
 
   const title = formatTitle(subject);
-  const showLoading = isLoading || internalLoading;
+  const showLoading = !disableLoadingOverlay && (isLoading || internalLoading);
 
   return (
     <div className="min-h-screen bg-[#f6f7fb] text-slate-900">

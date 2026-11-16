@@ -23,9 +23,9 @@ export default function MobileProfileDropdown({ user }) {
       </Dropdown.Trigger>
 
       <Dropdown.Content className="w-72 mt-2 rounded-xl shadow-lg border border-gray-200 bg-white">
-        <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
-          <div className="text-sm font-semibold text-gray-900">{user.name}</div>
-          <div className="text-xs text-gray-500 truncate mt-1">{user.email}</div>
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
+          <div aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-sm font-semibold text-white">{user?.name?.charAt(0)?.toUpperCase() ?? 'U'}</div>
+          <div className="min-w-0 break-words text-sm font-semibold text-gray-900">{t('hello')}, {user?.name ?? t('learner')}!</div>
         </div>
         
         <div className="py-1">

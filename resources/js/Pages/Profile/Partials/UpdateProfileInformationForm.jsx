@@ -9,6 +9,7 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
+    student,
     className = '',
 }) {
     const user = usePage().props.auth.user;
@@ -18,6 +19,7 @@ export default function UpdateProfileInformation({
         useForm({
             name: user.name,
             email: user.email,
+            ...(student ? { class_name: student.class_name ?? '' } : {}),
         });
 
     const submit = (e) => {
@@ -39,6 +41,20 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                {student && (
+                    <div>
+                        <InputLabel htmlFor="ic_number" value={t('ic_number')} />
+                        <TextInput
+                            id="ic_number"
+                            className="mt-1 block w-full bg-gray-100 text-gray-600"
+                            value={student.ic_number ?? ''}
+                            readOnly
+                            aria-describedby="ic_number_help"
+                        />
+                        <p id="ic_number_help" className="mt-1 text-sm text-gray-500">{t('ic_number_read_only')}</p>
+                    </div>
+                )}
+
                 <div>
                     <InputLabel htmlFor="name" value={t('name')} />
 
@@ -69,6 +85,23 @@ export default function UpdateProfileInformation({
 
                     <InputError className="mt-2" message={errors.email} />
                 </div>
+
+                {student && (
+                    <div>
+                        <InputLabel htmlFor="class_name" value={t('student_class')} />
+                        <TextInput
+                            id="class_name"
+                            className="mt-1 block w-full"
+                            value={data.class_name}
+                            onChange={(e) => setData('class_name', e.target.value)}
+                            maxLength={100}
+                            placeholder={t('student_class_example')}
+                            aria-describedby="class_name_help"
+                        />
+                        <p id="class_name_help" className="mt-1 text-sm text-gray-500">{t('student_class_help')}</p>
+                        <InputError className="mt-2" message={errors.class_name} />
+                    </div>
+                )}
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>

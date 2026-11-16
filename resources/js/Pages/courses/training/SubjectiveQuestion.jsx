@@ -508,7 +508,7 @@ const processHtmlContent = (html) => {
 
   // Responsive Progress Circles Component
   const ProgressCircles = () => (
-    <div className="flex justify-center space-x-2 md:space-x-3 overflow-x-auto py-2 px-2">
+    <div className="flex justify-center gap-1.5 overflow-x-auto p-1">
       {questions.map((_, index) => {
         let circleColor = 'bg-gray-300';
 
@@ -521,7 +521,7 @@ const processHtmlContent = (html) => {
         return (
           <div
             key={index}
-            className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-semibold transition-all duration-300 ${circleColor} ${index === currentIndex ? 'ring-2 md:ring-4 ring-blue-200 scale-110' : ''
+            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs text-white font-semibold transition-all duration-300 ${circleColor} ${index === currentIndex ? 'ring-2 ring-blue-200 ring-offset-1' : ''
               } flex-shrink-0`}
           >
             {index + 1}
