@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 use App\Http\Controllers\Web\QuizController;
+use App\Http\Controllers\Web\QuizSettingsController;
 use App\Http\Controllers\Web\ReportController;
 use App\Http\Controllers\Web\SubjectiveController;
 use App\Http\Controllers\Web\MissionController;
@@ -32,6 +33,9 @@ Route::get('/', function () {
 });
 
 
+
+// Public poster that invites people to play Quiz Arena (no login needed).
+Route::get('/quiz-poster', [GamesController::class, 'poster'])->name('quiz.poster');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -84,6 +88,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/quiz/next', [GamesController::class, 'nextQuestion'])->name('quiz.next');
         Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
     });
+    Route::get('/quiz-settings', [QuizSettingsController::class, 'show'])->name('quiz.settings');
+    Route::post('/quiz-settings/unlock', [QuizSettingsController::class, 'unlock'])
+        ->middleware('throttle:10,1')
+        ->name('quiz.settings.unlock');
+    Route::post('/quiz-settings/lock', [QuizSettingsController::class, 'lock'])->name('quiz.settings.lock');
+    Route::put('/quiz-settings', [QuizSettingsController::class, 'update'])->name('quiz.settings.update');
     Route::post('/quiz/prize/verify', [GamesController::class, 'verifyPrize'])
         ->middleware('throttle:10,1')
         ->name('quiz.prize.verify');

@@ -7,7 +7,18 @@ import { useLanguage } from '@/Contexts/LanguageContext';
 import { confirmAlert } from '@/Components/sweetAlert';
 import { motion, useReducedMotion } from 'framer-motion';
 
-const LEADERBOARD_TITLE = 'Selangor Education Summit 2026';
+const EMPTY_PLAYER = { nickname: '', school: '', ic_number: '', email: '', phone: '' };
+
+const formatDate = (value) => {
+  if (!value) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const dateRangeText = (start, end) => {
+  if (!start && !end) return 'Semua tarikh';
+  return `Mula: ${formatDate(start) ?? '—'} · Tamat: ${formatDate(end) ?? '—'}`;
+};
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -113,20 +124,20 @@ const QuizGame = ({ quiz, schoolName, onFinished, onSessionLost }) => {
 
   return (
     <div className="game-interface">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center gap-4">
+      <div className="quiz-batik-trim border-b border-amber-300/60 bg-gradient-to-r from-[#66402d] via-[#875438] to-[#66402d] p-4 pb-5 text-white shadow-lg">
+        <div className="quiz-responsive-content flex items-center gap-4 sm:px-1 xl:px-3">
           <div className="bg-white bg-opacity-20 p-2 rounded-lg">
             <span className="text-2xl">🎯</span>
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold">{t('quiz_challenge')}</h1>
-            <p className="text-blue-100 text-sm">{t('player')}: {quiz.player.display_name} | {t('school')}: {schoolName}</p>
+            <h1 className="text-xl font-bold sm:text-2xl 2xl:text-3xl">{t('quiz_challenge')}</h1>
+            <p className="text-amber-100 text-sm">{t('player')}: {quiz.player.display_name}{schoolName && ` | ${t('school')}: ${schoolName}`}</p>
           </div>
           {!submitting && (
             <button
               type="button"
               onClick={handleExit}
-              className="shrink-0 rounded-xl border border-white/40 bg-red-500/90 px-3 py-2 text-sm font-bold text-white shadow-lg hover:bg-red-600 sm:px-4"
+              className="shrink-0 rounded-xl border border-amber-100/50 bg-[#9b382d] px-3 py-2 text-sm font-bold text-white shadow-lg hover:bg-[#802d24] sm:px-4"
             >
               {t('exit_quiz')}
             </button>
@@ -258,11 +269,21 @@ const ResultModal = ({ result, onClose }) => {
   );
 };
 
-const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, activeQuiz = null }) => {
+const QuizLeaderboard = ({
+  schools = [],
+  leaderboard = [],
+  totalPlayers = 0,
+  activeQuiz = null,
+  registration = { school: true, ic: false, email: false, phone: false },
+  leaderboardLabel = '',
+  leaderboardStartDate = null,
+  leaderboardEndDate = null,
+}) => {
   const { t } = useLanguage();
+  const rangeText = dateRangeText(leaderboardStartDate, leaderboardEndDate);
   const reducedMotion = useReducedMotion();
   const [quiz, setQuiz] = useState(activeQuiz);
-  const [userInfo, setUserInfo] = useState({ nickname: '', school: '' });
+  const [userInfo, setUserInfo] = useState(EMPTY_PLAYER);
   const [showForm, setShowForm] = useState(false);
   const [schoolSearch, setSchoolSearch] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -275,7 +296,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
   const filteredSchools = schools.filter((school) =>
     school.name.toLocaleLowerCase().includes(normalizedSchoolSearch)
   );
-  const canStart = userInfo.nickname.trim() && userInfo.school && !starting;
+  const canStart = userInfo.nickname.trim() && !starting;
   const podium = leaderboard.slice(0, 3);
   const remainingPlayers = leaderboard.slice(3);
 
@@ -299,9 +320,13 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
     setFormErrors({});
 
     try {
+      // Only send the optional fields that are switched on for this event.
       const { data } = await axios.post('/quiz/start', {
         display_name: userInfo.nickname,
-        school_id: userInfo.school,
+        ...(registration.school && { school_id: userInfo.school || null }),
+        ...(registration.ic && { ic_number: userInfo.ic_number }),
+        ...(registration.email && { email: userInfo.email }),
+        ...(registration.phone && { phone: userInfo.phone }),
       });
       setShowForm(false);
       setNotice(null);
@@ -309,7 +334,13 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
     } catch (error) {
       const errors = error.response?.data?.errors;
       setFormErrors(errors
-        ? { nickname: errors.display_name?.[0], school: errors.school_id?.[0] }
+        ? {
+          nickname: errors.display_name?.[0],
+          school: errors.school_id?.[0],
+          ic_number: errors.ic_number?.[0],
+          email: errors.email?.[0],
+          phone: errors.phone?.[0],
+        }
         : { general: t('quiz_start_failed') });
     } finally {
       setStarting(false);
@@ -321,7 +352,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
   const handleQuizFinished = (quizResult) => {
     setQuiz(null);
     setResult(quizResult);
-    setUserInfo({ nickname: '', school: '' });
+    setUserInfo(EMPTY_PLAYER);
     refreshLeaderboard();
   };
 
@@ -389,9 +420,9 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
 
   return (
     <div
-      className="quiz-leaderboard-background relative min-h-screen text-white"
+      className="quiz-leaderboard-background relative isolate min-h-screen text-white"
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-violet-950/30 via-transparent to-blue-950/30" />
+      <div aria-hidden="true" className="quiz-batik-backdrop pointer-events-none fixed inset-0" />
       <div className="relative mx-auto max-w-6xl px-4 pb-28 pt-3 sm:px-6 sm:pt-4 lg:pb-12">
         <div className="mb-3 flex items-center justify-between gap-4">
           <Link
@@ -412,7 +443,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
             >
               {soundOn ? '🔔 Top 3 alert: ON' : '🔕 Top 3 alert: OFF'}
             </button>
-            <span className="hidden rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-violet-100 backdrop-blur-sm sm:inline">{LEADERBOARD_TITLE}</span>
+            <span className="hidden rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-violet-100 backdrop-blur-sm sm:inline">{leaderboardLabel}</span>
           </div>
         </div>
 
@@ -484,8 +515,8 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                   <FieldError message={formErrors.nickname} />
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-violet-100">{t('school')} *</label>
+                {registration.school && <div>
+                  <label className="mb-2 block text-sm font-semibold text-violet-100">{t('school')} <span className="font-normal text-violet-200/70">({t('optional')})</span></label>
 
                   <div className="relative mb-2">
                     <input
@@ -555,7 +586,62 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                       </p>
                     )}
                   </div>
-                </div>
+                </div>}
+
+                {registration.ic && (
+                  <div>
+                    <label htmlFor="quiz-ic" className="mb-2 block text-sm font-semibold text-violet-100">{t('ic_number')} <span className="font-normal text-violet-200/70">({t('optional')})</span></label>
+                    <input
+                      id="quiz-ic"
+                      type="text"
+                      name="ic_number"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={14}
+                      value={userInfo.ic_number}
+                      onChange={handleInputChange}
+                      className={inputClass(formErrors.ic_number)}
+                      placeholder="990101-14-1234"
+                    />
+                    <FieldError message={formErrors.ic_number} />
+                  </div>
+                )}
+
+                {registration.email && (
+                  <div>
+                    <label htmlFor="quiz-email" className="mb-2 block text-sm font-semibold text-violet-100">{t('email_address')} <span className="font-normal text-violet-200/70">({t('optional')})</span></label>
+                    <input
+                      id="quiz-email"
+                      type="email"
+                      name="email"
+                      autoComplete="off"
+                      maxLength={255}
+                      value={userInfo.email}
+                      onChange={handleInputChange}
+                      className={inputClass(formErrors.email)}
+                      placeholder="nama@contoh.com"
+                    />
+                    <FieldError message={formErrors.email} />
+                  </div>
+                )}
+
+                {registration.phone && (
+                  <div>
+                    <label htmlFor="quiz-phone" className="mb-2 block text-sm font-semibold text-violet-100">{t('phone_number')} <span className="font-normal text-violet-200/70">({t('optional')})</span></label>
+                    <input
+                      id="quiz-phone"
+                      type="tel"
+                      name="phone"
+                      autoComplete="off"
+                      maxLength={20}
+                      value={userInfo.phone}
+                      onChange={handleInputChange}
+                      className={inputClass(formErrors.phone)}
+                      placeholder="012-3456789"
+                    />
+                    <FieldError message={formErrors.phone} />
+                  </div>
+                )}
 
                 <div className="flex gap-3 pt-4">
                   <button
@@ -588,7 +674,8 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-white/5 px-5 py-5 sm:px-7">
             <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-300">{t('global_ranking')}</p>
-              <h2 id="leaderboard-title" className="text-xl font-extrabold text-white sm:text-2xl">{t('leaderboard')} <span className="text-violet-200">{LEADERBOARD_TITLE}</span></h2>
+              <h2 id="leaderboard-title" className="text-xl font-extrabold text-white sm:text-2xl">{t('leaderboard')} <span className="text-violet-200">{leaderboardLabel}</span></h2>
+              <p className="mt-1 text-xs font-semibold text-violet-200/80">📅 {rangeText}</p>
             </div>
             <span className="shrink-0 rounded-full border border-violet-300/20 bg-violet-400/15 px-4 py-2 text-sm font-bold text-violet-100">👥 {totalPlayers} {t('players')}</span>
           </div>
@@ -635,7 +722,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                       <p className="relative truncate pr-20 text-xl font-extrabold text-white md:pr-14 lg:pr-20" title={entry.nickname}>
                         {entry.nickname}{result?.id === entry.id && <span className="ml-2 text-xs font-bold text-amber-200">({t('you')})</span>}
                       </p>
-                      <p className="quiz-school-name relative mt-0.5 pr-20 text-xs text-white/70 md:pr-14 lg:pr-20" title={entry.school}>{entry.school}</p>
+                      {entry.school && <p className="quiz-school-name relative mt-0.5 pr-20 text-xs text-white/70 md:pr-14 lg:pr-20" title={entry.school}>{entry.school}</p>}
                       <div className="relative mt-4 flex items-center gap-2 pr-20 text-xs font-bold md:pr-14 lg:pr-20">
                         <span className={`rounded-full px-2.5 py-1 ${podiumStyles[index].stat}`}>{entry.correct}/{entry.answered} {t('correct_answers')}</span>
                         <span className="text-amber-200 font-bold">⭐ {entry.points.toLocaleString()} pts</span>
@@ -653,7 +740,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-sm font-black" aria-label={`${t('rank')} ${index + 4}`}>{rankMark(index + 3)}</div>
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-bold text-white">{entry.nickname} {result?.id === entry.id && <span className="text-xs text-amber-300">({t('you')})</span>}</p>
-                            <p className="quiz-school-name text-xs text-violet-200" title={entry.school}>{entry.school}</p>
+                            {entry.school && <p className="quiz-school-name text-xs text-violet-200" title={entry.school}>{entry.school}</p>}
                           </div>
                           <span className="shrink-0 font-mono text-xs text-violet-200">{formatTime(entry.time)}</span>
                         </div>
@@ -673,7 +760,7 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                   <table className="relative w-full table-fixed">
                     <thead className="sticky top-0 z-10 bg-[#292448]">
                       <tr>
-                        {['rank', 'player', 'school', 'score', 'time'].map(heading => (
+                        {['rank', 'player', ...(registration.school ? ['school'] : []), 'score', 'time'].map(heading => (
                           <th key={heading} className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-violet-200 ${heading === 'school' ? 'w-[30%]' : heading === 'score' ? 'w-[24%]' : ''}`}>
                             {t(heading)}
                           </th>
@@ -702,9 +789,9 @@ const QuizLeaderboard = ({ schools = [], leaderboard = [], totalPlayers = 0, act
                                 {isLatestPlayer && <span className="ml-2 text-xs text-amber-300">({t('you')})</span>}
                               </div>
                             </td>
-                            <td className="px-4 py-3.5">
-                              <span className="quiz-school-name text-violet-100/80" title={entry.school}>{entry.school}</span>
-                            </td>
+                            {registration.school && <td className="px-4 py-3.5">
+                              <span className="quiz-school-name text-violet-100/80" title={entry.school ?? ''}>{entry.school ?? '—'}</span>
+                            </td>}
                             <td className="px-4 py-3.5">
                               <div className="flex flex-wrap items-center gap-1.5">
                                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${scoreStyle.faceBg}`} aria-hidden="true">

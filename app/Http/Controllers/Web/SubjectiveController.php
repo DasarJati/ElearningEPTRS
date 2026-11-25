@@ -94,8 +94,8 @@ class SubjectiveController extends Controller
             ->where('questions.topic_id', $topicId)
             ->where('questions.question_type_id', 2) // Subjective questions
             ->where('questions.is_active', 1)
-            // ->where('questions.is_published', 1)
-            // ->where('questions.approval_status', 'approved')
+            ->where('questions.is_published', 1)
+            ->where('questions.approval_status', 2)
             ->orderByRaw('RAND()')
             ->limit(5)
             ->get();
@@ -180,8 +180,8 @@ class SubjectiveController extends Controller
             ->where('questions.topic_id', $topic->id)
             ->where('questions.question_type_id', 2)
             ->where('questions.is_active', 1)
-            // ->where('questions.is_published', 1)
-            // ->where('questions.approval_status', 'approved')
+            ->where('questions.is_published', 1)
+            ->where('questions.approval_status', 2)
             ->orderByRaw('RAND()')
             ->limit($limit)
             ->get();
@@ -216,7 +216,7 @@ class SubjectiveController extends Controller
             ->where('question_type_id', 2)
             ->where('is_active', 1)
             ->where('is_published', 1)
-            ->where('approval_status', 'approved')
+            ->where('approval_status', 2)
             ->count();
 
         Log::info("Topic '{$topicName}': {$totalQuestions} total subjective questions available, fetching {$limit}");
@@ -235,7 +235,7 @@ class SubjectiveController extends Controller
             ->where('question_type_id', 2)
             ->where('is_active', 1)
             ->where('is_published', 1)
-            ->where('approval_status', 'approved')
+            ->where('approval_status', 2)
             ->count();
     }
 

@@ -21,12 +21,14 @@ class QuizSession extends Model
         'school_id', // Changed from school_name
         'display_name',
         'ic_number',
+        'email',
+        'phone',
         'created_at',
         'updated_at'
     ];
 
-    // Never send participants' IC numbers to the browser
-    protected $hidden = ['ic_number'];
+    // Never send participants' personal details to the browser
+    protected $hidden = ['ic_number', 'email', 'phone'];
 
     protected $casts = [
         'created_at' => 'datetime',

@@ -58,7 +58,7 @@ export default function Login({ status, canResetPassword }) {
   return (
     <>
       <Head title={t('login')} />
-      <main className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(520px,0.100fr)]">
+      <main className="min-h-screen bg-white lg:grid lg:grid-cols-[min(62vw,calc(100vh*1.183))_minmax(0,1fr)]">
         <section className="relative hidden min-h-screen overflow-hidden bg-slate-950 lg:block" aria-label={t('ptrs_highlights')}>
           <AnimatePresence initial={false} mode="sync">
             <motion.img
@@ -132,8 +132,13 @@ export default function Login({ status, canResetPassword }) {
               </motion.button>
             </motion.form>
 
-            <motion.div variants={item} className="mt-7 border-t border-slate-200 pt-6 text-center text-sm text-slate-500">{t('new_to_ptrs')} <Link href={route('register')} className="font-semibold text-indigo-600 transition hover:text-indigo-800">{t('create_account')}</Link></motion.div>
+            <motion.div variants={item} className="mt-3">
+              <Link href={route('register')} className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-indigo-600 bg-white px-5 text-sm font-semibold text-indigo-600 transition hover:-translate-y-0.5 hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-200">{t('create_account')}<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+            </motion.div>
             <motion.p variants={item} className="mt-8 text-center text-[11px] leading-5 text-slate-400">{t('login_agreement')}</motion.p>
+            <motion.div variants={item} className="mt-4">
+              <a href="http://assetptrs.cloudhub.my/login" className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 hover:text-slate-950">{t('login_teacher_ptrs')}<ArrowRightIcon className="h-4 w-4" /></a>
+            </motion.div>
           </motion.div>
         </section>
       </main>

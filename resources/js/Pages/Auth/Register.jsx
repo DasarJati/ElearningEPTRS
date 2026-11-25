@@ -7,7 +7,6 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/Contexts/LanguageContext';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import {
-  AcademicCapIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   AtSymbolIcon,
@@ -72,36 +71,40 @@ export default function Register({ schools = [] }) {
           <p className="relative z-10 border-t border-white/10 pt-5 text-[11px] text-slate-500">© {new Date().getFullYear()} PTRS Praktis</p>
         </section>
 
-        <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-10 sm:px-8 lg:px-12">
-          <div className="absolute right-5 top-5 z-20"><LanguageSwitcher type="buttons" /></div>
-          <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-indigo-100/70 to-transparent" />
-          <motion.div className="absolute -right-24 -top-20 h-72 w-72 rounded-full bg-cyan-100/60 blur-3xl" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 8, repeat: Infinity }} />
+        <section className="relative flex min-h-screen flex-col items-center px-5 pb-10 pt-5 sm:px-8 sm:pb-14 sm:pt-7 lg:px-12">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-indigo-100/70 to-transparent" />
+          <div className="relative z-20 flex w-full max-w-xl flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 lg:hidden">
+              <ApplicationLogo className="h-9 w-9 object-contain" />
+              <p className="text-sm font-bold text-slate-900">PTRS Praktis</p>
+            </div>
+            <div className="ml-auto"><LanguageSwitcher type="buttons" /></div>
+          </div>
 
-          <motion.div variants={container} initial="hidden" animate="show" className="relative z-10 w-full max-w-lg rounded-3xl border border-white/80 bg-white/90 p-6 shadow-xl shadow-slate-200/70 backdrop-blur-xl sm:p-9">
-            <motion.div variants={item} className="mb-7 flex items-center justify-between">
-              <div className="flex items-center gap-3 lg:hidden"><span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-100"><ApplicationLogo className="h-9 w-9 object-contain" /></span><p className="text-sm font-bold text-slate-900">PTRS Praktis</p></div>
-              <Link href={route('login')} className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition hover:text-indigo-600"><ArrowLeftIcon className="h-4 w-4" /> {t('back_to_login')}</Link>
+          <motion.div variants={container} initial="hidden" animate="show" className="relative z-10 w-full max-w-xl pt-8 sm:pt-12 xl:pt-16">
+            <motion.div variants={item} className="mb-6">
+              <Link href={route('login')} className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-indigo-700"><ArrowLeftIcon className="h-4 w-4" /> {t('back_to_login')}</Link>
             </motion.div>
 
             <motion.div variants={item}>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><AcademicCapIcon className="h-6 w-6" /></div>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">{t('student_registration')}</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{t('create_your_account')}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-500">{t('register_details_intro')}</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-indigo-700">{t('student_registration')}</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t('create_your_account')}</h2>
+              <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">{t('register_details_intro')}</p>
             </motion.div>
 
             <motion.form variants={item} onSubmit={submit} className="mt-7 space-y-4">
-              <Field label={t('full_name')} name="name" value={data.name} error={errors.name} placeholder={t('your_full_name')} autoComplete="name" icon={UserIcon} onChange={(value) => setData('name', value)} autoFocus />
-              <Field label={t('ic_number')} name="ic_number" value={data.ic_number} error={errors.ic_number} placeholder={t('ic_example')} autoComplete="username" inputMode="numeric" maxLength={14} icon={IdentificationIcon} onChange={(value) => setData('ic_number', value)} />
+              <Field label={t('full_name')} name="name" value={data.name} error={errors.name} placeholder={t('your_full_name')} autoComplete="name" icon={UserIcon} onChange={(value) => setData('name', value.toUpperCase())} className="uppercase placeholder:normal-case" autoFocus />
+              <div className="space-y-4">
+                <Field label={t('ic_number')} name="ic_number" value={data.ic_number} error={errors.ic_number} placeholder={t('ic_example')} autoComplete="username" inputMode="numeric" maxLength={14} icon={IdentificationIcon} onChange={(value) => setData('ic_number', value)} />
+                <div>
+                <Field label={t('password')} name="password" value={data.ic_number.replace(/\D/g, '')} readOnly autoComplete="off" icon={LockClosedIcon} aria-describedby="registration-password-hint" />
+                  <p id="registration-password-hint" className="mt-2 text-sm text-slate-600">{t('initial_password_note')}</p>
+                </div>
+              </div>
               <Field label={t('email_address')} name="email" value={data.email} error={errors.email} placeholder="student@example.com" autoComplete="email" type="email" icon={AtSymbolIcon} onChange={(value) => setData('email', value)} />
               <SchoolField schools={schools} value={data.school_id} error={errors.school_id} onChange={(value) => setData('school_id', value)} />
 
-              <div className="flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50/70 p-3.5 text-xs leading-5 text-indigo-800">
-                <LockClosedIcon className="mt-0.5 h-4 w-4 flex-none" />
-                <p>{t('initial_password_note')}</p>
-              </div>
-
-              <motion.button type="submit" disabled={processing} whileHover={processing ? {} : { y: -2 }} whileTap={processing ? {} : { scale: 0.985 }} className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-slate-300 transition hover:bg-indigo-700 hover:shadow-indigo-200 disabled:cursor-not-allowed disabled:opacity-60">
+              <motion.button type="submit" disabled={processing} whileHover={processing ? {} : { y: -2 }} whileTap={processing ? {} : { scale: 0.985 }} className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-700 px-5 text-sm font-semibold text-white transition hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:opacity-60">
                 {processing ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />{t('creating_account')}</> : <>{t('create_student_account')}<ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" /></>}
               </motion.button>
             </motion.form>
@@ -114,13 +117,13 @@ export default function Register({ schools = [] }) {
   );
 }
 
-function Field({ label, name, value, error, icon: Icon, onChange, type = 'text', ...props }) {
+function Field({ label, name, value, error, icon: Icon, onChange, type = 'text', className = '', ...props }) {
   return (
     <div>
       <label htmlFor={name} className="text-sm font-semibold text-slate-700">{label}</label>
       <div className="relative mt-2">
         <Icon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-        <input id={name} name={name} type={type} value={value} onChange={(event) => onChange(event.target.value)} required className="h-12 w-full rounded-xl border-slate-200 bg-slate-50/70 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-indigo-500" {...props} />
+        <input id={name} name={name} type={type} value={value} onChange={onChange && ((event) => onChange(event.target.value))} required={!props.readOnly} className={`h-12 w-full rounded-xl border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 transition sm:text-sm focus:border-indigo-500 focus:bg-white focus:ring-indigo-500 read-only:bg-slate-100 ${className}`} {...props} />
       </div>
       <InputError message={error} className="mt-2" />
     </div>
@@ -151,11 +154,12 @@ function SchoolField({ schools, value, error, onChange }) {
             name="school_name_search"
             required={!value}
             aria-label={t('search_select_school')}
+            aria-describedby="school-selection-hint"
             displayValue={(school) => school?.name || ''}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('search_school_name')}
             autoComplete="off"
-            className="h-12 w-full rounded-xl border-slate-200 bg-slate-50/70 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:ring-indigo-500"
+            className="h-12 w-full rounded-xl border-slate-300 bg-white pl-11 pr-11 text-base text-slate-900 placeholder:text-slate-500 transition sm:text-sm focus:border-indigo-500 focus:bg-white focus:ring-indigo-500"
           />
           <ComboboxButton className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-slate-400 transition hover:text-indigo-600" aria-label={t('show_schools')}>
             <ChevronUpDownIcon className="h-5 w-5" />
@@ -182,6 +186,7 @@ function SchoolField({ schools, value, error, onChange }) {
           </ComboboxOptions>
         </div>
       </Combobox>
+      <p id="school-selection-hint" className="mt-2 text-sm text-slate-600">{t('school_not_listed_hint')}</p>
       {selectedSchool && (
         <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
           <CheckCircleIcon className="h-4 w-4" />

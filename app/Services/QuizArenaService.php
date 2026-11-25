@@ -199,7 +199,7 @@ class QuizArenaService
         return [
             'player' => [
                 'display_name' => $game['player']['display_name'],
-                'school_id' => $game['player']['school_id'],
+                'school_id' => $game['player']['school_id'] ?? null,
             ],
             'questions' => collect($game['questions'])->map(fn ($q) => [
                 'question' => $q['question'],

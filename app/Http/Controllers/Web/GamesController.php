@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\QuizSession;
+use App\Models\QuizSetting;
 use App\Models\School;
 use App\Services\QuizArenaService;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use RuntimeException;
@@ -25,24 +27,88 @@ class GamesController extends Controller
     public function index()
     {
         $game = $this->quiz->current();
+        $settings = QuizSetting::current();
 
         return Inertia::render('games/QuizLeaderboard', [
             'title' => 'Quiz Section',
             'schools' => School::select('id', 'name')->orderBy('name')->get(),
             'leaderboard' => $this->leaderboard(),
-            'totalPlayers' => QuizSession::where('quiz_mode', 'sprint')->count(),
+            'totalPlayers' => $this->leaderboardQuery()->count(),
+            'registration' => $settings->registrationFields(),
+            'leaderboardLabel' => $settings->label(),
+            'leaderboardStartDate' => $settings->leaderboard_start_date?->format('Y-m-d'),
+            'leaderboardEndDate' => $settings->leaderboard_end_date?->format('Y-m-d'),
             'activeQuiz' => $game ? $this->quiz->publicState($game) : null,
         ]);
     }
 
+    // Public poster page: event label and dates come from the quiz settings.
+    public function poster()
+    {
+        $settings = QuizSetting::current();
+
+        return Inertia::render('QuizPoster', [
+            'label' => $settings->label(),
+            'startDate' => $settings->leaderboard_start_date?->format('Y-m-d'),
+            'endDate' => $settings->leaderboard_end_date?->format('Y-m-d'),
+            'prizeTop' => config('quiz.prize_top'),
+            'quizUrl' => route('quiz-page'),
+            // Optional artwork: drop backdrop-cocoa.* or kids.* into public/images/poster to use it.
+            'assets' => [
+                'backdrop' => $this->posterAsset('backdrop-cocoa'),
+                'kids' => $this->posterAsset('kids'),
+            ],
+        ]);
+    }
+
+    private function posterAsset(string $name): ?string
+    {
+        $matches = glob(public_path("images/poster/{$name}.{png,webp,jpg,jpeg}"), GLOB_BRACE) ?: [];
+
+        return $matches
+            ? '/images/poster/' . basename($matches[0]) . '?v=' . filemtime($matches[0])
+            : null;
+    }
+
     public function startQuiz(Request $request): JsonResponse
     {
-        $request->merge(['display_name' => $this->normalizeName($request->input('display_name'))]);
+        $fields = QuizSetting::current()->registrationFields();
 
-        $validated = $request->validate([
-            'display_name' => 'required|string|max:200',
-            'school_id' => 'required|exists:school,id',
+        $request->merge([
+            'display_name' => $this->normalizeName($request->input('display_name')),
+            'ic_number' => preg_replace('/\D+/', '', (string) $request->input('ic_number')),
+            'email' => Str::lower(trim((string) $request->input('email'))),
+            'phone' => preg_replace('/[^\d+]/', '', (string) $request->input('phone')),
         ]);
+
+        // Player name is always required; the other fields are optional and only checked when switched on.
+        $rules = ['display_name' => 'required|string|max:200'];
+        if ($fields['school']) {
+            $rules['school_id'] = 'nullable|exists:school,id';
+        }
+        if ($fields['ic']) {
+            $rules['ic_number'] = 'nullable|digits:12';
+        }
+        if ($fields['email']) {
+            $rules['email'] = 'nullable|email|max:255';
+        }
+        if ($fields['phone']) {
+            $rules['phone'] = ['nullable', 'regex:/^\+?\d{9,14}$/'];
+        }
+
+        $validated = $request->validate($rules, [
+            'ic_number.digits' => 'Nombor IC mesti 12 digit.',
+            'email.email' => 'Alamat e-mel tidak sah.',
+            'phone.regex' => 'Nombor telefon tidak sah.',
+        ]);
+
+        $validated = [
+            'display_name' => $validated['display_name'],
+            'school_id' => $fields['school'] ? ($validated['school_id'] ?? null) : null,
+            'ic_number' => $fields['ic'] ? ($validated['ic_number'] ?? null) : null,
+            'email' => $fields['email'] ? ($validated['email'] ?? null) : null,
+            'phone' => $fields['phone'] ? ($validated['phone'] ?? null) : null,
+        ];
 
         if ($this->nameTaken($validated['display_name'])) {
             throw ValidationException::withMessages(['display_name' => self::NAME_TAKEN_MESSAGE]);
@@ -108,7 +174,10 @@ class GamesController extends Controller
 
                 return QuizSession::create([
                     'display_name' => $player['display_name'],
-                    'school_id' => $player['school_id'],
+                    'school_id' => $player['school_id'] ?? null,
+                    'ic_number' => $player['ic_number'] ?? null,
+                    'email' => $player['email'] ?? null,
+                    'phone' => $player['phone'] ?? null,
                     'total_correct' => $score,
                     'total_answered' => $answered,
                     'total_points' => $points,
@@ -139,7 +208,7 @@ class GamesController extends Controller
                 'points' => $session->total_points,
                 'time' => $session->total_time_seconds,
                 'rank' => $this->rankOf($session),
-                'total_players' => QuizSession::where('quiz_mode', 'sprint')->count(),
+                'total_players' => $this->leaderboardQuery()->count(),
             ],
         ]);
     }
@@ -156,10 +225,18 @@ class GamesController extends Controller
         return response()->json(['verified' => true]);
     }
 
+    // Sprint sessions inside the start/end dates chosen on the quiz settings page.
+    private function leaderboardQuery()
+    {
+        return QuizSetting::current()->applyDateRange(
+            QuizSession::query()->where('quiz_mode', 'sprint')
+        );
+    }
+
     private function leaderboard()
     {
-        return QuizSession::with('school:id,name')
-            ->where('quiz_mode', 'sprint')
+        return $this->leaderboardQuery()
+            ->with('school:id,name')
             ->select('id', 'display_name', 'school_id', 'total_correct', 'total_answered', 'total_points', 'total_time_seconds')
             ->orderByDesc('total_points')
             ->orderByDesc('total_correct')
@@ -169,7 +246,7 @@ class GamesController extends Controller
             ->map(fn ($s) => [
                 'id' => $s->id,
                 'nickname' => $s->display_name,
-                'school' => $s->school?->name ?? 'Unknown School',
+                'school' => $s->school?->name,
                 'correct' => $s->total_correct,
                 'answered' => $s->total_answered,
                 'points' => $s->total_points,
@@ -180,7 +257,7 @@ class GamesController extends Controller
     // Same ordering as the leaderboard: score desc, time asc, earliest first.
     private function rankOf(QuizSession $session): int
     {
-        return QuizSession::where('quiz_mode', 'sprint')
+        return $this->leaderboardQuery()
             ->where(fn ($q) => $q->where('total_points', '>', $session->total_points)
             ->orWhere(fn ($q) => $q->where('total_points', $session->total_points)
                 ->where('total_correct', '>', $session->total_correct))

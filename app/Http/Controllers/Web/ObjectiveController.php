@@ -110,8 +110,8 @@ class ObjectiveController extends Controller
             ->where('questions.topic_id', $topicId)
             ->where('questions.question_type_id', 1) // Objective questions
             ->where('questions.is_active', 1)
-            // ->where('questions.is_published', 1) // COMMENT OUT for now
-            // ->where('questions.approval_status', 'approved') // COMMENT OUT for now
+            ->where('questions.is_published', 1)
+            ->where('questions.approval_status', 2)
             ->orderByRaw('RAND()')
             ->limit(5)
             ->get();
@@ -189,8 +189,8 @@ class ObjectiveController extends Controller
             ->select('questions.*')
             ->where('questions.topic_id', $topic->id)
             ->where('questions.is_active', 1)
-            // ->where('questions.is_published', 1)
-            ->where('questions.approval_status', 'approved')
+            ->where('questions.is_published', 1)
+            ->where('questions.approval_status', 2)
             ->orderByRaw('RAND()')
             ->limit($limit)
             ->get();
@@ -198,8 +198,8 @@ class ObjectiveController extends Controller
         $totalQuestions = DB::table('questions')
             ->where('topic_id', $topic->id)
             ->where('is_active', 1)
-            // ->where('is_published', 1)
-            ->where('approval_status', 'approved')
+            ->where('is_published', 1)
+            ->where('approval_status', 2)
             ->count();
 
         Log::info("Topic '{$topicName}': {$totalQuestions} total questions available, fetching {$limit}");
@@ -236,8 +236,8 @@ class ObjectiveController extends Controller
         return DB::table('questions')
             ->where('topic_id', $topicId)
             ->where('is_active', 1)
-            // ->where('is_published', 1)
-            ->where('approval_status', 'approved')
+            ->where('is_published', 1)
+            ->where('approval_status', 2)
             ->count();
     }
 

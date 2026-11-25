@@ -46,6 +46,7 @@ class RegisteredUserController extends Controller
         $request->merge([
             'ic_number' => preg_replace('/\D+/', '', (string) $request->input('ic_number')),
             'email' => Str::lower(trim((string) $request->input('email'))),
+            'name' => mb_strtoupper(trim((string) $request->input('name'))),
         ]);
 
         $request->validate([
