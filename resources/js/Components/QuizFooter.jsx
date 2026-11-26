@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 export default function QuizFooter({ showExplanation, currentQuestion, checking, selectedOption = null, onCheckAnswer, onNextQuestion, answeredCount = 0, points = 0, remainingSeconds = 120, durationSeconds = 120 }) {
   const reducedMotion = useReducedMotion();
   return (
-    <footer className="sticky bottom-0 z-40 overflow-hidden border-t border-amber-200/40 bg-[#63402d]/95 text-white shadow-[0_-8px_30px_rgba(60,30,15,0.28)] backdrop-blur-xl">
+    <footer className="comic-footer sticky bottom-0 z-40 overflow-hidden border-t border-amber-200/40 bg-[#63402d]/95 text-white shadow-[0_-8px_30px_rgba(60,30,15,0.28)] backdrop-blur-xl">
       <div className="h-1 bg-white/10" aria-hidden="true">
         <motion.div className="h-full bg-gradient-to-r from-orange-400 to-amber-300" initial={false} animate={{ width: `${100 * remainingSeconds / durationSeconds}%` }} transition={{ duration: reducedMotion ? 0 : 0.45 }} />
       </div>

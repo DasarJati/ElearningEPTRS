@@ -37,6 +37,28 @@ Route::get('/', function () {
 // Public poster that invites people to play Quiz Arena (no login needed).
 Route::get('/quiz-poster', [GamesController::class, 'poster'])->name('quiz.poster');
 
+// Quiz Arena is public: players register with a name only, no account needed.
+Route::get('/quiz-page', [GamesController::class, 'index'])->name('quiz-page');
+Route::middleware('throttle:180,1')->group(function () {
+    Route::post('/quiz/start', [GamesController::class, 'startQuiz'])->name('quiz.start');
+    Route::post('/quiz/answer', [GamesController::class, 'answerQuestion'])->name('quiz.answer');
+    Route::post('/quiz/next', [GamesController::class, 'nextQuestion'])->name('quiz.next');
+    Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
+});
+Route::post('/quiz/prize/verify', [GamesController::class, 'verifyPrize'])
+    ->middleware('throttle:10,1')
+    ->name('quiz.prize.verify');
+
+Route::get('/quiz-settings', [QuizSettingsController::class, 'show'])->name('quiz.settings');
+Route::post('/quiz-settings/unlock', [QuizSettingsController::class, 'unlock'])
+    ->middleware('throttle:10,1')
+    ->name('quiz.settings.unlock');
+Route::post('/quiz-settings/lock', [QuizSettingsController::class, 'lock'])->name('quiz.settings.lock');
+Route::put('/quiz-settings', [QuizSettingsController::class, 'update'])->name('quiz.settings.update');
+Route::delete('/quiz-settings/players', [QuizSettingsController::class, 'destroyPlayers'])
+    ->middleware('throttle:30,1')
+    ->name('quiz.settings.players.destroy');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -81,22 +103,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tekakata-page', function () {
         return Inertia::render('games/TekaKataPage');
     })->name('tekakata-page');
-    Route::get('/quiz-page', [GamesController::class, 'index'])->name('quiz-page');
-    Route::middleware('throttle:180,1')->group(function () {
-        Route::post('/quiz/start', [GamesController::class, 'startQuiz'])->name('quiz.start');
-        Route::post('/quiz/answer', [GamesController::class, 'answerQuestion'])->name('quiz.answer');
-        Route::post('/quiz/next', [GamesController::class, 'nextQuestion'])->name('quiz.next');
-        Route::post('/quiz/submit', [GamesController::class, 'storeQuizResult'])->name('quiz.submit');
-    });
-    Route::get('/quiz-settings', [QuizSettingsController::class, 'show'])->name('quiz.settings');
-    Route::post('/quiz-settings/unlock', [QuizSettingsController::class, 'unlock'])
-        ->middleware('throttle:10,1')
-        ->name('quiz.settings.unlock');
-    Route::post('/quiz-settings/lock', [QuizSettingsController::class, 'lock'])->name('quiz.settings.lock');
-    Route::put('/quiz-settings', [QuizSettingsController::class, 'update'])->name('quiz.settings.update');
-    Route::post('/quiz/prize/verify', [GamesController::class, 'verifyPrize'])
-        ->middleware('throttle:10,1')
-        ->name('quiz.prize.verify');
 
 
     Route::get('/chat', [ChatController::class, 'lobby'])->name('chat.lobby');

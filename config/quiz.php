@@ -7,4 +7,7 @@ return [
     // Admin password that must be entered before a prize winner can continue.
     // Override with QUIZ_PRIZE_PASSWORD in .env.
     'prize_password' => env('QUIZ_PRIZE_PASSWORD', '12345678'),
+
+    // Public settings require a configured password with no built-in default.
+    'settings_password' => env('QUIZ_SETTINGS_PASSWORD'),
 ];

@@ -3,8 +3,10 @@ import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import QuizLayout from '@/Layouts/QuizLayout';
 import QuizFooter from '@/Components/QuizFooter';
+import ComicArt from '@/Components/ComicArt';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/Contexts/LanguageContext';
+import '../../../css/quiz-comic.css';
 
 const formatTime = (totalSeconds) => {
   const minutes = Math.floor(totalSeconds / 60);
@@ -12,27 +14,20 @@ const formatTime = (totalSeconds) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const TimerDisplay = memo(({ timeElapsed, reducedMotion }) => (
-  <div className={`flex items-center rounded-2xl border px-4 py-2 text-white shadow-lg backdrop-blur-sm ${timeElapsed <= 15 ? 'border-rose-300 bg-rose-500/30' : 'border-white/20 bg-white/10'}`}>
-    <span className="text-lg mr-2">⏰</span>
+const TimerDisplay = memo(({ remainingSeconds, reducedMotion }) => (
+  <div className="comic-timer" data-urgent={remainingSeconds <= 15} role="timer" aria-label="Masa berbaki">
+    <span aria-hidden="true">⏱</span>
     <motion.span
-      key={timeElapsed}
+      key={remainingSeconds}
       initial={reducedMotion ? false : { opacity: 0.65, y: -5 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="font-mono text-lg font-bold tabular-nums 2xl:text-2xl"
+      className="font-mono text-sm font-bold tabular-nums sm:text-base"
     >
-      {formatTime(timeElapsed)}
+      {formatTime(remainingSeconds)}
     </motion.span>
   </div>
 ));
-
-const optionColors = [
-  'bg-[#99502f] hover:bg-[#884226]',
-  'bg-[#24646a] hover:bg-[#1d555a]',
-  'bg-amber-400 hover:bg-amber-300',
-  'bg-[#9b382d] hover:bg-[#802d24]',
-];
 
 const QuestionOptions = memo(({ options, selectedOption, answer, disabled, handleOptionSelect, reducedMotion }) => (
   <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:gap-5 2xl:gap-6">
@@ -40,11 +35,7 @@ const QuestionOptions = memo(({ options, selectedOption, answer, disabled, handl
       const isSelected = selectedOption === index;
       const isCorrectOption = answer && index === answer.correct_answer;
       const isWrongPick = answer && isSelected && !answer.correct;
-      const tileColor = isCorrectOption
-        ? 'bg-green-500 hover:bg-green-500'
-        : isWrongPick
-          ? 'bg-red-500 hover:bg-red-500'
-          : optionColors[index % optionColors.length];
+      const optionState = isCorrectOption ? 'correct' : isWrongPick ? 'wrong' : undefined;
 
       return (
         <motion.button
@@ -63,25 +54,26 @@ const QuestionOptions = memo(({ options, selectedOption, answer, disabled, handl
           onClick={() => handleOptionSelect(index)}
           disabled={disabled}
           aria-pressed={isSelected}
-          className={`group relative min-h-24 w-full rounded-2xl border-2 p-4 text-left shadow-[0_6px_0_rgba(65,33,17,0.28)] transition-colors duration-150 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-32 sm:p-5 xl:min-h-[clamp(8rem,13vh,12rem)] xl:p-[clamp(1.25rem,1.5vw,2rem)] ${tileColor} ${index % optionColors.length === 2 && !isCorrectOption && !isWrongPick ? 'text-[#43291e]' : 'text-white'} ${isSelected ? 'border-white ring-4 ring-white/60 shadow-[0_10px_0_rgba(65,33,17,0.28)]' : 'border-white/15'}`}
+          data-state={optionState}
+          className="comic-option min-h-[4.5rem] w-full p-3 text-left sm:min-h-24 sm:p-4"
         >
-          <AnimatePresence>
-            {isSelected && !answer && (
-              <motion.span
-                initial={reducedMotion ? false : { scale: 0, rotate: -25 }}
-                animate={{ scale: 1, rotate: 0 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 420, damping: 19 }}
-                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-[#43291e] shadow-sm"
-                aria-hidden="true"
-              >✓</motion.span>
-            )}
-          </AnimatePresence>
           <div className="flex h-full items-center gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/40 bg-white/20 text-lg font-black sm:h-12 sm:w-12 2xl:h-14 2xl:w-14 2xl:text-2xl">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center comic-letter text-lg font-black sm:h-12 sm:w-12 2xl:h-14 2xl:w-14 2xl:text-2xl">
               {String.fromCharCode(65 + index)}
             </div>
             <div className="min-w-0 flex-1 break-words text-base font-bold leading-snug sm:text-lg xl:text-[clamp(1.125rem,1.15vw,1.75rem)]">{option}</div>
+            <AnimatePresence>
+              {isSelected && !answer && (
+                <motion.span
+                  initial={reducedMotion ? false : { scale: 0, rotate: -25 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 19 }}
+                  className="comic-option-check flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                  aria-hidden="true"
+                >✓</motion.span>
+              )}
+            </AnimatePresence>
             {isCorrectOption && (
               <motion.div initial={reducedMotion ? false : { scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 18 }} className="ml-2 text-xl">✅</motion.div>
             )}
@@ -129,11 +121,11 @@ const SubmittingScreen = ({ correct, total, points, timeElapsed }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   return (
-  <div className="min-h-screen bg-gradient-to-br from-[#684330] via-[#8a583c] to-[#66412e] flex items-center justify-center p-4">
+  <div className="comic-stage min-h-screen flex items-center justify-center p-4">
     <motion.div
       initial={reducedMotion ? false : { scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="bg-gray-800 bg-opacity-90 backdrop-blur-lg rounded-3xl border-2 border-yellow-400 shadow-2xl p-8 max-w-md w-full text-center"
+      className="comic-card comic-form p-5 sm:p-8 max-w-md w-full text-center"
     >
       <motion.div
         animate={reducedMotion ? undefined : { y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
@@ -142,7 +134,7 @@ const SubmittingScreen = ({ correct, total, points, timeElapsed }) => {
       >
         🏆
       </motion.div>
-      <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+      <h2 className="comic-display text-3xl mb-4">
         {t('calculating_victory')}
       </h2>
       <div className="bg-gray-700 rounded-full h-3 mb-6 overflow-hidden">
@@ -312,7 +304,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
 
   if (submitting) {
     return (
-      <QuizLayout title={t('submitting_results')}>
+      <QuizLayout title={t('submitting_results')} bgColor="quiz-comic">
         <Head title={t('submitting_results')} />
         <SubmittingScreen correct={correctAnswersCount} total={game.answered_count} points={game.points} timeElapsed={timeElapsed} />
       </QuizLayout>
@@ -320,10 +312,12 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
   }
 
   const question = questions[currentQuestion];
+  const remainingSeconds = Math.max(0, game.duration_seconds - timeElapsed);
 
   return (
     <QuizLayout
-      title={`${t('random_quiz')} · 2 minit`}
+      title="Misi Buku · 2 minit"
+      bgColor="quiz-comic comic-reading"
       firstAnswers={[]}
       footer={
         <QuizFooter
@@ -335,46 +329,23 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
           onNextQuestion={nextQuestion}
           answeredCount={game.answered_count}
           points={game.points}
-          remainingSeconds={Math.max(0, game.duration_seconds - timeElapsed)}
+          remainingSeconds={remainingSeconds}
           durationSeconds={game.duration_seconds}
         />
       }
     >
-      <Head title={t('random_quiz')} />
+      <Head title="Quiz Arena – Misi Buku" />
 
       <AnimatePresence>
         {showConfetti && !reducedMotion && <Confetti />}
       </AnimatePresence>
 
-      <div
-        className="quiz-sprint-background relative min-h-[calc(100dvh-160px)] overflow-hidden"
-      >
-        <motion.div
-          className="pointer-events-none absolute -left-16 top-12 h-56 w-56 rounded-full bg-orange-300/15 blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, 22, 0], y: [0, -15, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="pointer-events-none absolute -right-12 bottom-8 h-64 w-64 rounded-full bg-amber-300/15 blur-3xl"
-          animate={reducedMotion ? undefined : { x: [0, -24, 0], y: [0, 18, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
+      <div className="comic-stage comic-reading-stage relative min-h-[calc(100dvh-160px)]">
         <div className="quiz-responsive-content relative z-10 px-3 py-5 sm:px-5 sm:py-7 xl:px-7 xl:py-[clamp(1.75rem,3.5vh,3rem)]">
-          {/* Compact Header */}
-          <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4 xl:mb-6">
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-white shadow-md backdrop-blur-sm sm:px-5">
-              <span className="font-bold">🎯 {t('quiz_quest')}</span>
-              <span className="ml-2 hidden text-xs text-amber-100 sm:inline">Jawab sebanyak mungkin dalam 2 minit</span>
-            </div>
-
-            <TimerDisplay timeElapsed={Math.max(0, game.duration_seconds - timeElapsed)} reducedMotion={reducedMotion} />
-          </div>
-
           {(submitError || answerError) && (
-            <div className="mb-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" role="alert">
+            <div className="comic-card comic-quiz-alert mb-3 px-4 py-3 text-sm font-bold" role="alert">
               {submitError || answerError}
-              {submitError && <button type="button" onClick={onSubmit} className="ml-3 rounded bg-red-700 px-3 py-1 text-white">Cuba simpan semula</button>}
+              {submitError && <button type="button" onClick={onSubmit} className="ml-3 px-3 py-1">Cuba simpan semula</button>}
             </div>
           )}
 
@@ -385,18 +356,18 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reducedMotion ? undefined : { opacity: 0, y: -18, scale: 0.985 }}
             transition={{ duration: reducedMotion ? 0 : 0.28, ease: 'easeOut' }}
-            className="overflow-hidden rounded-3xl border border-amber-200/50 bg-[#704831] shadow-2xl shadow-black/30"
+            className="comic-card comic-reading-panel"
           >
             {/* Compact Progress Header */}
-            <div className="quiz-batik-trim border-b border-amber-200/30 bg-[#805338] p-4 sm:px-6 sm:py-5 2xl:px-9 2xl:py-6">
+            <div className="comic-question-header p-4 sm:px-6 sm:py-5 2xl:px-9 2xl:py-6">
               <div className="flex justify-between items-center">
-                <div className="min-w-0 font-bold text-white 2xl:text-xl">
+                <div className="min-w-0 font-bold 2xl:text-xl">
                   <span>{t('question')} {currentQuestion + 1}</span>
-                  <span className="ml-2 inline-block max-w-[150px] truncate rounded-full bg-amber-200 px-2.5 py-1 align-middle text-xs text-[#43291e] sm:max-w-none">
+                  <span className="comic-category">
                     {question.category}
                   </span>
                 </div>
-                <div className={`relative shrink-0 text-right text-sm font-extrabold transition-colors duration-300 ${scoreFx ? (scoreFx.value < 0 ? 'text-red-300' : 'text-green-300') : 'text-amber-300'}`}>
+                <div className="comic-score relative shrink-0 text-right text-sm font-extrabold">
                   ⭐ <motion.span
                     key={game.points}
                     initial={reducedMotion ? false : { scale: scoreFx?.value < 0 ? 0.7 : 1.4, opacity: 0.5 }}
@@ -412,7 +383,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                         animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 22, scale: 1.1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: reducedMotion ? 0 : 0.4, ease: 'easeOut' }}
-                        className={`pointer-events-none absolute right-0 top-full z-20 whitespace-nowrap rounded-full px-3 py-1 text-sm font-black text-white shadow-lg ${scoreFx.value < 0 ? 'bg-red-500' : 'bg-green-500'}`}
+                        className="comic-card pointer-events-none absolute right-0 top-full z-20 whitespace-nowrap px-3 py-1 text-sm font-black"
                         role="status"
                       >
                         {scoreFx.value < 0 ? '−' : '+'}{Math.abs(scoreFx.value).toLocaleString()}
@@ -421,15 +392,18 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                   </AnimatePresence>
                 </div>
               </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/15" aria-label="Masa berbaki">
-                <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-orange-400 transition-[width] duration-1000" style={{ width: `${Math.max(0, 100 * (game.duration_seconds - timeElapsed) / game.duration_seconds)}%` }} />
+              <div className="mt-3 flex items-center gap-3">
+                <div className="comic-progress min-w-0 flex-1" aria-hidden="true">
+                  <div className="h-full bg-[#1E5BD8] transition-[width] duration-1000" style={{ width: `${100 * remainingSeconds / game.duration_seconds}%` }} />
+                </div>
+                <TimerDisplay remainingSeconds={remainingSeconds} reducedMotion={reducedMotion} />
               </div>
-              <p className="mt-2 text-xs text-amber-100">Betul +1,000 (bonus kelajuan dalam 10 saat pertama) · Salah −333</p>
+              <p className="mt-2 text-xs font-bold">Betul +1,000 (bonus kelajuan dalam 10 saat pertama) · Salah −333</p>
             </div>
 
             <div className="p-4 sm:p-7 xl:p-[clamp(1.75rem,2vh,2.75rem)]">
               <motion.h2
-                className="mb-6 rounded-2xl border border-amber-300/70 bg-[#fff0d5] p-6 text-center text-xl font-extrabold leading-relaxed text-[#43291e] shadow-inner sm:mb-7 sm:p-8 sm:text-3xl xl:p-[clamp(2rem,3vh,3rem)] xl:text-[clamp(1.875rem,1.75vw,3rem)]"
+                className="comic-question mb-4 p-4 text-left text-xl font-extrabold leading-snug sm:p-6 sm:text-3xl"
                 initial={reducedMotion ? false : { y: -8, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: reducedMotion ? 0 : 0.08, duration: 0.28 }}
@@ -437,7 +411,7 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                 {question.question}
               </motion.h2>
 
-              <div className="mb-4 text-center text-sm font-semibold text-amber-100 2xl:mb-5 2xl:text-lg">{t('choose_answer')}</div>
+              <div className="mb-3 text-sm font-extrabold">{t('choose_answer')}</div>
 
               <QuestionOptions
                 options={question.options}
@@ -453,26 +427,29 @@ export default function QuizInterface({ quiz, onSubmit, onAnswered, submitting =
                   initial={reducedMotion ? false : { height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   transition={{ duration: reducedMotion ? 0 : 0.25 }}
-                  className={`mt-4 rounded-xl border-2 p-4 ${currentAnswer.correct ? 'border-green-400 bg-green-50' : 'border-amber-400 bg-amber-50'}`}
+                  className="comic-feedback comic-bubble mt-6 p-4"
+                  data-correct={currentAnswer.correct}
+                  role="status"
                 >
-                  <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg mr-3 ${
-                      currentAnswer.correct ? "bg-green-500" : "bg-red-500"
-                    }`}>
-                      {currentAnswer.correct ? "✓" : "!"}
-                    </div>
-                    <div>
-                      <h3 className={`font-bold ${currentAnswer.correct ? "text-green-800" : "text-red-800"}`}>
-                        {currentAnswer.correct ? `${t('correct_feedback')} 🎉` : `${t('learn')}: `}
-                      </h3>
-                      <p className="text-gray-700 mt-1 text-sm">{currentAnswer.explanation}</p>
-                      <p className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-black text-white ${currentAnswer.correct ? 'bg-green-500' : 'bg-red-500'}`}>
-                        {currentAnswer.correct
-                          ? `+${currentAnswer.points.toLocaleString()} mata${currentAnswer.bonus_points ? ` (termasuk bonus ${currentAnswer.bonus_points})` : ''}`
-                          : (currentAnswer.applied_points ?? currentAnswer.points) === 0 ? 'Salah · 0 mata' : `−${Math.abs(currentAnswer.applied_points ?? currentAnswer.points).toLocaleString()} mata`}
-                      </p>
-                    </div>
+                  <div className="comic-feedback-heading">
+                    <ComicArt
+                      file={currentAnswer.correct ? 'mascot-happy.png' : 'mascot-sad.png'}
+                      className="comic-reaction-mascot"
+                    />
+                    <h3 className="comic-display comic-feedback-label">
+                      <ComicArt
+                        file={currentAnswer.correct ? 'fx-correct.png' : 'fx-wrong.png'}
+                        className="comic-feedback-fx"
+                      />
+                      <span>{currentAnswer.correct ? 'POW! Betul!' : 'Alamak!'}</span>
+                    </h3>
                   </div>
+                  <p className="mt-2 text-sm">{currentAnswer.explanation}</p>
+                  <p className="mt-2 text-sm font-black">
+                    {currentAnswer.correct
+                      ? `+${currentAnswer.points.toLocaleString()} mata${currentAnswer.bonus_points ? ` (termasuk bonus ${currentAnswer.bonus_points})` : ''}`
+                      : (currentAnswer.applied_points ?? currentAnswer.points) === 0 ? 'Salah · 0 mata' : `−${Math.abs(currentAnswer.applied_points ?? currentAnswer.points).toLocaleString()} mata`}
+                  </p>
                 </motion.div>
               )}
             </div>
