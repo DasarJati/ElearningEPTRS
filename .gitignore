@@ -20,3 +20,11 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Fail kerja / sumber yang tidak dipaparkan di laman
+/output
+/poster-facebook
+/public/images/comic/misi-buku-character-sheet.png
+/public/images/comic/misi-buku-satu-soalan-dulu-*.png
+/public/images/comic/satu-hari-satu-soalan/halaman-*.png
+/public/images/comic/satu-hari-satu-soalan/pembaca/*.pdf

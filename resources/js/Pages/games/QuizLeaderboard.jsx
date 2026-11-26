@@ -3,6 +3,7 @@ import axios from 'axios';
 import { router, Link } from '@inertiajs/react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import QuizInterface from './QuizInterface';
+import QuizComicReader from './QuizComicReader';
 import ComicArt from '@/Components/ComicArt';
 import { useLanguage } from '@/Contexts/LanguageContext';
 import { confirmAlert } from '@/Components/sweetAlert';
@@ -259,6 +260,7 @@ const QuizLeaderboard = ({
   const [quiz, setQuiz] = useState(activeQuiz);
   const [userInfo, setUserInfo] = useState(EMPTY_PLAYER);
   const [showForm, setShowForm] = useState(false);
+  const [showComic, setShowComic] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [schoolSearch, setSchoolSearch] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -430,13 +432,23 @@ const QuizLeaderboard = ({
           <div className="comic-hero-copy">
             {leaderboardLabel && <p className="comic-event-label">{leaderboardLabel}</p>}
             <h1 className="comic-display">{t('quiz_arena')} <span className="comic-ribbon">Misi Buku</span></h1>
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-              className="comic-start mt-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-extrabold"
-            >
-              {t('start_quiz')}<span aria-hidden="true">→</span>
-            </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setShowForm(true)}
+                className="comic-start inline-flex items-center gap-2 px-4 py-2 text-sm font-extrabold"
+              >
+                {t('start_quiz')}<span aria-hidden="true">→</span>
+              </button>
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => setShowComic(true)}
+                className="px-4 py-2 text-sm font-extrabold"
+              >
+                Baca Komik
+              </button>
+            </div>
           </div>
           <ComicArt file="kids-hero.png" className="comic-hero-kids" />
         </header>
@@ -448,6 +460,8 @@ const QuizLeaderboard = ({
         )}
 
         {result && <ResultModal result={result} onClose={() => setResult(null)} />}
+
+        {showComic && <QuizComicReader onClose={() => setShowComic(false)} />}
 
         {avatarPreview && (
           <Dialog open onClose={() => setAvatarPreview(null)} className="quiz-comic fixed inset-0 z-[60]">

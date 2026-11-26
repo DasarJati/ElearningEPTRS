@@ -1,1 +1,0 @@
-import{r as i,j as o}from"./app-CFrcsFFV.js";function c({file:r,className:t,fallback:e=null}){const[s,a]=i.useState(null);return s===r?e:o.jsx("img",{className:t,src:`/images/comic/${r}`,alt:"","aria-hidden":"true",decoding:"async",onError:()=>a(r)})}export{c as C};
